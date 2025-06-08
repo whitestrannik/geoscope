@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapComponent } from '@/components/common/MapComponent';
 import { ImageViewerModal } from '@/components/common/ImageViewerModal';
 import { trpc } from '@/lib/trpc';
@@ -31,12 +31,16 @@ interface ResultData {
   guessLng: number;
 }
 
+type LayoutMode = 'split' | 'image-focus' | 'map-focus' | 'image-full' | 'map-full';
+
 export function SoloPage() {
   const [gameState, setGameState] = useState<GameState>('loading');
   const [currentGame, setCurrentGame] = useState<GameData | null>(null);
   const [userGuess, setUserGuess] = useState<GuessData | null>(null);
   const [result, setResult] = useState<ResultData | null>(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('split');
+  const [imageSplit, setImageSplit] = useState(50); // Percentage for image side in split mode
 
   // tRPC hooks
   const { data: imageData, isLoading: imageLoading, error: imageError, refetch: refetchImage } = trpc.image.getRandom.useQuery();
@@ -80,6 +84,7 @@ export function SoloPage() {
 
   const handlePlayAgain = () => {
     setGameState('loading');
+    setLayoutMode('split'); // Reset to split view for new game
     refetchImage();
   };
 
@@ -141,11 +146,190 @@ export function SoloPage() {
     );
   }
 
+  const renderLayoutControls = () => (
+    <div className="flex items-center gap-2 bg-black/20 backdrop-blur-sm rounded-lg p-2">
+      <span className="text-sm text-gray-300 mr-2">Layout:</span>
+      <Button
+        onClick={() => setLayoutMode('image-full')}
+        size="sm"
+        variant={layoutMode === 'image-full' ? 'default' : 'outline'}
+        className="text-xs h-7"
+      >
+        📷 Image
+      </Button>
+      <Button
+        onClick={() => setLayoutMode('split')}
+        size="sm"
+        variant={layoutMode === 'split' ? 'default' : 'outline'}
+        className="text-xs h-7"
+      >
+        ⚡ Split
+      </Button>
+      <Button
+        onClick={() => setLayoutMode('map-full')}
+        size="sm"
+        variant={layoutMode === 'map-full' ? 'default' : 'outline'}
+        className="text-xs h-7"
+      >
+        🗺️ Map
+      </Button>
+    </div>
+  );
+
+  const renderImageSection = (className: string = '') => (
+    <div className={className}>
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">📍 Where is this photo taken?</CardTitle>
+            <div className="flex items-center gap-2">
+              {layoutMode !== 'image-full' && (
+                <Button
+                  onClick={() => setLayoutMode('image-focus')}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs h-7"
+                >
+                  🔍 Focus
+                </Button>
+              )}
+              <Button
+                onClick={() => setIsImageModalOpen(true)}
+                size="sm"
+                variant="outline"
+                className="text-xs h-7"
+              >
+                ⛶ Fullscreen
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col">
+          <div className="relative group flex-1 min-h-0">
+            <img
+              src={currentGame.imageUrl}
+              alt="Mystery location"
+              className="w-full h-full object-cover rounded-lg cursor-pointer transition-transform hover:scale-[1.02]"
+              onClick={() => setIsImageModalOpen(true)}
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <span className="text-white bg-black/50 px-3 py-1 rounded-full text-sm">
+                🔍 Click to enlarge & zoom
+              </span>
+            </div>
+          </div>
+          
+          <div className="mt-3 space-y-2">
+            {currentGame.location && (
+              <div className="text-xs text-blue-300">
+                Hint: This photo is from somewhere around the world
+              </div>
+            )}
+            
+            {currentGame.copyright && (
+              <div className="text-xs text-gray-400">
+                Photo: {currentGame.copyright}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderMapSection = (className: string = '') => (
+    <div className={className}>
+      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">🗺️ Make your guess</CardTitle>
+            <div className="flex items-center gap-2">
+              {layoutMode !== 'map-full' && (
+                <Button
+                  onClick={() => setLayoutMode('map-focus')}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs h-7"
+                >
+                  🔍 Focus
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col">
+          <div className="flex-1 min-h-0">
+            <MapComponent
+              onMarkerPlace={handleMarkerPlace}
+              guessMarker={userGuess}
+              actualMarker={gameState === 'result' ? { lat: currentGame.actualLat, lng: currentGame.actualLng } : null}
+              showResult={gameState === 'result'}
+              className="h-full"
+            />
+          </div>
+          
+          {userGuess && gameState === 'playing' && (
+            <div className="mt-3 p-2 bg-blue-500/20 rounded-lg">
+              <p className="text-xs text-blue-200">
+                📍 Your guess: {userGuess.lat.toFixed(4)}, {userGuess.lng.toFixed(4)}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderGameContent = () => {
+    switch (layoutMode) {
+      case 'image-full':
+        return (
+          <div className="h-[calc(100vh-200px)] flex flex-col">
+            {renderImageSection('flex-1')}
+          </div>
+        );
+      
+      case 'map-full':
+        return (
+          <div className="h-[calc(100vh-200px)] flex flex-col">
+            {renderMapSection('flex-1')}
+          </div>
+        );
+      
+      case 'image-focus':
+        return (
+          <div className="h-[calc(100vh-200px)] flex gap-4">
+            {renderImageSection('flex-[3]')}
+            {renderMapSection('flex-[1]')}
+          </div>
+        );
+      
+      case 'map-focus':
+        return (
+          <div className="h-[calc(100vh-200px)] flex gap-4">
+            {renderImageSection('flex-[1]')}
+            {renderMapSection('flex-[3]')}
+          </div>
+        );
+      
+      default: // 'split'
+        return (
+          <div className="h-[calc(100vh-200px)] flex gap-4">
+            {renderImageSection('flex-1')}
+            {renderMapSection('flex-1')}
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">🎮 Solo Mode</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-white">🎮 Solo Mode</h1>
+          {renderLayoutControls()}
+        </div>
         <Link to="/">
           <Button variant="outline" className="text-white border-white/30 hover:bg-white/10">
             ← Back to Home
@@ -154,92 +338,30 @@ export function SoloPage() {
       </div>
 
       {/* Game Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Image */}
-        <div className="space-y-4">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl">📍 Where is this photo taken?</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="relative group">
-                <img
-                  src={currentGame.imageUrl}
-                  alt="Mystery location"
-                  className="w-full h-64 lg:h-80 object-cover rounded-lg cursor-pointer transition-transform hover:scale-[1.02]"
-                  onClick={() => setIsImageModalOpen(true)}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <span className="text-white bg-black/50 px-3 py-1 rounded-full text-sm">
-                    🔍 Click to enlarge
-                  </span>
-                </div>
-              </div>
-              
-              {currentGame.location && (
-                <div className="mt-3 text-xs text-blue-300">
-                  Hint: This photo is from somewhere around the world
-                </div>
-              )}
-              
-              {currentGame.copyright && (
-                <div className="mt-2 text-xs text-gray-400">
-                  Photo: {currentGame.copyright}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+      {renderGameContent()}
 
-        {/* Right Column - Map and Controls */}
-        <div className="space-y-4">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-            <CardHeader>
-              <CardTitle className="text-xl">🗺️ Make your guess</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MapComponent
-                onMarkerPlace={handleMarkerPlace}
-                guessMarker={userGuess}
-                actualMarker={gameState === 'result' ? { lat: currentGame.actualLat, lng: currentGame.actualLng } : null}
-                showResult={gameState === 'result'}
-                className="h-64 lg:h-80"
-              />
-              
-              {userGuess && gameState === 'playing' && (
-                <div className="mt-4 p-3 bg-blue-500/20 rounded-lg">
-                  <p className="text-sm text-blue-200">
-                    📍 Your guess: {userGuess.lat.toFixed(4)}, {userGuess.lng.toFixed(4)}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+      {/* Action Button */}
+      <div className="text-center">
+        {gameState === 'playing' && (
+          <Button
+            onClick={handleSubmitGuess}
+            disabled={!userGuess || evaluateGuessMutation.isPending}
+            size="lg"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+          >
+            {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✓ Submit Guess'}
+          </Button>
+        )}
 
-          {/* Action Button */}
-          <div className="text-center">
-            {gameState === 'playing' && (
-              <Button
-                onClick={handleSubmitGuess}
-                disabled={!userGuess || evaluateGuessMutation.isPending}
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-              >
-                {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✓ Submit Guess'}
-              </Button>
-            )}
-
-            {gameState === 'result' && result && (
-              <Button
-                onClick={handlePlayAgain}
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105"
-              >
-                🎮 Play Again
-              </Button>
-            )}
-          </div>
-        </div>
+        {gameState === 'result' && result && (
+          <Button
+            onClick={handlePlayAgain}
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105"
+          >
+            🎮 Play Again
+          </Button>
+        )}
       </div>
 
       {/* Results Card */}

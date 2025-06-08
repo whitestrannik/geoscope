@@ -237,8 +237,9 @@
   - [x] Submit guess
   - [x] View result correctly rendered
 
-**🎯 Phase 2 Status: COMPLETE**
+**🎯 Phase 2 Status: COMPLETE + ENHANCED UI/UX**
 - **Mapillary Integration: FULLY WORKING** with real street-level images ✅
+- **Enhanced UI/UX: MAJOR IMPROVEMENTS** with flexible layouts & better usability ✅
 - Backend API: Image retrieval + scoring with comprehensive testing ✅
 - Frontend Solo Page: Complete game flow with loading/error states ✅
 - Map Interface: Interactive MapLibre GL JS with click-to-place markers ✅
@@ -247,6 +248,36 @@
 - **Real-world Verification**: 6 geographic regions, OAuth 2.0, 50 images/region ✅
 - Testing: 11 backend unit tests + 30 frontend tests all passing ✅
 
+## ✨ 2.6 — UI/UX Enhancements (NEW) ✅
+
+### **🎨 Flexible Layout System**
+- [x] **5 Layout Modes**: Split (50/50), Image Focus (75/25), Map Focus (25/75), Image Full, Map Full
+- [x] **Dynamic Layout Controls**: Easy switching between modes with visual buttons
+- [x] **Responsive Design**: Adapts perfectly to different screen sizes
+- [x] **Full Viewport Usage**: Game content uses `calc(100vh-200px)` for maximum space
+
+### **🔍 Enhanced Image Experience**
+- [x] **Better Modal Integration**: Fullscreen button always visible in image section
+- [x] **Improved Image Scaling**: Better hover effects and interaction feedback
+- [x] **Focus Mode**: Dedicated layout for detailed image analysis
+- [x] **Visual Cues**: Clear "Click to enlarge & zoom" messaging
+
+### **🗺️ Enhanced Map Experience**
+- [x] **High-Quality Tiles**: OpenStreetMap with detailed street names & landmarks
+- [x] **Rich Controls**: Navigation, scale, fullscreen, attribution controls
+- [x] **Live Coordinates**: Real-time lat/lng display on mouse hover
+- [x] **Enhanced Markers**: Larger, more visible markers with labels ("YOU", 📍)
+- [x] **Better Legend**: Clear visual distinction between guess and actual location
+- [x] **Smart Bounds**: Auto-fit to show both markers with optimal padding
+
+### **💡 User Experience Improvements**
+- [x] **Visual Feedback**: Enhanced hover states and transitions
+- [x] **Information Panels**: Map info showing tile source and zoom instructions
+- [x] **Better Instructions**: Clear guidance for interaction patterns
+- [x] **Layout Persistence**: Remembers layout choice during gameplay
+- [x] **Quick Access**: Focus buttons for rapid layout switching
+
+---
 
 # 🔐 Phase 3 – Authentication & User Profiles
 
