@@ -9,7 +9,7 @@ export const trpc = createTRPCReact<AppRouter>();
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000/trpc',
+      url: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000/api/trpc',
       // Add headers, auth, etc. here if needed
       headers() {
         return {

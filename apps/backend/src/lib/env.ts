@@ -1,21 +1,24 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
+import path from 'path';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from external .env file
+dotenv.config({ 
+  path: path.join(process.cwd(), '../../../.env/geoscope.env') 
+});
 
 // Define environment schema
 const envSchema = z.object({
-  // Database
-  DATABASE_URL: z.string().url().optional(),
+  // Database (skip validation for now)
+  DATABASE_URL: z.string().optional(),
   
   // Supabase
-  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_URL: z.string().optional(),
   SUPABASE_ANON_KEY: z.string().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   
   // External APIs
-  MAPILLARY_API_KEY: z.string().optional(),
+  MAPILLARY_ACCESS_TOKEN: z.string().optional(),
   
   // Server config
   PORT: z.string().transform(Number).default('8000'),

@@ -1,5 +1,7 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
+import { imageRouter } from './imageRouter.js';
+import { guessRouter } from './guessRouter.js';
 
 // Initialize tRPC
 const t = initTRPC.create();
@@ -29,6 +31,10 @@ export const appRouter = router({
         from: 'GeoScope Backend',
       };
     }),
+
+  // Phase 2 routers
+  image: imageRouter,
+  guess: guessRouter,
 });
 
 // Export the type definition of the API
