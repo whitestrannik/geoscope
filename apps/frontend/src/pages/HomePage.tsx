@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ImageViewerModal } from '@/components/common/ImageViewerModal';
 
 export function HomePage() {
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
@@ -65,25 +63,12 @@ export function HomePage() {
             <p>✅ React + TypeScript + Vite</p>
             <p>✅ TailwindCSS v4 + shadcn/ui</p>
             <p>✅ React Router + Navigation</p>
-            <button
-              onClick={() => setIsImageModalOpen(true)}
-              className="text-purple-300 hover:text-purple-200 underline"
-            >
-              🖼️ Test Image Modal
-            </button>
+            <p>🖼️ Image viewing available in game</p>
           </div>
         </div>
       </Card>
 
-      {/* Image Viewer Modal Demo */}
-      <ImageViewerModal
-        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop"
-        alt="Demo landscape image"
-        title="Image Viewer Demo"
-        description="This modal will be used for viewing game images in fullscreen"
-        isOpen={isImageModalOpen}
-        onClose={() => setIsImageModalOpen(false)}
-      />
+
     </div>
   );
 } 

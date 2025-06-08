@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface MapComponentProps {
   onMarkerPlace?: (lat: number, lng: number) => void;
+  onDoubleClick?: () => void;
   guessMarker?: { lat: number; lng: number } | null;
   actualMarker?: { lat: number; lng: number } | null;
   showResult?: boolean;
@@ -12,6 +13,7 @@ interface MapComponentProps {
 
 export function MapComponent({ 
   onMarkerPlace, 
+  onDoubleClick,
   guessMarker, 
   actualMarker, 
   showResult = false,
@@ -78,11 +80,19 @@ export function MapComponent({
       setIsMapLoaded(true);
     });
 
-    // Click handler for placing guesses
-    map.current.on('click', (e) => {
+    // Right-click handler for placing guesses
+    map.current.on('contextmenu', (e) => {
+      e.preventDefault(); // Prevent context menu
       if (!showResult && onMarkerPlace) {
         const { lat, lng } = e.lngLat;
         onMarkerPlace(lat, lng);
+      }
+    });
+
+    // Left-click handler for fullscreen toggle
+    map.current.on('click', (e) => {
+      if (onDoubleClick) {
+        onDoubleClick();
       }
     });
 
@@ -178,7 +188,7 @@ export function MapComponent({
     <div className={`relative ${className}`}>
       <div 
         ref={mapContainer} 
-        className="w-full h-full rounded-lg overflow-hidden"
+        className="w-full h-full rounded-lg overflow-hidden cursor-pointer"
       />
       
       {/* Single status overlay */}
@@ -187,12 +197,12 @@ export function MapComponent({
           {!guessMarker ? (
             <div className="flex items-center gap-2">
               <span className="text-blue-400">🖱️</span>
-              <span>Click to place your guess</span>
+              <span>Right-click: place guess • Click: fullscreen</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <span className="text-green-400">✓</span>
-              <span>Guess placed</span>
+              <span>Guess placed • Click: fullscreen</span>
             </div>
           )}
         </div>
