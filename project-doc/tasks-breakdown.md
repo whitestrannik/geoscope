@@ -248,34 +248,41 @@
 - **Real-world Verification**: 6 geographic regions, OAuth 2.0, 50 images/region ✅
 - Testing: 11 backend unit tests + 30 frontend tests all passing ✅
 
-## ✨ 2.6 — UI/UX Enhancements (NEW) ✅
+## ✨ 2.6 — UI/UX Enhancements & Simplification ✅
 
-### **🎨 Flexible Layout System**
-- [x] **5 Layout Modes**: Split (50/50), Image Focus (75/25), Map Focus (25/75), Image Full, Map Full
-- [x] **Dynamic Layout Controls**: Easy switching between modes with visual buttons
+### **🎨 Streamlined Layout System**
+- [x] **3 Essential Modes**: Image Focus (2:1), Split (1:1), Map Focus (1:2) - reduced from 5 modes
+- [x] **Unified Controls**: Single control group with keyboard shortcuts (1-3)
+- [x] **Quick Access**: Dedicated zoom button for immediate image fullscreen
 - [x] **Responsive Design**: Adapts perfectly to different screen sizes
 - [x] **Full Viewport Usage**: Game content uses `calc(100vh-200px)` for maximum space
 
-### **🔍 Enhanced Image Experience**
-- [x] **Better Modal Integration**: Fullscreen button always visible in image section
-- [x] **Improved Image Scaling**: Better hover effects and interaction feedback
-- [x] **Focus Mode**: Dedicated layout for detailed image analysis
-- [x] **Visual Cues**: Clear "Click to enlarge & zoom" messaging
+### **🔍 Simplified Image Experience**
+- [x] **One-Click Zoom**: Click anywhere on image to open fullscreen modal
+- [x] **Visual Polish**: Smooth brightness transitions on hover
+- [x] **Clear Messaging**: Simple "Click to zoom & explore" overlay
+- [x] **Streamlined Info**: Only essential copyright info displayed
 
-### **🗺️ Enhanced Map Experience**
-- [x] **High-Quality Tiles**: OpenStreetMap with detailed street names & landmarks
-- [x] **Rich Controls**: Navigation, scale, fullscreen, attribution controls
-- [x] **Live Coordinates**: Real-time lat/lng display on mouse hover
-- [x] **Enhanced Markers**: Larger, more visible markers with labels ("YOU", 📍)
-- [x] **Better Legend**: Clear visual distinction between guess and actual location
-- [x] **Smart Bounds**: Auto-fit to show both markers with optimal padding
+### **🗺️ Optimized Map Experience**
+- [x] **Clean Interface**: Removed excessive overlays and information panels
+- [x] **Essential Controls**: Only zoom/pan controls (removed compass, scale, fullscreen)
+- [x] **Smart Status**: Single overlay showing interaction state
+- [x] **Simple Markers**: Cleaner, smaller markers (✓ for guess, 📍 for actual)
+- [x] **Coordinate Display**: Shows on hover only when needed
+- [x] **Minimal Legend**: Compact legend only during results
 
-### **💡 User Experience Improvements**
-- [x] **Visual Feedback**: Enhanced hover states and transitions
-- [x] **Information Panels**: Map info showing tile source and zoom instructions
-- [x] **Better Instructions**: Clear guidance for interaction patterns
-- [x] **Layout Persistence**: Remembers layout choice during gameplay
-- [x] **Quick Access**: Focus buttons for rapid layout switching
+### **⚡ Power User Features**
+- [x] **Keyboard Shortcuts**: 1-3 (layouts), F (fullscreen), Enter (submit), N (new game)
+- [x] **Shortcut Help**: Permanent help panel in bottom-right corner
+- [x] **Quick Submit**: Visual hint for Enter key when guess is placed
+- [x] **Efficient Workflow**: Reduced clicks for common actions
+
+### **💡 Simplified User Experience**
+- [x] **Reduced Cognitive Load**: Fewer buttons and overlays to process
+- [x] **Consistent Patterns**: Unified interaction model across components
+- [x] **Clear Hierarchy**: Important actions are more prominent
+- [x] **Less Visual Noise**: Removed redundant information and controls
+- [x] **Focus on Content**: Image and map take center stage
 
 ---
 
