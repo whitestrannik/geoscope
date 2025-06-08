@@ -1,0 +1,24 @@
+{
+  "name": "geoscope",
+  "version": "1.0.0",
+  "description": "A multiplayer geography guessing game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/**\" dev",
+    "build": "pnpm --recursive --filter \"./packages/**\" build && pnpm --recursive --filter \"./apps/**\" build",
+    "build:packages": "pnpm --recursive --filter \"./packages/**\" build",
+    "lint": "pnpm --recursive lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "clean": "pnpm --recursive clean && rm -rf node_modules",
+    "test": "pnpm --recursive test"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
+} 

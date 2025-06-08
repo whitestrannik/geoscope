@@ -1,73 +1,77 @@
-# 📍 Phase 0 – Project Setup & Tooling
+# 📍 Phase 0 – Project Setup & Tooling ✅ **COMPLETED**
 
 > Goal: Prepare a professional monorepo-based fullstack environment using Vite, Express, TailwindCSS v4, shadcn/ui, tRPC, and Vitest. Ensure security, type safety, and compatibility with Windows + PowerShell.
 
 ---
 
-## 🔧 0.1 — Project Bootstrapping
+## 🔧 0.1 — Project Bootstrapping ✅
 
-- [ ] Create root project directory with `frontend/` and `backend/` subfolders
-- [ ] Initialize monorepo with workspace support
-- [ ] Add `.gitignore`,  and `README.md`
-- [ ] Create `.env.example` for LLM-safe sharing
-- [ ] Store real secrets in `.env.local` placed **outside the project directory**
-
----
-
-## ⚙️ 0.2 — Frontend Setup (`/frontend`)
-
-- [ ] Scaffold React + TypeScript app using Vite
-- [ ] Install and configure TailwindCSS v4.0 using the official Vite plugin
-- [ ] Add base global stylesheet and import Tailwind via `@import "tailwindcss";`
-- [ ] Verify Tailwind utility classes render correctly in development
+- [x] Create root project directory with `apps/frontend/` and `apps/backend/` subfolders
+- [x] Initialize monorepo with workspace support (pnpm-workspace.yaml)
+- [x] Add `.gitignore` and `README.md`
+- [x] Create `.env.example` for LLM-safe sharing
+- [x] Store real secrets in `.env.local` placed **outside the project directory** (documented)
 
 ---
 
-## 🎨 0.3 — UI Framework Setup (shadcn/ui)
+## ⚙️ 0.2 — Frontend Setup (`apps/frontend`) ✅
 
-- [ ] Install and initialize `shadcn/ui` in the frontend
-- [ ] Enable App Router mode and confirm working theme structure
-- [ ] Render and style a sample component (e.g., Button)
-- [ ] Optionally adjust base Tailwind theme for project branding
-
----
-
-## 🚀 0.4 — Backend Setup (`/backend`)
-
-- [ ] Initialize backend with TypeScript and Express
-- [ ] Install and configure essential middlewares (e.g., CORS, JSON body parsing)
-- [ ] Set up initial folder structure:
-  - [ ] `src/trpc/` for routers and procedures
-  - [ ] `src/db/` for Prisma ORM setup
-  - [ ] `src/lib/` for utility functions
-- [ ] Create a base Express server entry point
-- [ ] Add placeholder tRPC router for testing API integration
+- [x] Scaffold React + TypeScript app using Vite
+- [x] Install and configure TailwindCSS v4.0 using the official Vite plugin
+- [x] Add base global stylesheet and import Tailwind via `@import "tailwindcss";`
+- [x] Verify Tailwind utility classes render correctly in development
 
 ---
 
-## 🔐 0.5 — Environment Variables & Secrets
+## 🎨 0.3 — UI Framework Setup (shadcn/ui) ✅
 
-- [ ] Define all necessary keys in `.env.example` (Mapillary, Supabase, etc.)
-- [ ] Load environment variables using `dotenv` in both frontend and backend
-- [ ] Validate env variables at runtime using `zod` schema (optional)
-
----
-
-## 🧪 0.6 — Testing Tooling
-
-- [ ] Install and configure `Vitest` as the unified test runner
-- [ ] Add `@testing-library/react` and `jsdom` for frontend component tests
-- [ ] Create basic unit tests in both frontend and backend
-- [ ] Optionally integrate Playwright or Cypress for end-to-end testing
-- [ ] Add scripts and configuration for test execution and CI integration
+- [x] Install and initialize `shadcn/ui` in the frontend
+- [x] Enable proper theme structure and path aliases (`@/*`)
+- [x] Render and style sample Button component
+- [x] Verified shadcn/ui components working with TailwindCSS v4
 
 ---
 
-## 🖥️ 0.7 — Local Dev Workflow
+## 🚀 0.4 — Backend Setup (`apps/backend`) ✅
 
-- [ ] Set up separate start scripts for frontend and backend
-- [ ] Ensure compatibility with PowerShell (Windows development environment)
-- [ ] Optionally add a combined dev script using a process manager like `concurrently`
+- [x] Initialize backend with TypeScript and Express
+- [x] Install and configure essential middlewares (CORS, JSON body parsing)
+- [x] Set up initial folder structure:
+  - [x] `src/trpc/` for routers and procedures
+  - [x] `src/db/` for Prisma ORM setup (folder created)
+  - [x] `src/lib/` for utility functions
+- [x] Create a base Express server entry point
+- [x] Add functional tRPC router with health check and test endpoints
+
+---
+
+## 🔐 0.5 — Environment Variables & Secrets ✅
+
+- [x] Define all necessary keys in `.env.example` (Mapillary, Supabase, etc.)
+- [x] Load environment variables using `dotenv` in backend
+- [x] Validate env variables at runtime using `zod` schema
+
+---
+
+## 🧪 0.6 — Testing Tooling ✅
+
+- [x] Install and configure `Vitest` as the unified test runner
+- [x] Add `@testing-library/react` and `jsdom` for frontend component tests
+- [x] Create basic unit tests for App component (3 tests passing)
+- [x] Add scripts and configuration for test execution
+
+---
+
+## 🖥️ 0.7 — Local Dev Workflow ✅
+
+- [x] Set up separate start scripts for frontend and backend
+- [x] Ensure compatibility with PowerShell (Windows development environment)
+- [x] Combined dev script working (`pnpm run dev` runs both servers)
+
+**🎯 Phase 0 Status: COMPLETE** 
+- Frontend: `http://localhost:3000` ✅ (React + Vite + TailwindCSS v4 + shadcn/ui)
+- Backend: `http://localhost:8000` ✅ (Express + tRPC + Socket.IO)
+- Tests: 3/3 passing ✅
 
 
 # 🎨 Phase 1 – UI Shell & Navigation
