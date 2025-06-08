@@ -30,8 +30,8 @@ interface ResultData {
   guessLng: number;
 }
 
-// Updated to include fullscreen modes
-type LayoutMode = 'split' | 'image-focus' | 'map-focus' | 'image-full' | 'map-full';
+// Simplified layout modes: split (default) or fullscreen
+type LayoutMode = 'split' | 'image-full' | 'map-full';
 
 export function SoloPage() {
   const [gameState, setGameState] = useState<GameState>('loading');
@@ -81,22 +81,13 @@ export function SoloPage() {
       switch (e.key) {
         case 'f':
         case 'F':
-          // Toggle image focus/fullscreen
-          if (layoutMode === 'image-full') {
-            setLayoutMode('image-focus');
-          } else if (layoutMode === 'image-focus') {
-            setLayoutMode('image-full');
-          } else {
-            setLayoutMode('image-focus');
-          }
-          break;
-        case '2':
-          setLayoutMode('split');
+          // Toggle image fullscreen
+          setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');
           break;
         case 'm':
         case 'M':
-          // Toggle map focus/fullscreen
-          setLayoutMode(prev => prev === 'map-full' ? 'map-focus' : 'map-full');
+          // Toggle map fullscreen
+          setLayoutMode(prev => prev === 'map-full' ? 'split' : 'map-full');
           break;
         case 'Escape':
           // Exit fullscreen to split view
@@ -127,7 +118,7 @@ export function SoloPage() {
   };
 
   const handleMapDoubleClick = () => {
-    setLayoutMode(layoutMode === 'map-full' ? 'map-focus' : 'map-full');
+    setLayoutMode(prev => prev === 'map-full' ? 'split' : 'map-full');
   };
 
   const handleSubmitGuess = () => {
@@ -150,11 +141,7 @@ export function SoloPage() {
 
   // Image interaction handlers
   const handleImageClick = () => {
-    setLayoutMode(prev => {
-      if (prev === 'image-full') return 'split';
-      if (prev === 'image-focus') return 'image-full';
-      return 'image-full';
-    });
+    setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');
   };
 
   const handleImageWheel = (e: React.WheelEvent) => {
@@ -198,45 +185,36 @@ export function SoloPage() {
     if (score >= 900) return '🎯 Perfect!';
     if (score >= 700) return '🎉 Excellent!';
     if (score >= 500) return '👍 Good!';
-    if (score >= 200) return '👌 Not bad!';
-    return '💪 Keep trying!';
+    if (score >= 200) return '🤔 Not bad';
+    return '💪 Try again!';
   };
 
-  if (imageLoading || gameState === 'loading') {
+  if (imageLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-          <CardContent className="text-center py-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-            <p className="text-lg">Loading your challenge...</p>
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="text-center space-y-4">
+              <div className="text-4xl">🌍</div>
+              <div className="text-lg">Loading mystery location...</div>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  if (imageError) {
+  if (imageError || !currentGame) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-          <CardContent className="text-center py-8">
-            <p className="text-lg text-red-300 mb-4">Failed to load image</p>
-            <Button onClick={() => refetchImage()} className="bg-blue-600 hover:bg-blue-700 text-white">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!currentGame) {
-    return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-          <CardContent className="text-center py-8">
-            <p className="text-lg text-yellow-300 mb-4">No image data available</p>
-            <Button onClick={() => refetchImage()} className="bg-blue-600 hover:bg-blue-700 text-white">
+      <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
+          <CardContent className="text-center p-8 space-y-4">
+            <div className="text-4xl">⚠️</div>
+            <div className="text-lg text-red-300">Failed to load game data</div>
+            <Button 
+              onClick={() => refetchImage()}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               Load Game
             </Button>
           </CardContent>
@@ -244,51 +222,6 @@ export function SoloPage() {
       </div>
     );
   }
-
-  // Fixed layout controls with consistent button styling
-  const renderLayoutControls = () => (
-    <div className="flex items-center gap-1 bg-black/20 backdrop-blur-sm rounded-lg p-1">
-      <Button
-        onClick={() => setLayoutMode(layoutMode === 'image-full' ? 'image-focus' : 'image-full')}
-        size="sm"
-        variant={layoutMode === 'image-focus' || layoutMode === 'image-full' ? 'default' : 'secondary'}
-        className={`text-xs h-8 px-3 font-medium ${
-          layoutMode === 'image-focus' || layoutMode === 'image-full' 
-            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-            : 'bg-white/10 hover:bg-white/20 text-white border-0'
-        }`}
-        title={layoutMode === 'image-full' ? 'Exit image fullscreen (Press F)' : 'Focus on image (Press F)'}
-      >
-        📷 {layoutMode === 'image-full' ? 'Exit' : 'Photo'}
-      </Button>
-      <Button
-        onClick={() => setLayoutMode('split')}
-        size="sm"
-        variant={layoutMode === 'split' ? 'default' : 'secondary'}
-        className={`text-xs h-8 px-3 font-medium ${
-          layoutMode === 'split' 
-            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-            : 'bg-white/10 hover:bg-white/20 text-white border-0'
-        }`}
-        title="Balanced view (Press 2)"
-      >
-        ⚖️ Both
-      </Button>
-      <Button
-        onClick={() => setLayoutMode(layoutMode === 'map-full' ? 'map-focus' : 'map-full')}
-        size="sm"
-        variant={layoutMode === 'map-focus' || layoutMode === 'map-full' ? 'default' : 'secondary'}
-        className={`text-xs h-8 px-3 font-medium ${
-          layoutMode === 'map-focus' || layoutMode === 'map-full' 
-            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-            : 'bg-white/10 hover:bg-white/20 text-white border-0'
-        }`}
-        title={layoutMode === 'map-full' ? 'Exit map fullscreen (Press M)' : 'Focus on map (Press M)'}
-      >
-        🗺️ {layoutMode === 'map-full' ? 'Exit' : 'Map'}
-      </Button>
-    </div>
-  );
 
   const renderImageSection = (className: string = '', isFullscreen: boolean = false) => (
     <div className={className}>
@@ -307,10 +240,10 @@ export function SoloPage() {
                   onClick={() => setLayoutMode('split')}
                   size="sm"
                   variant="outline"
-                  className="text-xs h-7 px-2 text-white border-white/30 hover:bg-white/10 hover:text-white hover:border-white/50"
-                  title="Exit fullscreen (Press Esc)"
+                  className="text-xs h-7 px-2 bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50"
+                  title="Back to split view (Press Esc)"
                 >
-                  ✕
+                  ← Back
                 </Button>
               )}
             </div>
@@ -340,7 +273,7 @@ export function SoloPage() {
             {/* Interactive overlay */}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
               <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium">
-                {layoutMode === 'image-full' ? '↩️ Exit fullscreen' : '⛶ Go fullscreen'}
+                {layoutMode === 'image-full' ? '↩️ Back to split view' : '⛶ Go fullscreen'}
               </div>
             </div>
 
@@ -379,10 +312,10 @@ export function SoloPage() {
                   onClick={() => setLayoutMode('split')}
                   size="sm"
                   variant="outline"
-                  className="text-xs h-7 px-2 text-white border-white/30 hover:bg-white/10 hover:text-white hover:border-white/50"
-                  title="Exit fullscreen (Press Esc)"
+                  className="text-xs h-7 px-2 bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50"
+                  title="Back to split view (Press Esc)"
                 >
-                  ✕
+                  ← Back
                 </Button>
               )}
             </div>
@@ -420,22 +353,6 @@ export function SoloPage() {
           </div>
         );
       
-      case 'image-focus':
-        return (
-          <div className="h-[calc(100vh-160px)] flex gap-3">
-            {renderImageSection('flex-[2]')}
-            {renderMapSection('flex-[1]')}
-          </div>
-        );
-      
-      case 'map-focus':
-        return (
-          <div className="h-[calc(100vh-160px)] flex gap-3">
-            {renderImageSection('flex-[1]')}
-            {renderMapSection('flex-[2]')}
-          </div>
-        );
-      
       default: // 'split'
         return (
           <div className="h-[calc(100vh-160px)] flex gap-3">
@@ -449,14 +366,14 @@ export function SoloPage() {
   return (
     <div className="space-y-3">
       {/* Header - Hide in fullscreen mode */}
-      {layoutMode !== 'image-full' && layoutMode !== 'map-full' && (
+      {layoutMode === 'split' && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-2xl font-bold text-white">🎮 Solo Mode</h1>
-            {renderLayoutControls()}
+            <div className="text-sm text-blue-300">Click on photo or map to go fullscreen</div>
           </div>
           <Link to="/">
-            <Button variant="outline" className="text-white border-white/30 hover:bg-white/10 hover:text-white hover:border-white/50">
+            <Button variant="outline" className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50">
               ← Home
             </Button>
           </Link>
@@ -467,7 +384,7 @@ export function SoloPage() {
       {renderGameContent()}
 
       {/* Action Zone - Hide in fullscreen */}
-      {layoutMode !== 'image-full' && layoutMode !== 'map-full' && (
+      {layoutMode === 'split' && (
         <div className="flex items-center justify-center gap-4">
           {gameState === 'playing' && (
             <>
@@ -505,7 +422,7 @@ export function SoloPage() {
       )}
 
       {/* Results Card - Hide in fullscreen */}
-      {gameState === 'result' && result && layoutMode !== 'image-full' && layoutMode !== 'map-full' && (
+      {gameState === 'result' && result && layoutMode === 'split' && (
         <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl text-center">🎯 Round Results</CardTitle>
@@ -544,7 +461,7 @@ export function SoloPage() {
         <div className="text-gray-300 mb-1">Controls:</div>
         <div className="space-y-1">
           <div><kbd className="bg-white/20 px-1 rounded">Click</kbd> Fullscreen • <kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom • <kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</div>
-          <div><kbd className="bg-white/20 px-1 rounded">Right-click</kbd> Map guess • <kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit • <kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</div>
+          <div><kbd className="bg-white/20 px-1 rounded">F</kbd> Photo • <kbd className="bg-white/20 px-1 rounded">M</kbd> Map • <kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit • <kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</div>
         </div>
       </div>
     </div>
