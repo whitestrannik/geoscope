@@ -46,6 +46,9 @@ export function SoloPage() {
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 });
   const [hasMouseMoved, setHasMouseMoved] = useState(false);
+  
+  // Ref for the image element to attach native wheel listener
+  const imageRef = React.useRef<HTMLImageElement>(null);
 
   // tRPC hooks
   const { data: imageData, isLoading: imageLoading, error: imageError, refetch: refetchImage } = trpc.image.getRandom.useQuery();
@@ -73,6 +76,28 @@ export function SoloPage() {
       setImagePosition({ x: 0, y: 0 });
     }
   }, [imageData]);
+
+  // Add native wheel event listener to image with proper options
+  React.useEffect(() => {
+    const imageElement = imageRef.current;
+    if (!imageElement) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      
+      const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
+      setImageScale(prev => Math.max(0.5, Math.min(4, prev + zoomDelta)));
+    };
+
+    // Add listener with passive: false to ensure preventDefault works
+    imageElement.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      imageElement.removeEventListener('wheel', handleWheel);
+    };
+  }, [currentGame]); // Re-attach when image changes
 
   // Simplified keyboard shortcuts
   useEffect(() => {
@@ -148,15 +173,8 @@ export function SoloPage() {
     }
   };
 
-  const handleImageWheel = (e: React.WheelEvent) => {
-    // Only prevent default scroll if mouse is over the actual image element
-    const target = e.target as HTMLElement;
-    if (target.tagName === 'IMG') {
-      e.preventDefault();
-      const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
-      setImageScale(prev => Math.max(0.5, Math.min(4, prev + zoomDelta)));
-    }
-  };
+  // Remove the React wheel handler since we're using native listener
+  // const handleImageWheel = (e: React.WheelEvent) => { ... }
 
   const handleImageMouseDown = (e: React.MouseEvent) => {
     if (e.button === 0) { // Left mouse button
@@ -272,7 +290,6 @@ export function SoloPage() {
         <CardContent className="flex-1 flex flex-col pt-0">
           <div 
             className="relative group flex-1 min-h-0 overflow-hidden select-none"
-            onWheel={handleImageWheel}
             onClick={(e) => {
               // Allow fullscreen toggle when clicking on container (black bars) but not on image
               if (e.target === e.currentTarget) {
@@ -281,6 +298,7 @@ export function SoloPage() {
             }}
           >
             <img
+              ref={imageRef}
               src={currentGame.imageUrl}
               alt="Mystery location"
               className="w-full h-full object-contain transition-transform duration-75"
