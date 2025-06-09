@@ -45,6 +45,7 @@ export function SoloPage() {
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [isDraggingImage, setIsDraggingImage] = useState(false);
   const [imageDragStart, setImageDragStart] = useState({ x: 0, y: 0 });
+  const [hasMouseMoved, setHasMouseMoved] = useState(false);
 
   // tRPC hooks
   const { data: imageData, isLoading: imageLoading, error: imageError, refetch: refetchImage } = trpc.image.getRandom.useQuery();
@@ -140,19 +141,27 @@ export function SoloPage() {
   };
 
   // Image interaction handlers
-  const handleImageClick = () => {
-    setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');
+  const handleImageClick = (e: React.MouseEvent) => {
+    // Only toggle fullscreen if this was a click, not a drag
+    if (!hasMouseMoved) {
+      setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');
+    }
   };
 
   const handleImageWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
-    setImageScale(prev => Math.max(0.5, Math.min(4, prev + zoomDelta)));
+    // Only prevent default scroll if mouse is over the actual image element
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'IMG') {
+      e.preventDefault();
+      const zoomDelta = e.deltaY < 0 ? 0.2 : -0.2;
+      setImageScale(prev => Math.max(0.5, Math.min(4, prev + zoomDelta)));
+    }
   };
 
   const handleImageMouseDown = (e: React.MouseEvent) => {
     if (e.button === 0) { // Left mouse button
       setIsDraggingImage(true);
+      setHasMouseMoved(false);
       setImageDragStart({
         x: e.clientX - imagePosition.x,
         y: e.clientY - imagePosition.y
@@ -163,6 +172,8 @@ export function SoloPage() {
 
   const handleImageMouseMove = (e: React.MouseEvent) => {
     if (isDraggingImage) {
+      // Track that mouse has moved during drag
+      setHasMouseMoved(true);
       setImagePosition({
         x: e.clientX - imageDragStart.x,
         y: e.clientY - imageDragStart.y
@@ -170,8 +181,17 @@ export function SoloPage() {
     }
   };
 
-  const handleImageMouseUp = () => {
-    setIsDraggingImage(false);
+  const handleImageMouseUp = (e: React.MouseEvent) => {
+    if (isDraggingImage) {
+      setIsDraggingImage(false);
+      // Small delay to handle click vs drag distinction
+      setTimeout(() => {
+        if (!hasMouseMoved) {
+          handleImageClick(e);
+        }
+        setHasMouseMoved(false);
+      }, 10);
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -251,27 +271,34 @@ export function SoloPage() {
         </CardHeader>
         <CardContent className="flex-1 flex flex-col pt-0">
           <div 
-            className="relative group flex-1 min-h-0 overflow-hidden cursor-pointer select-none"
-            onClick={handleImageClick}
+            className="relative group flex-1 min-h-0 overflow-hidden select-none"
             onWheel={handleImageWheel}
-            onMouseDown={handleImageMouseDown}
-            onMouseMove={handleImageMouseMove}
-            onMouseUp={handleImageMouseUp}
-            onMouseLeave={handleImageMouseUp}
+            onClick={(e) => {
+              // Allow fullscreen toggle when clicking on container (black bars) but not on image
+              if (e.target === e.currentTarget) {
+                setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');
+              }
+            }}
           >
             <img
               src={currentGame.imageUrl}
               alt="Mystery location"
-              className="w-full h-full object-contain transition-transform duration-200"
+              className="w-full h-full object-contain transition-transform duration-75"
               style={{
                 transform: `scale(${imageScale}) translate(${imagePosition.x / imageScale}px, ${imagePosition.y / imageScale}px)`,
                 cursor: isDraggingImage ? 'grabbing' : (imageScale > 1 ? 'grab' : 'pointer')
               }}
+              onMouseDown={handleImageMouseDown}
+              onMouseMove={handleImageMouseMove}
+              onMouseUp={handleImageMouseUp}
+              onMouseLeave={handleImageMouseUp}
               draggable={false}
             />
             
             {/* Interactive overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div 
+              className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
+            >
               <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium">
                 {layoutMode === 'image-full' ? '↩️ Back to split view' : '⛶ Go fullscreen'}
               </div>
