@@ -386,39 +386,39 @@ export function SoloPage() {
     switch (layoutMode) {
       case 'image-full':
         return (
-          <div className="h-[calc(100vh-80px)] flex flex-col">
-            {renderImageSection('flex-1', true)}
+          <div className="h-screen w-screen fixed inset-0 z-40">
+            {renderImageSection('h-full w-full', true)}
           </div>
         );
       
       case 'map-full':
         return (
-          <div className="h-[calc(100vh-80px)] flex flex-col">
-            {renderMapSection('flex-1', true)}
+          <div className="h-screen w-screen fixed inset-0 z-40">
+            {renderMapSection('h-full w-full', true)}
           </div>
         );
       
       default: // 'split'
         return (
-          <div className="h-[calc(100vh-160px)] flex gap-3">
-            {renderImageSection('flex-1')}
-            {renderMapSection('flex-1')}
+          <div className="h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-6">
+            {renderImageSection('flex-1 min-h-0')}
+            {renderMapSection('flex-1 min-h-0')}
           </div>
         );
     }
   };
 
   return (
-    <div className="space-y-3">
+    <div className={`${layoutMode === 'split' ? 'min-h-screen p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto' : ''} space-y-2 sm:space-y-4`}>
       {/* Header - Hide in fullscreen mode */}
       {layoutMode === 'split' && (
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-white">🎮 Solo Mode</h1>
-            <div className="text-sm text-blue-300">Click on photo or map to go fullscreen</div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">🎮 Solo Mode</h1>
+            <div className="text-xs sm:text-sm text-blue-300">Click on photo or map to go fullscreen</div>
           </div>
           <Link to="/">
-            <Button variant="outline" className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50">
+            <Button variant="outline" className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50 w-full sm:w-auto">
               ← Home
             </Button>
           </Link>
@@ -430,19 +430,19 @@ export function SoloPage() {
 
       {/* Action Zone - Hide in fullscreen */}
       {layoutMode === 'split' && (
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
           {gameState === 'playing' && (
             <>
               <Button
                 onClick={handleSubmitGuess}
                 disabled={!userGuess || evaluateGuessMutation.isPending}
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
               >
                 {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✅ Submit Guess'}
               </Button>
               {userGuess && (
-                <div className="text-sm text-gray-300">
+                <div className="text-xs sm:text-sm text-gray-300 text-center">
                   Press <kbd className="bg-white/20 px-1 rounded text-white">Enter</kbd> to submit
                 </div>
               )}
@@ -454,11 +454,11 @@ export function SoloPage() {
               <Button
                 onClick={handlePlayAgain}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 text-lg transition-all duration-200 hover:scale-105"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
               >
                 🎮 Play Again
               </Button>
-              <div className="text-sm text-gray-300">
+              <div className="text-xs sm:text-sm text-gray-300 text-center">
                 Press <kbd className="bg-white/20 px-1 rounded text-white">N</kbd> for new game
               </div>
             </>
@@ -470,29 +470,29 @@ export function SoloPage() {
       {gameState === 'result' && result && layoutMode === 'split' && (
         <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xl text-center">🎯 Round Results</CardTitle>
+            <CardTitle className="text-lg sm:text-xl text-center">🎯 Round Results</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
               <div className="space-y-1">
-                <div className="text-xl">📏</div>
-                <div className="text-base font-semibold">Distance</div>
-                <div className="text-xl text-blue-300">{result.distance.toLocaleString()} km</div>
+                <div className="text-lg sm:text-xl">📏</div>
+                <div className="text-sm sm:text-base font-semibold">Distance</div>
+                <div className="text-lg sm:text-xl text-blue-300">{result.distance.toLocaleString()} km</div>
               </div>
               
               <div className="space-y-1">
-                <div className="text-xl">🏆</div>
-                <div className="text-base font-semibold">Score</div>
-                <div className={`text-2xl font-bold ${getScoreColor(result.score)}`}>
+                <div className="text-lg sm:text-xl">🏆</div>
+                <div className="text-sm sm:text-base font-semibold">Score</div>
+                <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(result.score)}`}>
                   {result.score.toLocaleString()}
                 </div>
-                <div className="text-sm text-gray-300">{getScoreMessage(result.score)}</div>
+                <div className="text-xs sm:text-sm text-gray-300">{getScoreMessage(result.score)}</div>
               </div>
               
               <div className="space-y-1">
-                <div className="text-xl">📍</div>
-                <div className="text-base font-semibold">Actual Location</div>
-                <div className="text-sm text-gray-300">
+                <div className="text-lg sm:text-xl">📍</div>
+                <div className="text-sm sm:text-base font-semibold">Actual Location</div>
+                <div className="text-xs sm:text-sm text-gray-300">
                   {currentGame.location || `${result.actualLat.toFixed(2)}, ${result.actualLng.toFixed(2)}`}
                 </div>
               </div>
@@ -502,13 +502,24 @@ export function SoloPage() {
       )}
 
       {/* Keyboard Shortcuts Help */}
-      <div className="fixed bottom-3 right-3 bg-black/80 text-white px-3 py-2 rounded-lg text-xs backdrop-blur-sm border border-white/20">
-        <div className="text-gray-300 mb-1">Controls:</div>
-        <div className="space-y-1">
-          <div><kbd className="bg-white/20 px-1 rounded">Click</kbd> Fullscreen • <kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom • <kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</div>
-          <div><kbd className="bg-white/20 px-1 rounded">F</kbd> Photo • <kbd className="bg-white/20 px-1 rounded">M</kbd> Map • <kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit • <kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</div>
+      {layoutMode === 'split' && (
+        <div className="fixed bottom-2 right-2 sm:bottom-3 sm:right-3 bg-black/80 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-lg text-xs backdrop-blur-sm border border-white/20 max-w-xs">
+          <div className="text-gray-300 mb-1">Controls:</div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap gap-1">
+              <span><kbd className="bg-white/20 px-1 rounded">Click</kbd> Fullscreen</span>
+              <span><kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom</span>
+              <span><kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              <span><kbd className="bg-white/20 px-1 rounded">F</kbd> Photo</span>
+              <span><kbd className="bg-white/20 px-1 rounded">M</kbd> Map</span>
+              <span><kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit</span>
+              <span><kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</span>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 } 
