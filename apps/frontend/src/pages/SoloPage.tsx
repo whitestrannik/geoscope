@@ -400,7 +400,7 @@ export function SoloPage() {
       
       default: // 'split'
         return (
-          <div className="h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-8">
+          <div className="flex-1 flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-8 min-h-0">
             {renderImageSection('flex-1 min-h-0')}
             {renderMapSection('flex-1 min-h-0')}
           </div>
@@ -409,10 +409,10 @@ export function SoloPage() {
   };
 
   return (
-    <div className={`${layoutMode === 'split' ? 'fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 overflow-auto p-4 sm:p-6 lg:p-8' : ''} space-y-2 sm:space-y-4`}>
+    <div className={`${layoutMode === 'split' ? 'fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex flex-col p-4 sm:p-6 lg:p-8' : 'space-y-2 sm:space-y-4'}`}>
       {/* Header - Hide in fullscreen mode */}
       {layoutMode === 'split' && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 lg:gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 lg:gap-6 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">🎮 Solo Mode</h1>
             <div className="text-xs sm:text-sm lg:text-base text-blue-300">Click on photo or map to go fullscreen</div>
@@ -428,21 +428,21 @@ export function SoloPage() {
       {/* Game Content */}
       {renderGameContent()}
 
-      {/* Action Zone - Hide in fullscreen */}
+      {/* Action Zone - Back in normal flow */}
       {layoutMode === 'split' && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 xl:gap-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-4 flex-shrink-0">
           {gameState === 'playing' && (
             <>
               <Button
                 onClick={handleSubmitGuess}
                 disabled={!userGuess || evaluateGuessMutation.isPending}
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 xl:px-12 text-base sm:text-lg xl:text-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
               >
                 {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✅ Submit Guess'}
               </Button>
               {userGuess && (
-                <div className="text-xs sm:text-sm xl:text-base text-gray-300 text-center">
+                <div className="text-xs sm:text-sm text-gray-300 text-center">
                   Press <kbd className="bg-white/20 px-1 rounded text-white">Enter</kbd> to submit
                 </div>
               )}
@@ -454,11 +454,11 @@ export function SoloPage() {
               <Button
                 onClick={handlePlayAgain}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 xl:px-12 text-base sm:text-lg xl:text-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
               >
                 🎮 Play Again
               </Button>
-              <div className="text-xs sm:text-sm xl:text-base text-gray-300 text-center">
+              <div className="text-xs sm:text-sm text-gray-300 text-center">
                 Press <kbd className="bg-white/20 px-1 rounded text-white">N</kbd> for new game
               </div>
             </>
@@ -466,39 +466,41 @@ export function SoloPage() {
         </div>
       )}
 
-      {/* Results Card - Hide in fullscreen */}
+      {/* Results Card - Fixed position overlay */}
       {gameState === 'result' && result && layoutMode === 'split' && (
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg sm:text-xl text-center">🎯 Round Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
-              <div className="space-y-1">
-                <div className="text-lg sm:text-xl">📏</div>
-                <div className="text-sm sm:text-base font-semibold">Distance</div>
-                <div className="text-lg sm:text-xl text-blue-300">{result.distance.toLocaleString()} km</div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-lg sm:text-xl">🏆</div>
-                <div className="text-sm sm:text-base font-semibold">Score</div>
-                <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(result.score)}`}>
-                  {result.score.toLocaleString()}
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl max-w-lg w-full mx-4">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg sm:text-xl text-center">🎯 Round Results</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
+                <div className="space-y-1">
+                  <div className="text-lg sm:text-xl">📏</div>
+                  <div className="text-sm sm:text-base font-semibold">Distance</div>
+                  <div className="text-lg sm:text-xl text-blue-300">{result.distance.toLocaleString()} km</div>
                 </div>
-                <div className="text-xs sm:text-sm text-gray-300">{getScoreMessage(result.score)}</div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-lg sm:text-xl">📍</div>
-                <div className="text-sm sm:text-base font-semibold">Actual Location</div>
-                <div className="text-xs sm:text-sm text-gray-300">
-                  {currentGame.location || `${result.actualLat.toFixed(2)}, ${result.actualLng.toFixed(2)}`}
+                
+                <div className="space-y-1">
+                  <div className="text-lg sm:text-xl">🏆</div>
+                  <div className="text-sm sm:text-base font-semibold">Score</div>
+                  <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(result.score)}`}>
+                    {result.score.toLocaleString()}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-300">{getScoreMessage(result.score)}</div>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="text-lg sm:text-xl">📍</div>
+                  <div className="text-sm sm:text-base font-semibold">Actual Location</div>
+                  <div className="text-xs sm:text-sm text-gray-300">
+                    {currentGame.location || `${result.actualLat.toFixed(2)}, ${result.actualLng.toFixed(2)}`}
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Keyboard Shortcuts Help */}
