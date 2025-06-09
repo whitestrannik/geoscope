@@ -400,7 +400,7 @@ export function SoloPage() {
       
       default: // 'split'
         return (
-          <div className="h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-6">
+          <div className="h-[calc(100vh-120px)] flex flex-col lg:flex-row gap-2 sm:gap-4 lg:gap-8">
             {renderImageSection('flex-1 min-h-0')}
             {renderMapSection('flex-1 min-h-0')}
           </div>
@@ -409,16 +409,16 @@ export function SoloPage() {
   };
 
   return (
-    <div className={`${layoutMode === 'split' ? 'min-h-screen p-2 sm:p-4 lg:p-6 max-w-7xl mx-auto' : ''} space-y-2 sm:space-y-4`}>
+    <div className={`${layoutMode === 'split' ? 'fixed inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 overflow-auto p-4 sm:p-6 lg:p-8' : ''} space-y-2 sm:space-y-4`}>
       {/* Header - Hide in fullscreen mode */}
       {layoutMode === 'split' && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-            <h1 className="text-xl sm:text-2xl font-bold text-white">🎮 Solo Mode</h1>
-            <div className="text-xs sm:text-sm text-blue-300">Click on photo or map to go fullscreen</div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 lg:gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 lg:gap-6">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">🎮 Solo Mode</h1>
+            <div className="text-xs sm:text-sm lg:text-base text-blue-300">Click on photo or map to go fullscreen</div>
           </div>
           <Link to="/">
-            <Button variant="outline" className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50 w-full sm:w-auto">
+            <Button variant="outline" className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50 w-full sm:w-auto lg:text-lg lg:px-6">
               ← Home
             </Button>
           </Link>
@@ -430,19 +430,19 @@ export function SoloPage() {
 
       {/* Action Zone - Hide in fullscreen */}
       {layoutMode === 'split' && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 xl:gap-6">
           {gameState === 'playing' && (
             <>
               <Button
                 onClick={handleSubmitGuess}
                 disabled={!userGuess || evaluateGuessMutation.isPending}
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 xl:px-12 text-base sm:text-lg xl:text-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
               >
                 {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✅ Submit Guess'}
               </Button>
               {userGuess && (
-                <div className="text-xs sm:text-sm text-gray-300 text-center">
+                <div className="text-xs sm:text-sm xl:text-base text-gray-300 text-center">
                   Press <kbd className="bg-white/20 px-1 rounded text-white">Enter</kbd> to submit
                 </div>
               )}
@@ -454,11 +454,11 @@ export function SoloPage() {
               <Button
                 onClick={handlePlayAgain}
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 xl:px-12 text-base sm:text-lg xl:text-xl transition-all duration-200 hover:scale-105 w-full sm:w-auto"
               >
                 🎮 Play Again
               </Button>
-              <div className="text-xs sm:text-sm text-gray-300 text-center">
+              <div className="text-xs sm:text-sm xl:text-base text-gray-300 text-center">
                 Press <kbd className="bg-white/20 px-1 rounded text-white">N</kbd> for new game
               </div>
             </>
