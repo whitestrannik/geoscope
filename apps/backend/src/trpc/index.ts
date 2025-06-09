@@ -1,14 +1,8 @@
-import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
+import { router, publicProcedure } from './trpc.js';
 import { imageRouter } from './imageRouter.js';
 import { guessRouter } from './guessRouter.js';
-
-// Initialize tRPC
-const t = initTRPC.create();
-
-// Export reusable pieces
-export const router = t.router;
-export const publicProcedure = t.procedure;
+import { userRouter } from './user.js';
 
 // Define main app router
 export const appRouter = router({
@@ -35,6 +29,9 @@ export const appRouter = router({
   // Phase 2 routers
   image: imageRouter,
   guess: guessRouter,
+  
+  // Phase 3 routers
+  user: userRouter,
 });
 
 // Export the type definition of the API

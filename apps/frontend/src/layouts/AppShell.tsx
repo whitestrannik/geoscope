@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 interface AppShellProps {
   children?: React.ReactNode;
@@ -30,41 +31,46 @@ export function AppShell({ children }: AppShellProps) {
               </h1>
             </Link>
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/"
-                className={`text-sm font-medium transition-colors hover:text-blue-300 ${
-                  location.pathname === '/' ? 'text-blue-400' : 'text-white/80'
-                }`}
-              >
-                Home
-              </Link>
-              <Link
-                to="/solo"
-                className={`text-sm font-medium transition-colors hover:text-blue-300 ${
-                  location.pathname === '/solo' ? 'text-blue-400' : 'text-white/80'
-                }`}
-              >
-                Solo
-              </Link>
-              <Link
-                to="/leaderboard"
-                className={`text-sm font-medium transition-colors hover:text-blue-300 ${
-                  location.pathname === '/leaderboard' ? 'text-blue-400' : 'text-white/80'
-                }`}
-              >
-                Leaderboard
-              </Link>
-              <Link
-                to="/stats"
-                className={`text-sm font-medium transition-colors hover:text-blue-300 ${
-                  location.pathname === '/stats' ? 'text-blue-400' : 'text-white/80'
-                }`}
-              >
-                Stats
-              </Link>
-            </nav>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-6">
+              <nav className="flex items-center space-x-6">
+                <Link
+                  to="/"
+                  className={`text-sm font-medium transition-colors hover:text-blue-300 ${
+                    location.pathname === '/' ? 'text-blue-400' : 'text-white/80'
+                  }`}
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/solo"
+                  className={`text-sm font-medium transition-colors hover:text-blue-300 ${
+                    location.pathname === '/solo' ? 'text-blue-400' : 'text-white/80'
+                  }`}
+                >
+                  Solo
+                </Link>
+                <Link
+                  to="/leaderboard"
+                  className={`text-sm font-medium transition-colors hover:text-blue-300 ${
+                    location.pathname === '/leaderboard' ? 'text-blue-400' : 'text-white/80'
+                  }`}
+                >
+                  Leaderboard
+                </Link>
+                <Link
+                  to="/stats"
+                  className={`text-sm font-medium transition-colors hover:text-blue-300 ${
+                    location.pathname === '/stats' ? 'text-blue-400' : 'text-white/80'
+                  }`}
+                >
+                  Stats
+                </Link>
+              </nav>
+              
+              {/* User Menu */}
+              <UserMenu />
+            </div>
 
             {/* Mobile menu button */}
             <div className="md:hidden">
@@ -140,6 +146,11 @@ export function AppShell({ children }: AppShellProps) {
               >
                 📊 Stats
               </Link>
+              
+              {/* Mobile User Menu */}
+              <div className="pt-2 border-t border-white/10">
+                <UserMenu />
+              </div>
             </nav>
           </div>
         )}

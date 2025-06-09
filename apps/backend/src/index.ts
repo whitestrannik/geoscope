@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './trpc/index.js';
+import { createContext } from './lib/auth.js';
 import { env } from './lib/env.js';
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(express.json());
 // tRPC API endpoint
 app.use('/api/trpc', createExpressMiddleware({
   router: appRouter,
-  createContext: () => ({}), // We'll expand this later for auth
+  createContext,
 }));
 
 // Basic health check endpoint

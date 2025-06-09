@@ -1,10 +1,5 @@
 import { z } from 'zod';
-import { initTRPC } from '@trpc/server';
-
-// Initialize tRPC for this router
-const t = initTRPC.create();
-const router = t.router;
-const publicProcedure = t.procedure;
+import { router, publicProcedure } from './trpc.js';
 
 // Input validation schemas
 const GuessInputSchema = z.object({

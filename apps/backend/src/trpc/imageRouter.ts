@@ -1,10 +1,5 @@
 import { z } from 'zod';
-import { initTRPC } from '@trpc/server';
-
-// Initialize tRPC for this router
-const t = initTRPC.create();
-const router = t.router;
-const publicProcedure = t.procedure;
+import { router, publicProcedure } from './trpc.js';
 
 // Mock data for development - will be replaced with real Mapillary API
 const MOCK_IMAGES = [

@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User profile model (extends Supabase auth.users)
+model User {
+  id        String   @id // Matches Supabase auth.users.id (UUID)
+  username  String?  @unique // Optional, can be set after signup
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  guesses Guess[]
+
+  @@map("users")
+}
+
+// Game guess model for scoring system
+model Guess {
+  id         String   @id @default(cuid())
+  userId     String?  @map("user_id") // Optional for guest play
+  imageUrl   String   @map("image_url")
+  actualLat  Float    @map("actual_lat")
+  actualLng  Float    @map("actual_lng")
+  guessLat   Float    @map("guess_lat")
+  guessLng   Float    @map("guess_lng")
+  distance   Float    // Distance in kilometers
+  score      Int      // Calculated score
+  mode       String   // "solo" or "multiplayer"
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("guesses")
+} 
