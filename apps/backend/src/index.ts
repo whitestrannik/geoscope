@@ -1,20 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { appRouter } from './trpc/index.js';
 import { createContext } from './lib/auth.js';
+import { initializeSocket } from './lib/socket.js';
 import { env } from './lib/env.js';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: env.FRONTEND_URL,
-    methods: ["GET", "POST"]
-  }
-});
 
 const PORT = env.PORT;
 
@@ -40,20 +34,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
-  
-  socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.id}`);
-  });
-  
-  // Test event
-  socket.on('test', (data) => {
-    console.log('Test event received:', data);
-    socket.emit('test-response', { message: 'Hello from server!', data });
-  });
-});
+// Initialize Socket.IO for multiplayer rooms
+const io = initializeSocket(server);
 
 // Start server
 server.listen(PORT, () => {

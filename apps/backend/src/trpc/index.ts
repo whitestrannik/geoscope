@@ -3,6 +3,7 @@ import { router, publicProcedure } from './trpc.js';
 import { imageRouter } from './imageRouter.js';
 import { guessRouter } from './guessRouter.js';
 import { userRouter } from './user.js';
+import { roomRouter } from './roomRouter.js';
 
 // Define main app router
 export const appRouter = router({
@@ -32,7 +33,10 @@ export const appRouter = router({
   
   // Phase 3 routers
   user: userRouter,
+  
+  // Phase 4 routers
+  room: roomRouter,
 });
 
-// Export the type definition of the API
+// Export the app router type for frontend usage
 export type AppRouter = typeof appRouter; 

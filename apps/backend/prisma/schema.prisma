@@ -19,7 +19,9 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  guesses Guess[]
+  guesses     Guess[]
+  hostedRooms Room[]        @relation("RoomHost")
+  roomPlayers RoomPlayer[]
 
   @@map("users")
 }
@@ -28,6 +30,7 @@ model User {
 model Guess {
   id         String   @id @default(cuid())
   userId     String?  @map("user_id") // Optional for guest play
+  roomId     String?  @map("room_id")  // Optional for multiplayer games
   imageUrl   String   @map("image_url")
   actualLat  Float    @map("actual_lat")
   actualLng  Float    @map("actual_lng")
@@ -36,10 +39,57 @@ model Guess {
   distance   Float    // Distance in kilometers
   score      Int      // Calculated score
   mode       String   // "solo" or "multiplayer"
+  roundIndex Int?     @map("round_index") // For multiplayer rounds
   createdAt  DateTime @default(now()) @map("created_at")
 
   // Relations
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  room Room? @relation(fields: [roomId], references: [id], onDelete: SetNull)
 
   @@map("guesses")
+}
+
+// Multiplayer room model
+model Room {
+  id         String     @id @default(cuid()) // Room code
+  hostUserId String     @map("host_user_id")
+  status     RoomStatus @default(WAITING)
+  maxPlayers Int        @default(6) @map("max_players")
+  currentRound Int      @default(0) @map("current_round")
+  totalRounds  Int      @default(5) @map("total_rounds")
+  roundTimeLimit Int?   @map("round_time_limit") // seconds, null = no limit
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  host    User         @relation("RoomHost", fields: [hostUserId], references: [id], onDelete: Cascade)
+  players RoomPlayer[]
+  guesses Guess[]
+
+  @@map("rooms")
+}
+
+// Room player junction table
+model RoomPlayer {
+  id       String   @id @default(cuid())
+  roomId   String   @map("room_id")
+  userId   String   @map("user_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+  score    Int      @default(0) // Total score for this room
+  isReady  Boolean  @default(false) @map("is_ready") // Ready for next round
+
+  // Relations
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Unique constraint: one user per room
+  @@unique([roomId, userId])
+  @@map("room_players")
+}
+
+// Room status enum
+enum RoomStatus {
+  WAITING   // Waiting for players to join
+  ACTIVE    // Game in progress
+  FINISHED  // Game completed
 } 

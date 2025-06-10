@@ -1,40 +1,178 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
+import { trpc } from '@/lib/trpc';
+import { Link } from 'react-router-dom';
+import { Loader2, Users, Timer, Hash } from 'lucide-react';
 
 export function CreateRoomPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [maxPlayers, setMaxPlayers] = useState(6);
+  const [totalRounds, setTotalRounds] = useState(5);
+  const [hasTimeLimit, setHasTimeLimit] = useState(false);
+  const [roundTimeLimit, setRoundTimeLimit] = useState(120); // 2 minutes
+
+  const createRoomMutation = trpc.room.create.useMutation({
+    onSuccess: (room) => {
+      navigate(`/room/${room.id}`);
+    },
+    onError: (error) => {
+      console.error('Failed to create room:', error);
+    }
+  });
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">🔒 Authentication Required</CardTitle>
+            <CardDescription className="text-gray-300">
+              You need to be logged in to create a room
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Link to="/">
+              <Button className="w-full">Go Home</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const handleCreateRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    createRoomMutation.mutate({
+      maxPlayers,
+      totalRounds,
+      roundTimeLimit: hasTimeLimit ? roundTimeLimit : undefined
+    });
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-      <Card className="w-full max-w-2xl bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">
+          <CardTitle className="text-2xl flex items-center justify-center gap-2">
             🏠 Create Room
           </CardTitle>
+          <CardDescription className="text-gray-300">
+            Set up a multiplayer game for you and your friends
+          </CardDescription>
         </CardHeader>
         
-        <CardContent className="text-center space-y-6">
-          <p className="text-lg text-blue-200">
-            Create a multiplayer room for friends to join!
-          </p>
-          
-          <div className="space-y-2 text-sm text-blue-300">
-            <p>👥 Host multiplayer games</p>
-            <p>🔢 Generate room codes</p>
-            <p>⚡ Real-time gameplay</p>
-          </div>
+        <CardContent>
+          <form onSubmit={handleCreateRoom} className="space-y-6">
+            {/* Max Players */}
+            <div className="space-y-2">
+              <Label htmlFor="maxPlayers" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Max Players (2-10)
+              </Label>
+              <Input
+                id="maxPlayers"
+                type="number"
+                min="2"
+                max="10"
+                value={maxPlayers}
+                onChange={(e) => setMaxPlayers(parseInt(e.target.value) || 6)}
+                className="bg-black/20 border-white/30 text-white"
+              />
+            </div>
 
-          <div className="pt-4">
-            <Link to="/">
-              <Button variant="outline" className="text-white border-white/30 hover:bg-white/10">
-                ← Back to Home
+            {/* Total Rounds */}
+            <div className="space-y-2">
+              <Label htmlFor="totalRounds" className="flex items-center gap-2">
+                <Hash className="h-4 w-4" />
+                Number of Rounds (1-20)
+              </Label>
+              <Input
+                id="totalRounds"
+                type="number"
+                min="1"
+                max="20"
+                value={totalRounds}
+                onChange={(e) => setTotalRounds(parseInt(e.target.value) || 5)}
+                className="bg-black/20 border-white/30 text-white"
+              />
+            </div>
+
+            {/* Time Limit */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="hasTimeLimit"
+                  checked={hasTimeLimit}
+                  onChange={(e) => setHasTimeLimit(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="hasTimeLimit" className="flex items-center gap-2">
+                  <Timer className="h-4 w-4" />
+                  Enable Round Time Limit
+                </Label>
+              </div>
+              
+              {hasTimeLimit && (
+                <div className="space-y-2">
+                  <Label htmlFor="roundTimeLimit" className="text-sm">
+                    Time per Round (30-300 seconds)
+                  </Label>
+                  <Input
+                    id="roundTimeLimit"
+                    type="number"
+                    min="30"
+                    max="300"
+                    value={roundTimeLimit}
+                    onChange={(e) => setRoundTimeLimit(parseInt(e.target.value) || 120)}
+                    className="bg-black/20 border-white/30 text-white"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Link to="/" className="flex-1">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full bg-black/50 text-white border-white/30 hover:bg-black/70"
+                >
+                  Cancel
+                </Button>
+              </Link>
+              
+              <Button
+                type="submit"
+                disabled={createRoomMutation.isPending}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold"
+              >
+                {createRoomMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  '🏠 Create Room'
+                )}
               </Button>
-            </Link>
-          </div>
+            </div>
 
-          <div className="text-xs text-yellow-300 bg-yellow-500/20 rounded-lg p-3 border border-yellow-500/30">
-            📋 Future Implementation: Multiplayer room creation with Socket.IO
-          </div>
+            {/* Error Display */}
+            {createRoomMutation.error && (
+              <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-md text-sm">
+                Failed to create room: {createRoomMutation.error.message}
+              </div>
+            )}
+          </form>
         </CardContent>
       </Card>
     </div>
