@@ -40,6 +40,7 @@ class SocketService {
       return this.socket;
     }
 
+    // Use environment variable or fallback to localhost for development
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
     
     this.socket = io(backendUrl, {
