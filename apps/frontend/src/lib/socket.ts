@@ -21,6 +21,7 @@ interface ClientToServerEvents {
   'player-ready': (data: { roomId: string, isReady: boolean }) => void;
   'submit-guess': (data: { roomId: string, roundIndex: number, guessLat: number, guessLng: number }) => void;
   'start-game': (data: { roomId: string }) => void;
+  'get-round-state': (data: { roomId: string }) => void;
 }
 
 export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -67,7 +68,10 @@ class SocketService {
     this.socket.on('player-left', (data) => this.emit('player-left', data));
     this.socket.on('player-ready', (data) => this.emit('player-ready', data));
     this.socket.on('game-started', (data) => this.emit('game-started', data));
-    this.socket.on('round-started', (data) => this.emit('round-started', data));
+    this.socket.on('round-started', (data) => {
+      console.log('🔌 SocketService: round-started event received from backend:', data);
+      this.emit('round-started', data);
+    });
     this.socket.on('guess-submitted', (data) => this.emit('guess-submitted', data));
     this.socket.on('round-ended', (data) => this.emit('round-ended', data));
     this.socket.on('game-ended', (data) => this.emit('game-ended', data));
@@ -100,7 +104,9 @@ class SocketService {
     }
 
     this.currentRoomId = roomId;
+    console.log('🏠 Frontend: Emitting join-room event with roomId:', roomId);
     this.socket.emit('join-room', { roomId, token });
+    console.log('🏠 Frontend: join-room event emitted');
   }
 
   // Leave current room
@@ -124,11 +130,18 @@ class SocketService {
 
   // Start game (host only)
   startGame() {
+    console.log('🔌 SocketService.startGame() called');
+    console.log('🔌 Socket connected:', this.socket?.connected);
+    console.log('🔌 Current room ID:', this.currentRoomId);
+    
     if (!this.socket || !this.currentRoomId) {
+      console.error('🔌 Cannot start game - socket or room not available');
       throw new Error('Not connected to a room');
     }
 
+    console.log('🔌 Emitting start-game event with data:', { roomId: this.currentRoomId });
     this.socket.emit('start-game', { roomId: this.currentRoomId });
+    console.log('🔌 start-game event emitted');
   }
 
   // Submit guess
@@ -142,6 +155,18 @@ class SocketService {
       roundIndex,
       guessLat,
       guessLng
+    });
+  }
+
+  // Get current round state (for joining active games)
+  getRoundState() {
+    if (!this.socket || !this.currentRoomId) {
+      throw new Error('Not connected to a room');
+    }
+
+    console.log('🔌 SocketService.getRoundState() called for room:', this.currentRoomId);
+    this.socket.emit('get-round-state', {
+      roomId: this.currentRoomId
     });
   }
 
