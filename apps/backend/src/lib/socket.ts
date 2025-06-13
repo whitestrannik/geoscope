@@ -1,50 +1,49 @@
 import { Server as HTTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { verifyToken } from './supabase.js';
-import { db } from './db.js';
+import { verifyToken } from './supabase';
+import { db } from './db';
+import { imageRouter } from '../trpc/imageRouter';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import { appRouter } from '../trpc';
 
-// Import image and scoring utilities from existing routers
-import { calculateDistance, calculateScore } from '../trpc/guessRouter.js';
+// Create tRPC client for internal use
+console.log('🔧 Initializing tRPC client...');
+const trpc = createTRPCProxyClient<typeof appRouter>({
+  links: [
+    httpBatchLink({
+      url: `http://localhost:${process.env.PORT || 3001}/api/trpc`,
+    }),
+  ],
+});
+console.log('✅ tRPC client initialized');
 
-// Helper function to get random image (mimics the imageRouter logic)
-async function getRandomImage(): Promise<{
-  id: string;
-  imageUrl: string;
-  actualLat: number;
-  actualLng: number;
-  location?: string;
-  copyright?: string;
-}> {
-  // Mock data for now - can be replaced with real Mapillary API call
-  const mockImages = [
-    {
-      id: 'img1',
-      imageUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop',
-      actualLat: 46.2044,
-      actualLng: 6.1432,
-      location: 'Geneva, Switzerland',
-      copyright: 'Unsplash'
-    },
-    {
-      id: 'img2', 
-      imageUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&h=800&fit=crop',
-      actualLat: 51.5074,
-      actualLng: -0.1278,
-      location: 'London, UK',
-      copyright: 'Unsplash'
-    },
-    {
-      id: 'img3',
-      imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop',
-      actualLat: 40.7128,
-      actualLng: -74.0060,
-      location: 'New York, USA',
-      copyright: 'Unsplash'
+// Helper function to get random image using tRPC client
+async function getRandomImage() {
+  try {
+    console.log('🖼️ Requesting random image from tRPC...');
+    const result = await trpc.image.getRandom.query();
+    console.log('📥 Received tRPC response:', result);
+    
+    if (!result) {
+      console.error('❌ No image data received from tRPC');
+      throw new Error('No image data received from tRPC');
     }
-  ];
-  
-  const randomIndex = Math.floor(Math.random() * mockImages.length);
-  return mockImages[randomIndex]!;
+
+    const imageData = {
+      id: result.id,
+      imageUrl: result.imageUrl,
+      actualLat: result.actualLat,
+      actualLng: result.actualLng,
+      location: result.location,
+      copyright: result.copyright
+    };
+    console.log('✅ Processed image data:', imageData);
+    return imageData;
+  } catch (error) {
+    console.error('❌ Error getting random image:', error instanceof Error ? error.message : String(error));
+    console.error('❌ Full error:', error);
+    throw error;
+  }
 }
 
 // Game state management
@@ -67,7 +66,7 @@ export interface ServerToClientEvents {
   'player-joined': (data: { roomId: string, player: any }) => void;
   'player-left': (data: { roomId: string, playerId: string }) => void;
   'player-ready': (data: { roomId: string, playerId: string, isReady: boolean }) => void;
-  'game-started': (data: { roomId: string, imageData: any, roundIndex: number }) => void;
+  'game-started': (data: { roomId: string, roundIndex: number }) => void;
   'round-started': (data: { 
     roomId: string, 
     imageData: { imageUrl: string }, 
@@ -499,8 +498,14 @@ async function startNewRound(roomId: string, roundIndex: number, timeLimit?: num
     console.log(`🎯 Starting new round ${roundIndex} for room ${roomId} with timeLimit: ${timeLimit}`);
     
     // Get random image
+    console.log('🖼️ Requesting random image...');
     const imageData = await getRandomImage();
-    console.log(`🖼️ Got image data:`, { id: imageData.id, url: imageData.imageUrl });
+    console.log(`🖼️ Got image data:`, { 
+      id: imageData.id, 
+      url: imageData.imageUrl,
+      lat: imageData.actualLat,
+      lng: imageData.actualLng
+    });
     
     // Create round state
     const roundState: RoundState = {
@@ -547,18 +552,25 @@ async function startNewRound(roomId: string, roundIndex: number, timeLimit?: num
     }
 
   } catch (error) {
-    console.error('❌ Error starting new round:', error);
+    console.error('❌ Error starting new round:', error instanceof Error ? error.message : String(error));
+    console.error('❌ Error details:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     io.to(roomId).emit('error', { message: 'Failed to start round' });
   }
 }
 
-// Helper function to end a round and calculate results
+// Helper function to end a round and calculate scores
 async function endRound(roomId: string) {
   try {
     const roundState = activeRounds.get(roomId);
-    if (!roundState) return;
+    if (!roundState) {
+      console.log(`❌ No active round found for room ${roomId}`);
+      return;
+    }
 
-    // Get room and players
+    console.log(`🎯 Ending round ${roundState.roundIndex} for room ${roomId}`);
+    
+    // Get all players in the room
     const room = await db.room.findUnique({
       where: { id: roomId },
       include: {
@@ -576,80 +588,76 @@ async function endRound(roomId: string) {
       }
     });
 
-    if (!room) return;
+    if (!room) {
+      console.log(`❌ Room ${roomId} not found`);
+      return;
+    }
 
-    // Calculate scores for all guesses
-    const results = [];
-    const playerScoreUpdates = new Map<string, number>();
-
-    for (const player of room.players) {
+    // Calculate scores for each player
+    const results = room.players.map((player: { 
+      userId: string; 
+      score: number; 
+      user: { 
+        username: string | null; 
+        email: string; 
+      }; 
+    }) => {
       const guess = roundState.guesses.get(player.userId);
+      // Ensure username is always a string
+      const username = (player.user.username || player.user.email.split('@')[0]) as string;
       
-      let distance = 0;
-      let score = 0;
-      let guessLat = 0;
-      let guessLng = 0;
-
-      if (guess) {
-        distance = calculateDistance(
-          roundState.imageData.actualLat,
-          roundState.imageData.actualLng,
-          guess.guessLat,
-          guess.guessLng
-        );
-        score = calculateScore(distance);
-        guessLat = guess.guessLat;
-        guessLng = guess.guessLng;
-
-        // Store the guess in the database
-        await db.guess.create({
-          data: {
-            userId: player.userId,
-            roomId: roomId,
-            imageUrl: roundState.imageData.imageUrl,
-            actualLat: roundState.imageData.actualLat,
-            actualLng: roundState.imageData.actualLng,
-            guessLat: guess.guessLat,
-            guessLng: guess.guessLng,
-            distance,
-            score,
-            mode: 'multiplayer',
-            roundIndex: roundState.roundIndex
-          }
-        });
+      if (!guess) {
+        return {
+          playerId: player.userId,
+          username,
+          guessLat: 0,
+          guessLng: 0,
+          distance: 0,
+          score: 0,
+          totalScore: player.score,
+          hasGuessed: false
+        };
       }
 
-      // Update player's total score
-      const newTotalScore = player.score + score;
-      playerScoreUpdates.set(player.userId, newTotalScore);
+      // Calculate distance using haversine formula
+      const distance = calculateHaversineDistance(
+        guess.guessLat,
+        guess.guessLng,
+        roundState.imageData.actualLat,
+        roundState.imageData.actualLng
+      );
 
-      results.push({
+      // Calculate score based on distance
+      const score = calculateRoundScore(distance);
+      const newTotalScore = player.score + score;
+
+      // Update player's total score in database
+      db.roomPlayer.update({
+        where: {
+          roomId_userId: {
+            roomId,
+            userId: player.userId
+          }
+        },
+        data: {
+          score: newTotalScore
+        }
+      });
+
+      return {
         playerId: player.userId,
-        username: (player.user.username || player.user.email.split('@')[0]) as string,
-        guessLat,
-        guessLng,
+        username,
+        guessLat: guess.guessLat,
+        guessLng: guess.guessLng,
         distance,
         score,
         totalScore: newTotalScore,
-        hasGuessed: !!guess
-      });
-    }
+        hasGuessed: true
+      };
+    });
 
-    // Update player scores in database
-    for (const [userId, totalScore] of playerScoreUpdates) {
-      await db.roomPlayer.update({
-        where: {
-          roomId_userId: {
-            roomId: roomId,
-            userId: userId
-          }
-        },
-        data: { score: totalScore }
-      });
-    }
-
-    // Sort results by score (highest first)
-    results.sort((a, b) => b.score - a.score);
+    // Sort results by score with proper type annotations
+    results.sort((a: { score: number }, b: { score: number }) => b.score - a.score);
 
     // Broadcast round results
     io.to(roomId).emit('round-ended', {
@@ -663,21 +671,14 @@ async function endRound(roomId: string) {
       imageUrl: roundState.imageData.imageUrl
     });
 
-    console.log(`🏆 Round ${roundState.roundIndex} ended in room ${roomId}`);
-
-    // Check if game should continue or end
+    // Check if this was the last round
     if (roundState.roundIndex >= room.totalRounds) {
-      // Game finished
+      // End the game
       await endGame(roomId, results);
     } else {
-      // Start next round after delay
-      setTimeout(async () => {
-        const nextRound = roundState.roundIndex + 1;
-        await db.room.update({
-          where: { id: roomId },
-          data: { currentRound: nextRound }
-        });
-        await startNewRound(roomId, nextRound, room.roundTimeLimit ?? undefined);
+      // Start next round after a short delay
+      setTimeout(() => {
+        startNewRound(roomId, roundState.roundIndex + 1, room.roundTimeLimit ?? undefined);
       }, 5000); // 5 second delay between rounds
     }
 
@@ -685,9 +686,35 @@ async function endRound(roomId: string) {
     activeRounds.delete(roomId);
 
   } catch (error) {
-    console.error('Error ending round:', error);
+    console.error('❌ Error ending round:', error);
     io.to(roomId).emit('error', { message: 'Failed to end round' });
   }
+}
+
+// Helper function to calculate distance between two points
+function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Helper function to convert degrees to radians
+function toRad(degrees: number): number {
+  return degrees * (Math.PI / 180);
+}
+
+// Helper function to calculate score based on distance
+function calculateRoundScore(distance: number): number {
+  // Score decreases exponentially with distance
+  // Max score is 1000 points
+  // Score is 0 at 10000km or more
+  return Math.max(0, Math.round(1000 * Math.exp(-distance / 2000)));
 }
 
 // Helper function to end the game
