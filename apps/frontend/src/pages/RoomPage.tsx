@@ -482,8 +482,8 @@ export function RoomPage() {
                   variant={isReady ? "default" : "outline"}
                   className={
                     isReady
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "border-white/30 text-white hover:bg-white/10"
+                      ? "bg-green-600 hover:bg-green-700 text-white border-green-600"
+                      : "bg-red-600/20 hover:bg-red-600/30 text-red-200 border-red-500/50 hover:text-red-100"
                   }
                   disabled={setReadyMutation.isPending}
                 >

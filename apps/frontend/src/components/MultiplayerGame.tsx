@@ -66,6 +66,15 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
   // Set up socket event listeners
   useEffect(() => {
+    const handleGameStarted = (data: {
+      roomId: string;
+      roundIndex: number;
+    }) => {
+      console.log('🎯 MultiplayerGame: Game started event received:', data);
+      // Request current round state immediately
+      socket.getRoundState();
+    };
+
     const handleRoundStarted = (data: {
       roomId: string;
       imageData: { imageUrl: string };
@@ -146,6 +155,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     console.log('🎯 MultiplayerGame: Registering socket event listeners');
     console.log('🎯 MultiplayerGame: Socket object:', socket);
     
+    socket.on('game-started', handleGameStarted);
     socket.on('round-started', handleRoundStarted);
     socket.on('guess-submitted', handleGuessSubmitted);
     socket.on('round-ended', handleRoundEnded);
@@ -153,6 +163,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     return () => {
       console.log('🎯 MultiplayerGame: Cleaning up socket event listeners');
+      socket.off('game-started', handleGameStarted);
       socket.off('round-started', handleRoundStarted);
       socket.off('guess-submitted', handleGuessSubmitted);
       socket.off('round-ended', handleRoundEnded);

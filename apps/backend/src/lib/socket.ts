@@ -363,6 +363,12 @@ export function initializeSocket(httpServer: HTTPServer) {
           }
         });
 
+        // Emit game-started event to all players
+        io.to(roomId.toUpperCase()).emit('game-started', {
+          roomId: roomId.toUpperCase(),
+          roundIndex: 1
+        });
+
         // Start the first round
         await startNewRound(roomId.toUpperCase(), 1, room.roundTimeLimit ?? undefined);
 
