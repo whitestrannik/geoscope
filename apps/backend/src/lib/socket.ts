@@ -580,17 +580,38 @@ async function endRound(roomId: string) {
       const score = calculateRoundScore(distance);
       const newTotalScore = player.score + score;
 
-      // Update player's total score in database
-      db.roomPlayer.update({
-        where: {
-          roomId_userId: {
-            roomId,
-            userId: player.userId
+      // Store the guess in database and update player's total score
+      Promise.all([
+        // Store individual guess record
+        db.guess.create({
+          data: {
+            userId: player.userId,
+            roomId: roomId,
+            imageUrl: roundState.imageData.imageUrl,
+            actualLat: roundState.imageData.actualLat,
+            actualLng: roundState.imageData.actualLng,
+            guessLat: guess.guessLat,
+            guessLng: guess.guessLng,
+            distance: distance,
+            score: score,
+            mode: 'multiplayer',
+            roundIndex: roundState.roundIndex
           }
-        },
-        data: {
-          score: newTotalScore
-        }
+        }),
+        // Update player's total score
+        db.roomPlayer.update({
+          where: {
+            roomId_userId: {
+              roomId,
+              userId: player.userId
+            }
+          },
+          data: {
+            score: newTotalScore
+          }
+        })
+      ]).catch(error => {
+        console.error('Error storing guess and updating score:', error);
       });
 
       return {
