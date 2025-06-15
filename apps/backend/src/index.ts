@@ -39,7 +39,5 @@ const io = initializeSocket(server);
 
 // Start server
 server.listen(PORT, () => {
-  console.log(`🚀 GeoScope Backend running on port ${PORT}`);
-  console.log(`📡 Socket.IO server ready`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+
 }); 

@@ -51,11 +51,9 @@ class SocketService {
 
     // Set up default event handlers
     this.socket.on('connect', () => {
-      console.log('🔌 Connected to Socket.IO server');
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('🔌 Disconnected from Socket.IO server:', reason);
     });
 
     this.socket.on('error', (data) => {
@@ -69,7 +67,6 @@ class SocketService {
     this.socket.on('player-ready', (data) => this.emit('player-ready', data));
     this.socket.on('game-started', (data) => this.emit('game-started', data));
     this.socket.on('round-started', (data) => {
-      console.log('🔌 SocketService: round-started event received from backend:', data);
       this.emit('round-started', data);
     });
     this.socket.on('guess-submitted', (data) => this.emit('guess-submitted', data));
@@ -104,9 +101,7 @@ class SocketService {
     }
 
     this.currentRoomId = roomId;
-    console.log('🏠 Frontend: Emitting join-room event with roomId:', roomId);
     this.socket.emit('join-room', { roomId, token });
-    console.log('🏠 Frontend: join-room event emitted');
   }
 
   // Leave current room
@@ -130,18 +125,13 @@ class SocketService {
 
   // Start game (host only)
   startGame() {
-    console.log('🔌 SocketService.startGame() called');
-    console.log('🔌 Socket connected:', this.socket?.connected);
-    console.log('🔌 Current room ID:', this.currentRoomId);
     
     if (!this.socket || !this.currentRoomId) {
       console.error('🔌 Cannot start game - socket or room not available');
       throw new Error('Not connected to a room');
     }
 
-    console.log('🔌 Emitting start-game event with data:', { roomId: this.currentRoomId });
     this.socket.emit('start-game', { roomId: this.currentRoomId });
-    console.log('🔌 start-game event emitted');
   }
 
   // Submit guess
@@ -164,7 +154,6 @@ class SocketService {
       throw new Error('Not connected to a room');
     }
 
-    console.log('🔌 SocketService.getRoundState() called for room:', this.currentRoomId);
     this.socket.emit('get-round-state', {
       roomId: this.currentRoomId
     });

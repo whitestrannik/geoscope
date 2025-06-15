@@ -7,7 +7,6 @@ import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import { appRouter } from '../trpc';
 
 // Create tRPC client for internal use
-console.log('🔧 Initializing tRPC client...');
 const trpc = createTRPCProxyClient<typeof appRouter>({
   links: [
     httpBatchLink({
@@ -15,14 +14,11 @@ const trpc = createTRPCProxyClient<typeof appRouter>({
     }),
   ],
 });
-console.log('✅ tRPC client initialized');
 
 // Helper function to get random image using tRPC client
 async function getRandomImage() {
   try {
-    console.log('🖼️ Requesting random image from tRPC...');
     const result = await trpc.image.getRandom.query();
-    console.log('📥 Received tRPC response:', result);
     
     if (!result) {
       console.error('❌ No image data received from tRPC');
@@ -37,7 +33,6 @@ async function getRandomImage() {
       location: result.location,
       copyright: result.copyright
     };
-    console.log('✅ Processed image data:', imageData);
     return imageData;
   } catch (error) {
     console.error('❌ Error getting random image:', error instanceof Error ? error.message : String(error));
@@ -134,14 +129,9 @@ export function initializeSocket(httpServer: HTTPServer) {
   });
 
   io.on('connection', (socket: TypedSocket) => {
-    console.log(`🔌 Socket connected: ${socket.id}`);
-    console.log(`🔌 Socket transport: ${socket.conn.transport.name}`);
-    console.log(`🔌 Socket handshake: ${JSON.stringify(socket.handshake.headers.origin)}`);
 
     // Join room
-    console.log('🏠 Backend: Registering join-room event listener');
     socket.on('join-room', async ({ roomId, token }) => {
-      console.log('🏠 Backend: join-room event received!', { roomId });
       try {
         // Verify user token
         const user = await verifyToken(token);
@@ -219,7 +209,6 @@ export function initializeSocket(httpServer: HTTPServer) {
         if (roomPlayer.room.status === 'ACTIVE') {
           const activeRound = activeRounds.get(roomId.toUpperCase());
           if (activeRound) {
-            console.log(`🎯 Room ${roomId.toUpperCase()} is ACTIVE with ongoing round ${activeRound.roundIndex} - sending round state to joining player`);
             
             // Calculate remaining time if there's a time limit
             let timeRemaining: number | undefined;
@@ -237,12 +226,8 @@ export function initializeSocket(httpServer: HTTPServer) {
               roundIndex: activeRound.roundIndex,
               ...(timeRemaining !== undefined && { timeLimit: timeRemaining })
             });
-            
-            console.log(`🎯 Sent round-started event to joining player ${user.id} for round ${activeRound.roundIndex}`);
           }
         }
-
-        console.log(`👤 User ${user.id} joined room ${roomId.toUpperCase()}`);
       } catch (error) {
         console.error('Error joining room:', error);
         socket.emit('error', { message: 'Failed to join room' });
@@ -265,7 +250,6 @@ export function initializeSocket(httpServer: HTTPServer) {
 
         // Clear socket data
         delete socket.data.roomId;
-        console.log(`👤 User ${userId} left room ${roomId.toUpperCase()}`);
       } catch (error) {
         console.error('Error leaving room:', error);
       }
@@ -294,8 +278,6 @@ export function initializeSocket(httpServer: HTTPServer) {
           playerId: userId,
           isReady
         });
-
-        console.log(`👤 User ${userId} is ${isReady ? 'ready' : 'not ready'} in room ${roomId.toUpperCase()}`);
       } catch (error) {
         console.error('Error updating ready status:', error);
         socket.emit('error', { message: 'Failed to update ready status' });
@@ -303,15 +285,11 @@ export function initializeSocket(httpServer: HTTPServer) {
     });
 
     // Start game (host only)
-    console.log('🎮 Backend: Registering start-game event listener');
     socket.on('start-game', async ({ roomId }) => {
-      console.log('🎮 Backend: start-game event received!', { roomId });
       try {
-        console.log(`🎮 Start game request received for room ${roomId} from user ${socket.data.userId}`);
         
         const userId = socket.data.userId;
         if (!userId) {
-          console.log('❌ No userId in socket data');
           return;
         }
 
@@ -333,25 +311,18 @@ export function initializeSocket(httpServer: HTTPServer) {
           }
         });
 
-        console.log(`🏠 Room found: ${room?.id}, Host: ${room?.hostUserId}, Current user: ${userId}`);
-
         if (!room || room.hostUserId !== userId) {
-          console.log('❌ User is not the host');
           socket.emit('error', { message: 'Only the host can start the game' });
           return;
         }
 
         // Check if all players are ready
         const allReady = room.players.every(p => p.isReady);
-        console.log(`👥 Players ready status:`, room.players.map(p => ({ id: p.userId, ready: p.isReady })));
         
         if (!allReady) {
-          console.log('❌ Not all players are ready');
           socket.emit('error', { message: 'All players must be ready to start' });
           return;
         }
-
-        console.log('✅ All checks passed, updating room status and starting first round');
 
         // Update room status to ACTIVE and start first round
         await db.room.update({
@@ -387,7 +358,6 @@ export function initializeSocket(httpServer: HTTPServer) {
         const activeRound = activeRounds.get(roomIdUpper);
         
         if (activeRound) {
-          console.log(`🎯 Player ${userId} requested round state for room ${roomIdUpper} - sending round ${activeRound.roundIndex}`);
           
           // Calculate remaining time if there's a time limit
           let timeRemaining: number | undefined;
@@ -405,10 +375,6 @@ export function initializeSocket(httpServer: HTTPServer) {
             roundIndex: activeRound.roundIndex,
             ...(timeRemaining !== undefined && { timeLimit: timeRemaining })
           });
-          
-          console.log(`🎯 Sent round-started event to player ${userId} for round ${activeRound.roundIndex}`);
-        } else {
-          console.log(`🎯 Player ${userId} requested round state for room ${roomIdUpper} but no active round found`);
         }
       } catch (error) {
         console.error('Error getting round state:', error);
@@ -453,7 +419,7 @@ export function initializeSocket(httpServer: HTTPServer) {
           roundIndex
         });
 
-        console.log(`🎯 User ${userId} submitted guess for round ${roundIndex} in room ${roomIdUpper}`);
+
 
         // Check if all players have submitted guesses
         const room = await db.room.findUnique({
@@ -485,7 +451,7 @@ export function initializeSocket(httpServer: HTTPServer) {
         });
       }
       
-      console.log(`🔌 Socket disconnected: ${socket.id}`);
+
     });
   });
 
@@ -495,17 +461,9 @@ export function initializeSocket(httpServer: HTTPServer) {
 // Helper function to start a new round
 async function startNewRound(roomId: string, roundIndex: number, timeLimit?: number) {
   try {
-    console.log(`🎯 Starting new round ${roundIndex} for room ${roomId} with timeLimit: ${timeLimit}`);
     
     // Get random image
-    console.log('🖼️ Requesting random image...');
     const imageData = await getRandomImage();
-    console.log(`🖼️ Got image data:`, { 
-      id: imageData.id, 
-      url: imageData.imageUrl,
-      lat: imageData.actualLat,
-      lng: imageData.actualLng
-    });
     
     // Create round state
     const roundState: RoundState = {
@@ -522,7 +480,6 @@ async function startNewRound(roomId: string, roundIndex: number, timeLimit?: num
     };
 
     activeRounds.set(roomId, roundState);
-    console.log(`💾 Round state saved for room ${roomId}`);
 
     // Notify all players that the round has started
     const eventData = {
@@ -535,17 +492,13 @@ async function startNewRound(roomId: string, roundIndex: number, timeLimit?: num
       ...(timeLimit !== undefined && { timeLimit })
     };
     
-    console.log(`📡 Emitting round-started event to room ${roomId}:`, eventData);
     io.to(roomId).emit('round-started', eventData);
-
-    console.log(`🎮 Round ${roundIndex} started in room ${roomId}`);
 
     // Set timeout to end round if time limit is set
     if (timeLimit) {
       setTimeout(async () => {
         const currentRound = activeRounds.get(roomId);
         if (currentRound && currentRound.roundIndex === roundIndex) {
-          console.log(`⏰ Time limit reached for round ${roundIndex} in room ${roomId}`);
           await endRound(roomId);
         }
       }, timeLimit * 1000);
@@ -564,11 +517,8 @@ async function endRound(roomId: string) {
   try {
     const roundState = activeRounds.get(roomId);
     if (!roundState) {
-      console.log(`❌ No active round found for room ${roomId}`);
       return;
     }
-
-    console.log(`🎯 Ending round ${roundState.roundIndex} for room ${roomId}`);
     
     // Get all players in the room
     const room = await db.room.findUnique({
@@ -589,7 +539,6 @@ async function endRound(roomId: string) {
     });
 
     if (!room) {
-      console.log(`❌ Room ${roomId} not found`);
       return;
     }
 
@@ -735,7 +684,7 @@ async function endGame(roomId: string, finalResults: any[]) {
       finalResults: sortedResults
     });
 
-    console.log(`🎉 Game ended in room ${roomId}`);
+
 
     // Clean up any remaining round state
     activeRounds.delete(roomId);
@@ -765,6 +714,5 @@ export function emitToUser(userId: string, event: keyof ServerToClientEvents, da
   if (io) {
     // Find socket by user ID (would need to maintain user-socket mapping)
     // For now, we'll use room-based communication
-    console.log(`Attempted to emit to user ${userId}, but user-specific emit not implemented yet`);
   }
 } 

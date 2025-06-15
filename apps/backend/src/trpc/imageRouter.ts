@@ -69,7 +69,6 @@ async function fetchFromMapillary(): Promise<ImageResponse> {
   }
 
   try {
-    console.log('✅ Fetching from Mapillary API...');
     
     // Define geographic regions for diversity
     const geographicRegions = [
@@ -84,7 +83,6 @@ async function fetchFromMapillary(): Promise<ImageResponse> {
     // Pick a random region for geographic diversity
     const regionIndex = Math.floor(Math.random() * geographicRegions.length);
     const randomRegion = geographicRegions[regionIndex]!; // Safe because array is not empty
-    console.log(`🌍 Searching in region: ${randomRegion.name}`);
     
     // Use proper authorization header and bbox parameter
     const response = await fetch(
@@ -98,31 +96,24 @@ async function fetchFromMapillary(): Promise<ImageResponse> {
       }
     );
 
-    console.log(`📡 Mapillary API response: ${response.status}`);
-
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Mapillary API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log(`📊 Mapillary returned ${data.data ? data.data.length : 0} images from ${randomRegion.name}`);
     
     if (!data.data || data.data.length === 0) {
       console.warn(`⚠️  No images returned from Mapillary API for ${randomRegion.name} - using mock data`);
-      console.log('ℹ️  This might be due to API access limitations or no coverage in this region');
       return getRandomMockImage();
     }
 
     // Pick a random image from the results
     const imageIndex = Math.floor(Math.random() * data.data.length);
     const mapillaryImage = data.data[imageIndex];
-    
-    console.log(`🎯 Selected Mapillary image: ${mapillaryImage.id} from ${randomRegion.name}`);
     return processMapillaryResponse(mapillaryImage);
   } catch (error) {
     console.error('❌ Error fetching from Mapillary API:', error instanceof Error ? error.message : String(error));
-    console.log('🔄 Falling back to mock data');
     return getRandomMockImage();
   }
 }

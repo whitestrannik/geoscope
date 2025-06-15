@@ -89,38 +89,28 @@ export function RoomPage() {
 
     // Join the room (only if not already in this room)
     if (socket.roomId !== roomId.toUpperCase()) {
-      console.log('🏠 RoomPage: Joining room via socket:', roomId);
       socket.joinRoom(roomId).catch(error => {
         console.error('Failed to join room via socket:', error);
       });
-    } else {
-      console.log('🏠 RoomPage: Already in room:', roomId);
     }
 
     // Set up event listeners
     const handlePlayerJoined = (data: { roomId: string, player: any }) => {
-      console.log('Player joined:', data);
       refetch();
     };
 
     const handlePlayerLeft = (data: { roomId: string, playerId: string }) => {
-      console.log('Player left:', data);
       refetch();
     };
 
     const handlePlayerReady = (data: { roomId: string, playerId: string, isReady: boolean }) => {
-      console.log('👥 Player ready status changed:', data);
       if (data.playerId === user.id) {
         setIsReady(data.isReady);
       }
       refetch();
-      
-      // Check if this might be triggering auto-start
-      console.log('👥 After player ready change, refetching room data...');
     };
 
     const handleGameStarted = (data: { roomId: string, imageData: any, roundIndex: number }) => {
-      console.log('Game started:', data);
       refetch();
     };
 
@@ -132,17 +122,14 @@ export function RoomPage() {
     // };
 
     const handleRoundEnded = (data: { roomId: string, results: any[], roundIndex: number }) => {
-      console.log('Round ended:', data);
       refetch();
     };
 
     const handleGameEnded = (data: { roomId: string, finalResults: any[] }) => {
-      console.log('Game ended:', data);
       refetch();
     };
 
     const handleRoomUpdated = (data: { roomId: string, room: any }) => {
-      console.log('Room updated:', data);
       refetch();
     };
 
@@ -155,14 +142,10 @@ export function RoomPage() {
     socket.on('player-ready', handlePlayerReady);
     socket.on('game-started', handleGameStarted);
     // Only listen to game events if room is not ACTIVE (MultiplayerGame handles these when active)
-    console.log('🏠 RoomPage: Setting up socket listeners, room status:', room?.status);
     if (room?.status !== 'ACTIVE') {
-      console.log('🏠 RoomPage: Room is not ACTIVE, registering game event listeners');
       // Note: round-started is handled by MultiplayerGame only
       socket.on('round-ended', handleRoundEnded);
       socket.on('game-ended', handleGameEnded);
-    } else {
-      console.log('🏠 RoomPage: Room is ACTIVE, NOT registering game event listeners (MultiplayerGame should handle them)');
     }
     socket.on('room-updated', handleRoomUpdated);
     socket.on('socket-error', handleSocketError);
@@ -269,11 +252,8 @@ export function RoomPage() {
   };
 
   const handleReadyToggle = () => {
-    console.log('🔄 handleReadyToggle called');
     const newReadyState = !isReady;
     setIsReady(newReadyState);
-    
-    console.log('🔄 Setting ready state to:', newReadyState);
     
     // Update via Socket.IO for real-time
     socket.setPlayerReady(newReadyState);
@@ -283,37 +263,26 @@ export function RoomPage() {
       roomId: room.id,
       isReady: newReadyState
     });
-    
-    console.log('🔄 handleReadyToggle completed');
   };
 
   const handleStartGame = async () => {
-    console.log('🎮 handleStartGame called, canStartGame:', canStartGame);
     if (!canStartGame) {
-      console.log('🎮 Cannot start game - conditions not met');
       return;
     }
     
-    console.log('🎮 Starting game via Socket.IO...');
     // Start game via Socket.IO
     socket.startGame();
-    console.log('🎮 socket.startGame() called');
     
     // Refetch room data to get updated status
-    console.log('🎮 Refetching room data after starting game...');
     try {
       const result = await refetch();
-      console.log('🎮 Refetch completed. New room status:', result.data?.status);
-      console.log('🎮 Full refetch result:', result.data);
     } catch (error) {
       console.error('🎮 Refetch failed:', error);
     }
   };
 
   // Show game interface if room is active
-  console.log('🎮 Room status check - current status:', room.status);
   if (room.status === 'ACTIVE') {
-    console.log('🎮 Room is ACTIVE - rendering MultiplayerGame');
     return (
       <MultiplayerGame 
         room={room} 
@@ -329,13 +298,6 @@ export function RoomPage() {
   const currentPlayer = room.players.find(p => p.userId === user.id);
   const allPlayersReady = room.players.every(p => p.isReady);
   const canStartGame = isHost && allPlayersReady && room.players.length >= 2;
-  
-  console.log('🎮 Start Game Button Debug:');
-  console.log('  - isHost:', isHost, '(user.id:', user.id, ', room.hostUserId:', room.hostUserId, ')');
-  console.log('  - allPlayersReady:', allPlayersReady);
-  console.log('  - room.players.length:', room.players.length);
-  console.log('  - canStartGame:', canStartGame);
-  console.log('  - Players ready status:', room.players.map(p => ({ userId: p.userId, isReady: p.isReady })));
 
   const handleCopyRoomCode = async () => {
     try {

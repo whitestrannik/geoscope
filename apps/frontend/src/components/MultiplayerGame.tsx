@@ -29,17 +29,14 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     totalRounds: room.totalRounds
   });
   
-  console.log('🎯 MultiplayerGame: Component rendered with gameState:', gameState);
-  console.log('🎯 MultiplayerGame: Room data:', room);
+
   
   // Check if we need to request current round state (room is ACTIVE but we're still waiting)
   useEffect(() => {
     if (room.status === 'ACTIVE' && gameState.phase === 'waiting') {
-      console.log('🎯 MultiplayerGame: Room is ACTIVE but game is waiting - requesting current round state');
       
       // Add a small delay to allow event listeners to be registered first
       const timer = setTimeout(() => {
-        console.log('🎯 MultiplayerGame: Requesting current round state from backend');
         socket.getRoundState();
       }, 100);
       
@@ -70,7 +67,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       roomId: string;
       roundIndex: number;
     }) => {
-      console.log('🎯 MultiplayerGame: Game started event received:', data);
       // Request current round state immediately
       socket.getRoundState();
     };
@@ -81,8 +77,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       roundIndex: number;
       timeLimit?: number;
     }) => {
-      console.log('🎯 MultiplayerGame: Round started event received:', data);
-      console.log('🎯 MultiplayerGame: Current game state before update:', gameState);
       
       setGameState(prev => {
         const newState = {
@@ -92,7 +86,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
           imageUrl: data.imageData.imageUrl,
           timeLimit: data.timeLimit
         };
-        console.log('🎯 MultiplayerGame: Setting new game state:', newState);
         return newState;
       });
       
@@ -111,7 +104,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
         setTimerActive(true);
       }
       
-      console.log('🎯 MultiplayerGame: Round started handler completed');
     };
 
     const handleGuessSubmitted = (data: {
@@ -119,7 +111,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       playerId: string;
       roundIndex: number;
     }) => {
-      console.log('Guess submitted:', data);
       setGuessSubmissions(prev => new Set([...prev, data.playerId]));
     };
 
@@ -130,7 +121,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       actualLocation: { lat: number; lng: number };
       imageUrl: string;
     }) => {
-      console.log('Round ended:', data);
       setGameState(prev => ({
         ...prev,
         phase: 'round-results',
@@ -143,7 +133,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       roomId: string;
       finalResults: any[];
     }) => {
-      console.log('Game ended:', data);
       setGameState(prev => ({
         ...prev,
         phase: 'game-finished',
@@ -152,8 +141,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       setTimerActive(false);
     };
 
-    console.log('🎯 MultiplayerGame: Registering socket event listeners');
-    console.log('🎯 MultiplayerGame: Socket object:', socket);
     
     socket.on('game-started', handleGameStarted);
     socket.on('round-started', handleRoundStarted);
@@ -162,7 +149,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     socket.on('game-ended', handleGameEnded);
 
     return () => {
-      console.log('🎯 MultiplayerGame: Cleaning up socket event listeners');
       socket.off('game-started', handleGameStarted);
       socket.off('round-started', handleRoundStarted);
       socket.off('guess-submitted', handleGuessSubmitted);
