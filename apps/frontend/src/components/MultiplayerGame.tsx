@@ -187,9 +187,10 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   }, [timerActive, timeRemaining]);
 
   const handleMapClick = useCallback((lat: number, lng: number) => {
-    if (gameState.phase !== 'round-active' || hasSubmittedGuess) return;
-    
-    setGuess({ lat, lng });
+    if (gameState.phase === 'round-active' && !hasSubmittedGuess) {
+      setGuess({ lat, lng });
+    }
+    // Allow map interaction during results phase for exploration
   }, [gameState.phase, hasSubmittedGuess]);
 
   const handleMapDoubleClick = () => {
@@ -365,7 +366,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                 return userResult ? { distance: userResult.distance, score: userResult.score } : null;
               })() : null
             }
-            disabled={hasSubmittedGuess || gameState.phase !== 'round-active'}
+            disabled={gameState.phase !== 'round-active' && gameState.phase !== 'round-results'}
           />
         </CardContent>
       </Card>

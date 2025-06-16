@@ -48,6 +48,7 @@ export function MapComponent({
   const guessMarkerRef = useRef<maplibregl.Marker | null>(null);
   const actualMarkerRef = useRef<maplibregl.Marker | null>(null);
   const distanceLabelRef = useRef<maplibregl.Marker | null>(null);
+  const allDistanceLabelsRef = useRef<maplibregl.Marker[]>([]);
   const allGuessMarkersRef = useRef<maplibregl.Marker[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [currentCoords, setCurrentCoords] = useState<string>('');
@@ -225,12 +226,28 @@ export function MapComponent({
       distanceLabelRef.current = null;
     }
 
-    // Remove existing distance line and label
+    // Remove all existing distance labels for multiplayer
+    allDistanceLabelsRef.current.forEach(label => label.remove());
+    allDistanceLabelsRef.current = [];
+
+    // Remove existing distance lines
     if (map.current.getLayer('distance-line')) {
       map.current.removeLayer('distance-line');
     }
     if (map.current.getSource('distance-line')) {
       map.current.removeSource('distance-line');
+    }
+
+    // Remove all multiplayer distance lines
+    for (let i = 0; i < 10; i++) { // Support up to 10 players
+      const layerId = `distance-line-${i}`;
+      const sourceId = `distance-line-${i}`;
+      if (map.current.getLayer(layerId)) {
+        map.current.removeLayer(layerId);
+      }
+      if (map.current.getSource(sourceId)) {
+        map.current.removeSource(sourceId);
+      }
     }
 
     // Add actual marker if provided and showing results
@@ -250,9 +267,75 @@ export function MapComponent({
         .setLngLat([currentActualLocation.lng, currentActualLocation.lat])
         .addTo(map.current);
 
-      // Draw distance line if user has made a guess
-      if (currentGuess) {
-        // Calculate distance
+      // Draw distance lines for all players in multiplayer mode
+      if (allGuesses && allGuesses.length > 0) {
+        const colors = ['#fbbf24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316', '#06B6D4', '#84CC16', '#EC4899'];
+        
+        allGuesses.forEach((guess, index) => {
+          const distance = calculateDistance(
+            guess.lat, 
+            guess.lng, 
+            currentActualLocation.lat, 
+            currentActualLocation.lng
+          );
+
+          const color = colors[index % colors.length];
+          const layerId = `distance-line-${index}`;
+          const sourceId = `distance-line-${index}`;
+
+          // Add line source and layer for each player
+          map.current!.addSource(sourceId, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [guess.lng, guess.lat],
+                  [currentActualLocation.lng, currentActualLocation.lat]
+                ]
+              }
+            }
+          });
+
+          map.current!.addLayer({
+            id: layerId,
+            type: 'line',
+            source: sourceId,
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': color,
+              'line-width': 2,
+              'line-dasharray': [3, 3]
+            }
+          });
+
+          // Add distance label at midpoint for each player
+          const midLat = (guess.lat + currentActualLocation.lat) / 2;
+          const midLng = (guess.lng + currentActualLocation.lng) / 2;
+
+          const distanceEl = document.createElement('div');
+          distanceEl.innerHTML = `
+            <div class="px-2 py-1 rounded-lg text-xs font-bold shadow-lg border-2 border-white" style="background-color: ${color}; color: ${color === '#fbbf24' ? '#000' : '#fff'}">
+              ${guess.username}: ${distance.toFixed(1)} km
+            </div>
+          `;
+
+          const distanceLabel = new maplibregl.Marker({
+            element: distanceEl,
+            anchor: 'center'
+          })
+            .setLngLat([midLng, midLat])
+            .addTo(map.current!);
+
+          allDistanceLabelsRef.current.push(distanceLabel);
+        });
+      } else if (currentGuess) {
+        // Single player mode - draw one distance line
         const distance = calculateDistance(
           currentGuess.lat, 
           currentGuess.lng, 
@@ -374,19 +457,25 @@ export function MapComponent({
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-blue-400">📏</span>
-                <span className="text-sm font-medium">Distance:</span>
+                <span className="text-sm font-medium">Your Distance:</span>
                 <span className="text-lg font-bold text-blue-300">{resultData.distance.toFixed(1)} km</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-yellow-400">🏆</span>
-                <span className="text-sm font-medium">Score:</span>
+                <span className="text-sm font-medium">Your Score:</span>
                 <span className={`text-lg font-bold ${getScoreColor(resultData.score)}`}>
                   {resultData.score.toLocaleString()}
                 </span>
               </div>
+              {allGuesses && allGuesses.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-purple-400">👥</span>
+                  <span className="text-sm font-medium">{allGuesses.length} players</span>
+                </div>
+              )}
             </div>
             <div className="text-xs text-gray-400">
-              Results shown on map
+              {allGuesses && allGuesses.length > 1 ? 'All results shown on map' : 'Results shown on map'}
             </div>
           </div>
         </div>
@@ -424,7 +513,7 @@ export function MapComponent({
       {/* Disabled overlay */}
       {disabled && (
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center text-white text-sm backdrop-blur-sm">
-          Guess already submitted
+          {showResult ? 'Viewing results' : 'Round not active'}
         </div>
       )}
     </div>
