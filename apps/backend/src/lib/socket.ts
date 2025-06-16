@@ -2,7 +2,6 @@ import { Server as HTTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { verifyToken } from './supabase';
 import { db } from './db';
-import { imageRouter } from '../trpc/imageRouter';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import { appRouter } from '../trpc';
 
@@ -731,7 +730,7 @@ export function emitToRoom(roomId: string, event: keyof ServerToClientEvents, da
   }
 }
 
-export function emitToUser(userId: string, event: keyof ServerToClientEvents, data: any) {
+export function emitToUser(_userId: string, _event: keyof ServerToClientEvents, _data: any) {
   if (io) {
     // Find socket by user ID (would need to maintain user-socket mapping)
     // For now, we'll use room-based communication

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapComponent } from '@/components/common/MapComponent';
 import { trpc } from '@/lib/trpc';
 
@@ -166,7 +166,7 @@ export function SoloPage() {
   };
 
   // Image interaction handlers
-  const handleImageClick = (e: React.MouseEvent) => {
+  const handleImageClick = (_e: React.MouseEvent) => {
     // Only toggle fullscreen if this was a click, not a drag
     if (!hasMouseMoved) {
       setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full');

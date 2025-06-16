@@ -17,25 +17,26 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@trpc/server": "^11.0.0",
+    "@prisma/client": "^6.1.0",
     "@supabase/supabase-js": "^2.45.4",
-    "express": "^4.21.2",
-    "socket.io": "^4.8.1",
+    "@trpc/client": "^11.4.1",
+    "@trpc/server": "^11.4.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "zod": "^3.24.1",
+    "express": "^4.21.2",
     "prisma": "^6.1.0",
-    "@prisma/client": "^6.1.0"
+    "socket.io": "^4.8.1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.5",
-    "@types/express": "^5.0.0",
     "@types/cors": "^2.8.17",
-    "typescript": "^5.8.3",
-    "tsx": "^4.19.2",
-    "eslint": "^9.25.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.30.1",
+    "eslint": "^9.25.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
     "vitest": "^2.1.8"
   }
-} 
+}

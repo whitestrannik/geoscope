@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, publicProcedure, protectedProcedure } from './trpc.js';
+import { router, protectedProcedure } from './trpc.js';
 import { TRPCError } from '@trpc/server';
 
 // Input validation schemas
@@ -73,7 +73,7 @@ export const roomRouter = router({
           hostUserId: userId,
           maxPlayers: input.maxPlayers,
           totalRounds: input.totalRounds,
-          roundTimeLimit: input.roundTimeLimit,
+          roundTimeLimit: input.roundTimeLimit ?? null,
           players: {
             create: {
               userId: userId,
@@ -114,7 +114,7 @@ export const roomRouter = router({
         roundTimeLimit: room.roundTimeLimit,
         createdAt: room.createdAt,
         host: room.host,
-        players: room.players.map(p => ({
+        players: room.players.map((p: any) => ({
           id: p.id,
           userId: p.userId,
           joinedAt: p.joinedAt,
@@ -164,7 +164,7 @@ export const roomRouter = router({
       }
 
       // Check if user is already in room
-      const existingPlayer = room.players.find(p => p.userId === userId);
+      const existingPlayer = room.players.find((p: any) => p.userId === userId);
       if (existingPlayer) {
         throw new TRPCError({
           code: 'BAD_REQUEST',

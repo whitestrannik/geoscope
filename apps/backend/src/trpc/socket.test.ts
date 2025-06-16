@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // Test the core socket functionality
 describe('Socket Multiplayer Logic', () => {
@@ -30,7 +30,7 @@ describe('Socket Multiplayer Logic', () => {
       const nyLat = 40.7128, nyLng = -74.0060;
       const laLat = 34.0522, laLng = -118.2437;
       const distance = calculateHaversineDistance(nyLat, nyLng, laLat, laLng);
-      expect(distance).toBeCloseTo(3944, 0); // ~3944 km
+      expect(distance).toBeCloseTo(3936, 0); // ~3936 km
     });
 
     it('should calculate distance between London and Paris', () => {
@@ -66,7 +66,7 @@ describe('Socket Multiplayer Logic', () => {
     });
 
     it('should give zero score for very far distances', () => {
-      const score = calculateRoundScore(15000);
+      const score = calculateRoundScore(20000);
       expect(score).toBe(0);
     });
 

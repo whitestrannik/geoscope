@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,36 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { trpc } from '@/lib/trpc';
 import { useSocket } from '@/lib/socket';
 import { Link } from 'react-router-dom';
-import { Loader2, Users, Crown, CheckCircle, XCircle, Settings, Play, LogOut, Copy, Wifi, WifiOff } from 'lucide-react';
+import { Loader2, Users, Crown, CheckCircle, XCircle, Play, LogOut, Copy, Wifi, WifiOff } from 'lucide-react';
 import { MultiplayerGame } from '@/components/MultiplayerGame';
-
-interface RoomData {
-  id: string;
-  hostUserId: string;
-  status: 'WAITING' | 'ACTIVE' | 'FINISHED';
-  maxPlayers: number;
-  currentRound: number;
-  totalRounds: number;
-  roundTimeLimit?: number;
-  createdAt: string;
-  host: {
-    id: string;
-    username?: string | null;
-    email: string;
-  };
-  players: Array<{
-    id: string;
-    userId: string;
-    joinedAt: string;
-    score: number;
-    isReady: boolean;
-    user: {
-      id: string;
-      username?: string | null;
-      email: string;
-    };
-  }>;
-}
 
 export function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -61,15 +33,6 @@ export function RoomPage() {
     }
   });
 
-  const updateStatusMutation = trpc.room.updateStatus.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-    onError: (error) => {
-      console.error('Failed to update room status:', error);
-    }
-  });
-
   const leaveMutation = trpc.room.leave.useMutation({
     onSuccess: () => {
       navigate('/');
@@ -84,7 +47,7 @@ export function RoomPage() {
     if (!roomId || !user) return;
 
     // Connect to Socket.IO
-    const socketInstance = socket.connect();
+    socket.connect();
     setSocketConnected(socket.isConnected);
 
     // Join the room (only if not already in this room)
@@ -95,11 +58,11 @@ export function RoomPage() {
     }
 
     // Set up event listeners
-    const handlePlayerJoined = (data: { roomId: string, player: any }) => {
+    const handlePlayerJoined = (_data: { roomId: string, player: any }) => {
       refetch();
     };
 
-    const handlePlayerLeft = (data: { roomId: string, playerId: string }) => {
+    const handlePlayerLeft = (_data: { roomId: string, playerId: string }) => {
       refetch();
     };
 
@@ -110,7 +73,7 @@ export function RoomPage() {
       refetch();
     };
 
-    const handleGameStarted = (data: { roomId: string, imageData: any, roundIndex: number }) => {
+    const handleGameStarted = (_data: { roomId: string, imageData: any, roundIndex: number }) => {
       refetch();
     };
 
@@ -121,15 +84,15 @@ export function RoomPage() {
     //   refetch();
     // };
 
-    const handleRoundEnded = (data: { roomId: string, results: any[], roundIndex: number }) => {
+    const handleRoundEnded = (_data: { roomId: string, results: any[], roundIndex: number }) => {
       refetch();
     };
 
-    const handleGameEnded = (data: { roomId: string, finalResults: any[] }) => {
+    const handleGameEnded = (_data: { roomId: string, finalResults: any[] }) => {
       refetch();
     };
 
-    const handleRoomUpdated = (data: { roomId: string, room: any }) => {
+    const handleRoomUpdated = (_data: { roomId: string, room: any }) => {
       refetch();
     };
 
@@ -275,7 +238,7 @@ export function RoomPage() {
     
     // Refetch room data to get updated status
     try {
-      const result = await refetch();
+      await refetch();
     } catch (error) {
       console.error('🎮 Refetch failed:', error);
     }
@@ -295,7 +258,6 @@ export function RoomPage() {
 
   // Check if current user is the host
   const isHost = user.id === room.hostUserId;
-  const currentPlayer = room.players.find(p => p.userId === user.id);
   const allPlayersReady = room.players.every(p => p.isReady);
   const canStartGame = isHost && allPlayersReady && room.players.length >= 2;
 

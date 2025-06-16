@@ -16,7 +16,7 @@ export function JoinRoomPage() {
 
   const joinRoomMutation = trpc.room.join.useMutation({
     onSuccess: (room) => {
-      navigate(`/room/${room.id}`);
+      navigate(`/room/${room?.id}`);
     },
     onError: (error) => {
       console.error('Failed to join room:', error);

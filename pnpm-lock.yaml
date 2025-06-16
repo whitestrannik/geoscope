@@ -20,8 +20,11 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.45.4
         version: 2.50.0
+      '@trpc/client':
+        specifier: ^11.4.1
+        version: 11.4.1(@trpc/server@11.3.1(typescript@5.8.3))(typescript@5.8.3)
       '@trpc/server':
-        specifier: ^11.0.0
+        specifier: ^11.3.1
         version: 11.3.1(typescript@5.8.3)
       cors:
         specifier: ^2.8.5
@@ -1199,6 +1202,12 @@ packages:
     resolution: {integrity: sha512-UlLsUN7x8qD07FaGzdz/FG3K+kpaYowZkmVZ8R4Nlx1Yj01Kgr1Y+cGjtBdRpd+0l7uVylwDPmHA1OxYE6zHgA==}
     peerDependencies:
       '@trpc/server': 11.3.1
+      typescript: '>=5.7.2'
+
+  '@trpc/client@11.4.1':
+    resolution: {integrity: sha512-h28HKqxOBu35Q3f7h2chOjkQnwmIFdZDqG6NxovPaxEGcUmQWdo63mthlPSiMThXpy9J1AUA8q4uZZ4a5d1JVA==}
+    peerDependencies:
+      '@trpc/server': 11.4.1
       typescript: '>=5.7.2'
 
   '@trpc/react-query@11.3.1':
@@ -3748,6 +3757,11 @@ snapshots:
       '@types/react-dom': 19.1.6(@types/react@19.1.6)
 
   '@trpc/client@11.3.1(@trpc/server@11.3.1(typescript@5.8.3))(typescript@5.8.3)':
+    dependencies:
+      '@trpc/server': 11.3.1(typescript@5.8.3)
+      typescript: 5.8.3
+
+  '@trpc/client@11.4.1(@trpc/server@11.3.1(typescript@5.8.3))(typescript@5.8.3)':
     dependencies:
       '@trpc/server': 11.3.1(typescript@5.8.3)
       typescript: 5.8.3

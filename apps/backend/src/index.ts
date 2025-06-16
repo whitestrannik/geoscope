@@ -26,7 +26,7 @@ app.use('/api/trpc', createExpressMiddleware({
 }));
 
 // Basic health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ 
     status: 'ok', 
     message: 'GeoScope Backend is running!',
@@ -35,7 +35,7 @@ app.get('/health', (req, res) => {
 });
 
 // Initialize Socket.IO for multiplayer rooms
-const io = initializeSocket(server);
+initializeSocket(server);
 
 // Start server
 server.listen(PORT, () => {

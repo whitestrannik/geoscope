@@ -75,7 +75,7 @@ export const userRouter = router({
       const updatedUser = await ctx.db.user.update({
         where: { id: user.id },
         data: {
-          username: input.username
+          username: input.username ?? null
         }
       })
 

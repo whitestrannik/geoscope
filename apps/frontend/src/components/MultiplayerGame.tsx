@@ -63,7 +63,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
   // Set up socket event listeners
   useEffect(() => {
-    const handleGameStarted = (data: {
+    const handleGameStarted = (_data: {
       roomId: string;
       roundIndex: number;
     }) => {
@@ -213,7 +213,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   }, [guess, hasSubmittedGuess, gameState.phase, gameState.currentRound, socket]);
 
   // Image interaction handlers
-  const handleImageClick = (e: React.MouseEvent) => {
+  const handleImageClick = (_e: React.MouseEvent) => {
     if (!hasMouseMoved) {
       // Simple click behavior - could add fullscreen toggle here if needed
     }
@@ -241,13 +241,11 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     }
   };
 
-  const handleImageMouseUp = (e: React.MouseEvent) => {
+  const handleImageMouseUp = (_e: React.MouseEvent) => {
     setIsDraggingImage(false);
   };
 
-  const getUserDisplayName = (userData: { username?: string; email: string }) => {
-    return userData.username || userData.email.split('@')[0];
-  };
+
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

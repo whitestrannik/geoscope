@@ -53,7 +53,7 @@ class SocketService {
     this.socket.on('connect', () => {
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', (_reason) => {
     });
 
     this.socket.on('error', (data) => {

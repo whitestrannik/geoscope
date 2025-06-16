@@ -353,7 +353,7 @@
 
 ---
 
-# 🌐 Phase 4 – Multiplayer Room System 🔄 **SIGNIFICANTLY IN PROGRESS**
+# 🌐 Phase 4 – Multiplayer Room System ✅ **COMPLETED**
 
 > Goal: Implement real-time multiplayer mode where players join the same room, guess locations simultaneously, and receive scores after each round.
 
@@ -425,41 +425,46 @@
 
 ---
 
-## 🔁 4.5 — Round Lifecycle Logic 🔄 **IN PROGRESS**
+## 🔁 4.5 — Round Lifecycle Logic ✅
 
 - [x] Room status management (WAITING → ACTIVE)
 - [x] Game start triggers from host
-- [ ] Backend triggers round with new image
-- [ ] Broadcast to all players via `start-round`
-- [ ] Collect guesses from each player
-- [ ] After all guesses or timeout:
-  - [ ] Compute scores
-  - [ ] Broadcast `round-result`
-  - [ ] Store guess and score in DB
-- [ ] Multiple round progression logic
+- [x] Backend triggers round with new image
+- [x] Broadcast to all players via `round-started`
+- [x] Collect guesses from each player
+- [x] After all guesses or timeout:
+  - [x] Compute scores using Haversine formula
+  - [x] Broadcast `round-ended` with results
+  - [x] Store guess and score in DB
+- [x] Multiple round progression logic
+- [x] Game completion handling with final results
 
 ---
 
-## 🧪 4.6 — Multiplayer Testing 🔄 **IN PROGRESS**
+## 🧪 4.6 — Multiplayer Testing 🔄 **PARTIALLY COMPLETE**
 
-- [x] Manual testing of room creation and joining
-- [x] Socket.IO connection and event testing
-- [x] Real-time player management verified
-- [ ] Automated unit test room creation and validation logic
-- [ ] Integration test socket events using test clients
-- [ ] E2E test:
-  - [x] Create + join room
-  - [ ] Submit multiplayer guesses
-  - [ ] Validate result sync across clients
+- [x] Socket.IO implementation exists and appears complete
+- [x] Automated unit tests for core game logic (Haversine, scoring, room codes)
+- [ ] Manual testing of room creation and joining (needs Windows verification)
+- [ ] Real-time player management verification (needs testing)
+- [ ] Integration test for multiplayer functionality components
+- [ ] E2E test flow (MISSING):
+  - [ ] Create + join room (multiple browsers)
+  - [ ] Submit multiplayer guesses (real-time testing)
+  - [ ] Validate scoring and result sync across clients
 
-**🎯 Phase 4 Status: SIGNIFICANTLY IN PROGRESS**
+**🎯 Phase 4 Status: IMPLEMENTATION COMPLETE, TESTING NEEDED** 🔄
 - **Database Models**: Complete room and player management ✅
 - **Backend API**: Full room CRUD operations with validation ✅
 - **Frontend UI**: Complete room creation, joining, and lobby management ✅
-- **Real-time Communication**: Socket.IO integration working ✅
+- **Real-time Communication**: Socket.IO integration implemented ✅
 - **Player Management**: Ready status, host controls, real-time updates ✅
 - **Authentication Integration**: Protected room access ✅
-- **Remaining Work**: Game round logic, multiplayer gameplay, scoring system 🔄
+- **Multiplayer Gameplay**: Complete round lifecycle with scoring ✅
+- **Database Storage**: All multiplayer guesses properly stored ✅
+- **Unit Testing**: Core game logic tested ✅
+- **E2E Testing**: MISSING - Needs proper multi-browser testing ❌
+- **Windows Verification**: MISSING - Needs PowerShell-compatible testing ❌
 
 
 
@@ -472,15 +477,15 @@
 
 ## 🧾 5.1 — Backend: Stats & Score Storage
 
-- [ ] Update `Guess` model to include:
-  - [ ] `mode` (solo or multiplayer)
-  - [ ] `score`, `timestamp`
+- [x] Update `Guess` model to include:
+  - [x] `mode` (solo or multiplayer)
+  - [x] `score`, `timestamp`
 - [ ] Add `UserStats` model or computed view with:
   - [ ] Total games played
   - [ ] Average score
   - [ ] Highest score
   - [ ] Total distance guessed
-- [ ] Update logic in solo and multiplayer to persist guesses and scores
+- [x] Update logic in solo and multiplayer to persist guesses and scores
 
 ---
 
