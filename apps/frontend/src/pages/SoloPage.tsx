@@ -38,6 +38,8 @@ export function SoloPage() {
   const [userGuess, setUserGuess] = useState<GuessData | null>(null);
   const [result, setResult] = useState<ResultData | null>(null);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('split');
+  const [showResultsOnMap, setShowResultsOnMap] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
 
   // tRPC hooks
   const { data: imageData, isLoading: imageLoading, error: imageError, refetch: refetchImage } = trpc.image.getRandom.useQuery();
@@ -46,6 +48,8 @@ export function SoloPage() {
     onSuccess: (data) => {
       setResult(data);
       setGameState('result');
+      setShowResultsOnMap(true);
+      setShowResultModal(true);
     },
     onError: (error) => {
       console.error('Error evaluating guess:', error);
@@ -60,6 +64,8 @@ export function SoloPage() {
       setGameState('playing');
       setUserGuess(null);
       setResult(null);
+      setShowResultsOnMap(false);
+      setShowResultModal(false);
     }
   }, [imageData]);
 
@@ -86,6 +92,8 @@ export function SoloPage() {
   const handlePlayAgain = () => {
     setGameState('loading');
     setLayoutMode('split');
+    setShowResultsOnMap(false);
+    setShowResultModal(false);
     refetchImage();
   };
 
@@ -190,8 +198,9 @@ export function SoloPage() {
             onMarkerPlace={handleMarkerPlace}
             onDoubleClick={handleMapDoubleClick}
             guessMarker={userGuess}
-            actualMarker={gameState === 'result' ? { lat: currentGame.actualLat, lng: currentGame.actualLng } : null}
-            showResult={gameState === 'result'}
+            actualMarker={showResultsOnMap ? { lat: currentGame.actualLat, lng: currentGame.actualLng } : null}
+            showResult={showResultsOnMap}
+            resultData={showResultsOnMap && result ? { distance: result.distance, score: result.score } : null}
             className="h-full"
           />
         </div>
@@ -238,32 +247,36 @@ export function SoloPage() {
   );
 
   // Results overlay component
-  const resultsOverlay = gameState === 'result' && result ? (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl max-w-lg w-full mx-4">
+  const resultsOverlay = showResultModal && result ? (
+    <Card 
+      className="bg-slate-900/95 backdrop-blur-lg border-white/30 text-white shadow-2xl max-w-lg w-full mx-4 cursor-pointer hover:bg-slate-900/98 transition-colors"
+      onClick={() => setShowResultModal(false)}
+    >
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg sm:text-xl text-center">🎯 Round Results</CardTitle>
+        <CardTitle className="text-xl sm:text-2xl text-center">🎯 Round Results</CardTitle>
+        <p className="text-center text-sm text-gray-300">Click anywhere to continue</p>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-center">
-          <div className="space-y-1">
-            <div className="text-lg sm:text-xl">📏</div>
-            <div className="text-sm sm:text-base font-semibold">Distance</div>
-            <div className="text-lg sm:text-xl text-blue-300">{result.distance.toLocaleString()} km</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
+          <div className="space-y-2">
+            <div className="text-2xl sm:text-3xl">📏</div>
+            <div className="text-sm sm:text-base font-semibold text-gray-200">Distance</div>
+            <div className="text-xl sm:text-2xl text-blue-300 font-bold">{result.distance.toLocaleString()} km</div>
           </div>
           
-          <div className="space-y-1">
-            <div className="text-lg sm:text-xl">🏆</div>
-            <div className="text-sm sm:text-base font-semibold">Score</div>
-            <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(result.score)}`}>
+          <div className="space-y-2">
+            <div className="text-2xl sm:text-3xl">🏆</div>
+            <div className="text-sm sm:text-base font-semibold text-gray-200">Score</div>
+            <div className={`text-2xl sm:text-3xl font-bold ${getScoreColor(result.score)}`}>
               {result.score.toLocaleString()}
             </div>
-            <div className="text-xs sm:text-sm text-gray-300">{getScoreMessage(result.score)}</div>
+            <div className="text-sm text-gray-300">{getScoreMessage(result.score)}</div>
           </div>
           
-          <div className="space-y-1">
-            <div className="text-lg sm:text-xl">📍</div>
-            <div className="text-sm sm:text-base font-semibold">Actual Location</div>
-            <div className="text-xs sm:text-sm text-gray-300">
+          <div className="space-y-2">
+            <div className="text-2xl sm:text-3xl">📍</div>
+            <div className="text-sm sm:text-base font-semibold text-gray-200">Actual Location</div>
+            <div className="text-sm text-gray-300">
               {currentGame.location || `${result.actualLat.toFixed(2)}, ${result.actualLng.toFixed(2)}`}
             </div>
           </div>

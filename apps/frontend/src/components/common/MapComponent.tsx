@@ -9,6 +9,11 @@ interface PlayerGuess {
   username: string;
 }
 
+interface ResultData {
+  distance: number;
+  score: number;
+}
+
 interface MapComponentProps {
   onMarkerPlace?: (lat: number, lng: number) => void;
   onMapClick?: (lat: number, lng: number) => void;
@@ -21,6 +26,7 @@ interface MapComponentProps {
   showResult?: boolean;
   disabled?: boolean;
   className?: string;
+  resultData?: ResultData | null;
 }
 
 export function MapComponent({ 
@@ -34,12 +40,14 @@ export function MapComponent({
   allGuesses,
   showResult = false,
   disabled = false,
-  className = "w-full h-96"
+  className = "w-full h-96",
+  resultData
 }: MapComponentProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const guessMarkerRef = useRef<maplibregl.Marker | null>(null);
   const actualMarkerRef = useRef<maplibregl.Marker | null>(null);
+  const distanceLabelRef = useRef<maplibregl.Marker | null>(null);
   const allGuessMarkersRef = useRef<maplibregl.Marker[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [currentCoords, setCurrentCoords] = useState<string>('');
@@ -211,6 +219,20 @@ export function MapComponent({
       actualMarkerRef.current = null;
     }
 
+    // Remove existing distance label
+    if (distanceLabelRef.current) {
+      distanceLabelRef.current.remove();
+      distanceLabelRef.current = null;
+    }
+
+    // Remove existing distance line and label
+    if (map.current.getLayer('distance-line')) {
+      map.current.removeLayer('distance-line');
+    }
+    if (map.current.getSource('distance-line')) {
+      map.current.removeSource('distance-line');
+    }
+
     // Add actual marker if provided and showing results
     if (currentActualLocation && showResult) {
       const actualEl = document.createElement('div');
@@ -227,6 +249,66 @@ export function MapComponent({
       })
         .setLngLat([currentActualLocation.lng, currentActualLocation.lat])
         .addTo(map.current);
+
+      // Draw distance line if user has made a guess
+      if (currentGuess) {
+        // Calculate distance
+        const distance = calculateDistance(
+          currentGuess.lat, 
+          currentGuess.lng, 
+          currentActualLocation.lat, 
+          currentActualLocation.lng
+        );
+
+        // Add line source and layer
+        map.current.addSource('distance-line', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [currentGuess.lng, currentGuess.lat],
+                [currentActualLocation.lng, currentActualLocation.lat]
+              ]
+            }
+          }
+        });
+
+        map.current.addLayer({
+          id: 'distance-line',
+          type: 'line',
+          source: 'distance-line',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#fbbf24', // Yellow color
+            'line-width': 3,
+            'line-dasharray': [2, 2]
+          }
+        });
+
+        // Add distance label at midpoint
+        const midLat = (currentGuess.lat + currentActualLocation.lat) / 2;
+        const midLng = (currentGuess.lng + currentActualLocation.lng) / 2;
+
+        const distanceEl = document.createElement('div');
+        distanceEl.innerHTML = `
+          <div class="bg-yellow-500 text-black px-2 py-1 rounded-lg text-sm font-bold shadow-lg border-2 border-white">
+            ${distance.toFixed(1)} km
+          </div>
+        `;
+
+        distanceLabelRef.current = new maplibregl.Marker({
+          element: distanceEl,
+          anchor: 'center'
+        })
+          .setLngLat([midLng, midLat])
+          .addTo(map.current);
+      }
 
       // Smart bounds fitting
       const bounds = new maplibregl.LngLatBounds();
@@ -251,8 +333,65 @@ export function MapComponent({
     }
   }, [currentActualLocation, showResult, currentGuess, allGuesses, isMapLoaded]);
 
+  // Handle map resize when container size changes (e.g., fullscreen toggle)
+  useEffect(() => {
+    if (!map.current || !isMapLoaded) return;
+    
+    // Small delay to ensure DOM has updated
+    const timer = setTimeout(() => {
+      map.current?.resize();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [className, isMapLoaded]);
+
+  // Helper function to calculate distance between two points
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 800) return 'text-green-400';
+    if (score >= 600) return 'text-yellow-400';
+    if (score >= 400) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
   return (
     <div className={`relative ${className}`}>
+      {/* Results Header */}
+      {showResult && resultData && (
+        <div className="absolute top-3 left-3 right-3 bg-slate-900/95 backdrop-blur-lg border border-white/30 text-white px-4 py-3 rounded-lg shadow-lg z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-400">📏</span>
+                <span className="text-sm font-medium">Distance:</span>
+                <span className="text-lg font-bold text-blue-300">{resultData.distance.toFixed(1)} km</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-400">🏆</span>
+                <span className="text-sm font-medium">Score:</span>
+                <span className={`text-lg font-bold ${getScoreColor(resultData.score)}`}>
+                  {resultData.score.toLocaleString()}
+                </span>
+              </div>
+            </div>
+            <div className="text-xs text-gray-400">
+              Results shown on map
+            </div>
+          </div>
+        </div>
+      )}
+
       <div 
         ref={mapContainer} 
         className={`w-full h-full rounded-lg overflow-hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}

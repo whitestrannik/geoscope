@@ -35,6 +35,12 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   // Layout mode state for consistency with Solo mode
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('split');
   
+  // Separate states for results display
+  const [showResultsOnMap, setShowResultsOnMap] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [persistedResults, setPersistedResults] = useState<any[] | null>(null);
+  const [persistedActualLocation, setPersistedActualLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
   // Check if we need to request current round state (room is ACTIVE but we're still waiting)
   useEffect(() => {
     if (room.status === 'ACTIVE' && gameState.phase === 'waiting') {
@@ -90,6 +96,12 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       // Reset layout mode
       setLayoutMode('split');
       
+      // Reset results display for new round
+      setShowResultsOnMap(false);
+      setShowResultModal(false);
+      setPersistedResults(null);
+      setPersistedActualLocation(null);
+      
       // Start timer if there's a time limit
       if (data.timeLimit) {
         setTimeRemaining(data.timeLimit);
@@ -118,6 +130,12 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
         results: data.results
       }));
       setTimerActive(false);
+      
+      // Set results display states
+      setShowResultsOnMap(true);
+      setShowResultModal(true);
+      setPersistedResults(data.results);
+      setPersistedActualLocation(data.actualLocation);
     };
 
     const handleGameEnded = (data: {
@@ -331,19 +349,22 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             onMapClick={handleMapClick}
             onDoubleClick={handleMapDoubleClick}
             userGuess={guess}
-            actualLocation={gameState.phase === 'round-results' && gameState.results ? {
-              lat: gameState.results[0]?.actualLat || 0,
-              lng: gameState.results[0]?.actualLng || 0
-            } : undefined}
-            allGuesses={gameState.phase === 'round-results' ? 
-              gameState.results?.map(r => ({
+            actualLocation={showResultsOnMap && persistedActualLocation ? persistedActualLocation : undefined}
+            allGuesses={showResultsOnMap && persistedResults ? 
+              persistedResults.map(r => ({
                 lat: r.guessLat,
                 lng: r.guessLng,
                 playerId: r.playerId,
                 username: r.username
               })) : undefined
             }
-            showResult={gameState.phase === 'round-results'}
+            showResult={showResultsOnMap}
+            resultData={showResultsOnMap && persistedResults ? 
+              (() => {
+                const userResult = persistedResults.find(r => r.playerId === user.id);
+                return userResult ? { distance: userResult.distance, score: userResult.score } : null;
+              })() : null
+            }
             disabled={hasSubmittedGuess || gameState.phase !== 'round-active'}
           />
         </CardContent>
@@ -385,35 +406,39 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     );
 
     // Results overlay component
-    const resultsOverlay = gameState.phase === 'round-results' && gameState.results ? (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white max-w-2xl w-full mx-4">
+    const resultsOverlay = showResultModal && gameState.results ? (
+      <Card 
+        className="bg-slate-900/95 backdrop-blur-lg border-white/30 text-white shadow-2xl max-w-2xl w-full mx-4 cursor-pointer hover:bg-slate-900/98 transition-colors"
+        onClick={() => setShowResultModal(false)}
+      >
         <CardHeader>
-          <CardTitle>Round {gameState.currentRound} Results</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl text-center">Round {gameState.currentRound} Results</CardTitle>
+          <p className="text-center text-sm text-gray-300">Click anywhere to continue</p>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {gameState.results.map((result, index) => (
               <div
                 key={result.playerId}
-                className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
+                className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20"
               >
-                <div className="flex items-center space-x-3">
-                  <div className="text-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="text-2xl">
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </div>
                   <div>
-                    <p className="font-semibold">{result.username}</p>
+                    <p className="font-semibold text-lg">{result.username}</p>
                     {result.playerId === user.id && (
                       <p className="text-sm text-blue-400">You</p>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold">{result.score} points</p>
-                  <p className="text-sm text-white/70">
+                  <p className="font-bold text-xl">{result.score} points</p>
+                  <p className="text-sm text-gray-300">
                     {result.hasGuessed ? `${result.distance.toFixed(1)} km` : 'No guess'}
                   </p>
-                  <p className="text-sm text-white/70">
+                  <p className="text-sm text-gray-300">
                     Total: {result.totalScore}
                   </p>
                 </div>
