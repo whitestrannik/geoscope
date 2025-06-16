@@ -7,7 +7,6 @@ interface ImageViewerProps {
   copyright?: string;
   onFullscreenToggle?: () => void;
   showFullscreenButton?: boolean;
-  showZoomControls?: boolean;
   showInstructions?: boolean;
   isFullscreen?: boolean;
   className?: string;
@@ -19,7 +18,6 @@ export function ImageViewer({
   copyright,
   onFullscreenToggle,
   showFullscreenButton = true,
-  showZoomControls = false,
   showInstructions = true,
   isFullscreen = false,
   className = "w-full h-full"
@@ -125,10 +123,8 @@ export function ImageViewer({
         alt={alt}
         className="w-full h-full object-contain transition-transform duration-75"
         style={{
-          transform: showZoomControls 
-            ? `translate(${imagePosition.x}px, ${imagePosition.y}px) scale(${imageScale})`
-            : `scale(${imageScale}) translate(${imagePosition.x / imageScale}px, ${imagePosition.y / imageScale}px)`,
-          transformOrigin: showZoomControls ? 'center center' : 'center center',
+          transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) scale(${imageScale})`,
+          transformOrigin: 'center center',
           cursor: isDraggingImage ? 'grabbing' : (imageScale > 1 ? 'grab' : (showFullscreenButton ? 'pointer' : 'default'))
         }}
         onMouseDown={handleImageMouseDown}
@@ -138,35 +134,36 @@ export function ImageViewer({
         draggable={false}
       />
 
-      {/* Zoom Controls (for multiplayer style) */}
-      {showZoomControls && (
-        <div className="absolute top-3 right-3 flex flex-col space-y-2">
-          <Button
-            size="sm"
-            variant="outline"
-            className="bg-black/80 border-white/30 text-white hover:bg-black/90"
-            onClick={handleZoomIn}
-          >
-            +
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="bg-black/80 border-white/30 text-white hover:bg-black/90"
-            onClick={handleZoomOut}
-          >
-            -
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            className="bg-black/80 border-white/30 text-white hover:bg-black/90 text-xs"
-            onClick={handleResetZoom}
-          >
-            Reset
-          </Button>
-        </div>
-      )}
+      {/* Zoom Controls - Always visible for better UX */}
+      <div className="absolute top-3 right-3 flex flex-col">
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-8 h-8 p-0 rounded-none rounded-t-sm border-b-0"
+          onClick={handleZoomIn}
+          title="Zoom in"
+        >
+          +
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-8 h-8 p-0 rounded-none border-b-0"
+          onClick={handleZoomOut}
+          title="Zoom out"
+        >
+          -
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 text-xs h-8 px-2 rounded-none rounded-b-sm"
+          onClick={handleResetZoom}
+          title="Reset zoom and position"
+        >
+          Reset
+        </Button>
+      </div>
 
       {/* Zoom Percentage Indicator */}
       {imageScale !== 1 && (
@@ -176,7 +173,7 @@ export function ImageViewer({
       )}
 
       {/* Interactive Overlay (for solo style) */}
-      {showFullscreenButton && !showZoomControls && (
+      {showFullscreenButton && (
         <div 
           className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
         >
@@ -190,8 +187,8 @@ export function ImageViewer({
       {showInstructions && !isDraggingImage && (
         <div className="absolute bottom-3 left-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
           {imageScale === 1 
-            ? (showFullscreenButton ? 'Click: fullscreen • Scroll: zoom' : 'Scroll: zoom • Drag: pan')
-            : 'Drag: pan • Scroll: zoom'
+            ? (showFullscreenButton ? 'Click: fullscreen • Scroll/Buttons: zoom' : 'Scroll/Buttons: zoom • Drag: pan')
+            : 'Drag: pan • Scroll/Buttons: zoom'
           }
         </div>
       )}

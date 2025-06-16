@@ -23,8 +23,8 @@ describe('ImageViewer', () => {
     expect(screen.getByText('📸 Test Copyright')).toBeInTheDocument();
   });
 
-  it('shows zoom controls when showZoomControls is true', () => {
-    render(<ImageViewer {...mockProps} showZoomControls={true} />);
+  it('shows zoom controls always', () => {
+    render(<ImageViewer {...mockProps} />);
     
     expect(screen.getByText('+')).toBeInTheDocument();
     expect(screen.getByText('-')).toBeInTheDocument();
@@ -61,13 +61,13 @@ describe('ImageViewer', () => {
   it('shows instructions when showInstructions is true', () => {
     render(<ImageViewer {...mockProps} showInstructions={true} />);
     
-    expect(screen.getByText(/Click: fullscreen • Scroll: zoom/)).toBeInTheDocument();
+    expect(screen.getByText(/Click: fullscreen • Scroll\/Buttons: zoom/)).toBeInTheDocument();
   });
 
   it('hides instructions when showInstructions is false', () => {
     render(<ImageViewer {...mockProps} showInstructions={false} />);
     
-    expect(screen.queryByText(/Click: fullscreen • Scroll: zoom/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Click: fullscreen • Scroll\/Buttons: zoom/)).not.toBeInTheDocument();
   });
 
   it('applies custom className', () => {
@@ -79,7 +79,7 @@ describe('ImageViewer', () => {
   });
 
   it('handles zoom controls correctly', () => {
-    render(<ImageViewer {...mockProps} showZoomControls={true} />);
+    render(<ImageViewer {...mockProps} />);
     
     const zoomInButton = screen.getByText('+');
     const zoomOutButton = screen.getByText('-');
@@ -96,12 +96,11 @@ describe('ImageViewer', () => {
     expect(resetButton).toBeInTheDocument();
   });
 
-  it('shows interactive overlay when showFullscreenButton is true and showZoomControls is false', () => {
+  it('shows interactive overlay when showFullscreenButton is true', () => {
     render(
       <ImageViewer 
         {...mockProps} 
-        showFullscreenButton={true} 
-        showZoomControls={false}
+        showFullscreenButton={true}
       />
     );
     

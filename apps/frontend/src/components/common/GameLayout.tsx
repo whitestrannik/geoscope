@@ -175,7 +175,8 @@ export function GameLayout({
               <div className="text-gray-300 mb-1">Controls:</div>
               <div className="space-y-1">
                 <div className="flex flex-wrap gap-1">
-                  <span><kbd className="bg-white/20 px-1 rounded">Click</kbd> Fullscreen</span>
+                  <span><kbd className="bg-white/20 px-1 rounded">Left-click</kbd> Fullscreen</span>
+                  <span><kbd className="bg-white/20 px-1 rounded">Right-click</kbd> Guess</span>
                   <span><kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom</span>
                   <span><kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</span>
                 </div>
@@ -185,6 +186,9 @@ export function GameLayout({
                   <span><kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit</span>
                   {onEnterPress && <span><kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</span>}
                   {onNPress && <span><kbd className="bg-white/20 px-1 rounded">N</kbd> Next</span>}
+                </div>
+                <div className="text-xs text-gray-400">
+                  Left-click map for fullscreen
                 </div>
               </div>
             </>

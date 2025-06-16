@@ -2,6 +2,20 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import App from './App';
 
+// Mock the AuthContext
+vi.mock('./contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useAuth: () => ({
+    user: null,
+    session: null,
+    loading: false,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+  }),
+}));
+
 // Mock MapLibre GL to avoid issues in test environment
 vi.mock('maplibre-gl', () => ({
   default: {

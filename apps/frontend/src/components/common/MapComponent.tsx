@@ -103,21 +103,15 @@ export function MapComponent({
       setIsMapLoaded(true);
     });
 
-    // Click handler for placing guesses
-    map.current.on('click', (e) => {
-      if (!disabled && !showResult && clickHandler) {
-        const { lat, lng } = e.lngLat;
-        clickHandler(lat, lng);
-        return;
-      }
-      
-      // Double-click for fullscreen if no guess placement
+    // Click handlers - left click for fullscreen, right click for guess
+    map.current.on('click', () => {
+      // Left click - toggle fullscreen
       if (onDoubleClick) {
         onDoubleClick();
       }
     });
 
-    // Right-click handler as alternative
+    // Right-click handler for placing guesses
     map.current.on('contextmenu', (e) => {
       e.preventDefault(); // Prevent context menu
       if (!disabled && !showResult && clickHandler) {
@@ -270,7 +264,7 @@ export function MapComponent({
           {!currentGuess ? (
             <div className="flex items-center gap-2">
               <span className="text-blue-400">🖱️</span>
-              <span>Click to place your guess</span>
+              <span>Right-click to place guess • Left-click for fullscreen</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">

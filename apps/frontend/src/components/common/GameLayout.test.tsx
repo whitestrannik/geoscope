@@ -219,6 +219,7 @@ describe('GameLayout', () => {
       </GameLayoutWrapper>
     );
     
-    expect(container.firstChild?.firstChild).toHaveClass('custom-class');
+    // The className is applied to the main div which is the first child
+    expect(container.firstChild).toHaveClass('custom-class');
   });
 }); 

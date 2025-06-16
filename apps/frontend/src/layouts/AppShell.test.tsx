@@ -3,6 +3,20 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AppShell } from './AppShell';
 
+// Mock the AuthContext
+vi.mock('../contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useAuth: () => ({
+    user: null,
+    session: null,
+    loading: false,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    updateProfile: vi.fn(),
+  }),
+}));
+
 // Mock react-router-dom's useLocation
 const mockUseLocation = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -51,35 +65,44 @@ describe('AppShell', () => {
   it('renders mobile menu button', () => {
     render(<AppShellWrapper />);
     
-    const menuButton = screen.getByRole('button');
+    // Look for the mobile menu button specifically (has hamburger icon)
+    const menuButton = screen.getAllByRole('button').find(btn => 
+      btn.querySelector('svg path[d*="M4 6h16M4 12h16M4 18h16"]')
+    );
     expect(menuButton).toBeInTheDocument();
   });
 
   it('toggles mobile menu when button is clicked', () => {
     render(<AppShellWrapper />);
     
-    const menuButton = screen.getByRole('button');
+    // Get the mobile menu button (the one with hamburger icon)
+    const menuButton = screen.getAllByRole('button').find(btn => 
+      btn.querySelector('svg path[d*="M4 6h16M4 12h16M4 18h16"]')
+    );
     
     // Mobile menu should not be visible initially
     expect(screen.queryByText('🏠 Home')).not.toBeInTheDocument();
     
     // Click to open mobile menu
-    fireEvent.click(menuButton);
+    fireEvent.click(menuButton!);
     expect(screen.getByText('🏠 Home')).toBeInTheDocument();
     expect(screen.getByText('🎮 Solo Mode')).toBeInTheDocument();
     expect(screen.getByText('🏠 Create Room')).toBeInTheDocument();
     expect(screen.getByText('🚪 Join Room')).toBeInTheDocument();
     
     // Click to close mobile menu
-    fireEvent.click(menuButton);
+    fireEvent.click(menuButton!);
     expect(screen.queryByText('🏠 Home')).not.toBeInTheDocument();
   });
 
   it('closes mobile menu when a link is clicked', () => {
     render(<AppShellWrapper />);
     
-    const menuButton = screen.getByRole('button');
-    fireEvent.click(menuButton);
+    // Get the mobile menu button (the one with hamburger icon)
+    const menuButton = screen.getAllByRole('button').find(btn => 
+      btn.querySelector('svg path[d*="M4 6h16M4 12h16M4 18h16"]')
+    );
+    fireEvent.click(menuButton!);
     
     // Menu should be open
     expect(screen.getByText('🏠 Home')).toBeInTheDocument();

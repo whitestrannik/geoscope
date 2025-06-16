@@ -307,7 +307,6 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
               alt="Location to guess"
               onFullscreenToggle={() => setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full')}
               showFullscreenButton={true}
-              showZoomControls={false}
               showInstructions={true}
               isFullscreen={layoutMode === 'image-full'}
               className="h-full"
@@ -375,7 +374,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                       Submit Guess
                     </Button>
                   ) : (
-                    <span className="text-yellow-400">Click on the map to place your guess</span>
+                    <span className="text-yellow-400">Right-click on the map to place your guess</span>
                   )}
                 </div>
               )}
@@ -431,7 +430,8 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
         <div className="text-gray-300 mb-1">Multiplayer Controls:</div>
         <div className="space-y-1">
           <div className="flex flex-wrap gap-1">
-            <span><kbd className="bg-white/20 px-1 rounded">Click</kbd> Fullscreen</span>
+            <span><kbd className="bg-white/20 px-1 rounded">Left-click</kbd> Fullscreen</span>
+            <span><kbd className="bg-white/20 px-1 rounded">Right-click</kbd> Guess</span>
             <span><kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom</span>
             <span><kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</span>
           </div>
