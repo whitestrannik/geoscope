@@ -8,7 +8,7 @@ import type { LayoutMode } from '@/components/common/GameLayout';
 import { Loader2, Clock, Users, Trophy, LogOut, MapPin, Crown } from 'lucide-react';
 
 interface GameState {
-  phase: 'waiting' | 'round-active' | 'round-results' | 'results-countdown' | 'waiting-for-host' | 'loading-next-round' | 'game-finished';
+  phase: 'waiting' | 'round-active' | 'round-results' | 'waiting-for-host' | 'loading-next-round' | 'game-finished';
   currentRound: number;
   totalRounds: number;
   imageUrl?: string;
@@ -145,7 +145,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     }) => {
       setGameState(prev => ({
         ...prev,
-        phase: 'results-countdown',
+        // Keep in round-results phase but add countdown time
         countdownTime: data.timeRemaining
       }));
     };
@@ -263,22 +263,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     );
   }
 
-  // Results countdown (auto mode)
-  if (gameState.phase === 'results-countdown') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              <div className="text-6xl font-bold text-blue-400">{gameState.countdownTime}</div>
-              <p className="text-lg">Next round starting in...</p>
-              <p className="text-sm text-gray-300">Review the results on the map</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Results countdown (auto mode) - removed, now handled within round-results phase
 
   // Waiting for host (manual mode)
   if (gameState.phase === 'waiting-for-host') {
@@ -393,7 +378,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   }
 
   // Active round state - use GameLayout for consistency
-  if (gameState.phase === 'round-active' || gameState.phase === 'round-results' || gameState.phase === 'results-countdown' || gameState.phase === 'waiting-for-host') {
+  if (gameState.phase === 'round-active' || gameState.phase === 'round-results') {
     // Header actions for multiplayer
     const headerActions = (
       <>
@@ -506,21 +491,31 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                   )}
                 </div>
               )}
-              {gameState.phase === 'round-results' && !room.autoAdvance && (
+              {gameState.phase === 'round-results' && (
                 <div className="flex items-center space-x-2">
-                  {user.id === room.hostUserId ? (
-                    <Button
-                      onClick={() => socket.startNextRound()}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                    >
-                      <Crown className="h-4 w-4 mr-2" />
-                      Start Next Round
-                    </Button>
-                  ) : (
-                    <span className="text-blue-400 text-sm">
-                      📊 Review results - Host will start next round
-                    </span>
-                  )}
+                  {room.autoAdvance && gameState.countdownTime !== undefined ? (
+                    <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg">
+                      <Clock className="h-4 w-4 text-blue-400" />
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-400">{gameState.countdownTime}</div>
+                        <div className="text-xs text-blue-300">Next round in...</div>
+                      </div>
+                    </div>
+                  ) : !room.autoAdvance ? (
+                    user.id === room.hostUserId ? (
+                      <Button
+                        onClick={() => socket.startNextRound()}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                      >
+                        <Crown className="h-4 w-4 mr-2" />
+                        Start Next Round
+                      </Button>
+                    ) : (
+                      <span className="text-blue-400 text-sm">
+                        📊 Review results - Host will start next round
+                      </span>
+                    )
+                  ) : null}
                 </div>
               )}
             </div>
@@ -540,6 +535,8 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
           <p className="text-center text-sm text-gray-300">
             {!room.autoAdvance && gameState.phase === 'round-results' 
               ? "Examine results - Host will start next round" 
+              : room.autoAdvance && gameState.countdownTime !== undefined
+              ? `Review results - Next round starts in ${gameState.countdownTime}s`
               : "Click anywhere to continue"}
           </p>
         </CardHeader>
