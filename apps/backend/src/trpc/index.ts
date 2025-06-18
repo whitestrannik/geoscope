@@ -4,6 +4,7 @@ import { imageRouter } from './imageRouter.js';
 import { guessRouter } from './guessRouter.js';
 import { userRouter } from './user.js';
 import { roomRouter } from './roomRouter.js';
+import { leaderboardRouter } from './leaderboardRouter.js';
 
 // Define main app router
 export const appRouter = router({
@@ -36,6 +37,9 @@ export const appRouter = router({
   
   // Phase 4 routers
   room: roomRouter,
+
+  // Phase 5 routers
+  leaderboard: leaderboardRouter,
 });
 
 // Export the app router type for frontend usage
