@@ -754,11 +754,9 @@ async function endRound(roomId: string) {
         }, 1000);
         
       } else {
-        // Manual mode: Wait for host to start next round
-        io.to(roomId).emit('next-round-ready', {
-          roomId,
-          isHost: true // This will be filtered on client side based on user
-        });
+        // Manual mode: Keep players in results view until host advances
+        // Do NOT emit next-round-ready yet - let them examine results
+        // The next-round-ready will be handled when host clicks the button
       }
     }
 

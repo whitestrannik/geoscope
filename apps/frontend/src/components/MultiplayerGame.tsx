@@ -506,6 +506,23 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                   )}
                 </div>
               )}
+              {gameState.phase === 'round-results' && !room.autoAdvance && (
+                <div className="flex items-center space-x-2">
+                  {user.id === room.hostUserId ? (
+                    <Button
+                      onClick={() => socket.startNextRound()}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Start Next Round
+                    </Button>
+                  ) : (
+                    <span className="text-blue-400 text-sm">
+                      📊 Review results - Host will start next round
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -520,7 +537,11 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       >
         <CardHeader>
           <CardTitle className="text-xl sm:text-2xl text-center">Round {gameState.currentRound} Results</CardTitle>
-          <p className="text-center text-sm text-gray-300">Click anywhere to continue</p>
+          <p className="text-center text-sm text-gray-300">
+            {!room.autoAdvance && gameState.phase === 'round-results' 
+              ? "Examine results - Host will start next round" 
+              : "Click anywhere to continue"}
+          </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
