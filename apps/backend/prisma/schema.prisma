@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,88 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User profile model (extends Supabase auth.users)
 model User {
-  id        String   @id // Matches Supabase auth.users.id (UUID)
-  username  String?  @unique // Optional, can be set after signup
-  email     String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
+  id          String       @id
+  username    String?      @unique
+  email       String       @unique
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
   guesses     Guess[]
-  hostedRooms Room[]        @relation("RoomHost")
   roomPlayers RoomPlayer[]
+  hostedRooms Room[]       @relation("RoomHost")
 
   @@map("users")
 }
 
-// Game guess model for scoring system
 model Guess {
   id         String   @id @default(cuid())
-  userId     String?  @map("user_id") // Optional for guest play
-  roomId     String?  @map("room_id")  // Optional for multiplayer games
+  userId     String?  @map("user_id")
+  roomId     String?  @map("room_id")
   imageUrl   String   @map("image_url")
   actualLat  Float    @map("actual_lat")
   actualLng  Float    @map("actual_lng")
   guessLat   Float    @map("guess_lat")
   guessLng   Float    @map("guess_lng")
-  distance   Float    // Distance in kilometers
-  score      Int      // Calculated score
-  mode       String   // "solo" or "multiplayer"
-  roundIndex Int?     @map("round_index") // For multiplayer rounds
+  distance   Float
+  score      Int
+  mode       String
+  roundIndex Int?     @map("round_index")
   createdAt  DateTime @default(now()) @map("created_at")
-
-  // Relations
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-  room Room? @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  room       Room?    @relation(fields: [roomId], references: [id])
+  user       User?    @relation(fields: [userId], references: [id])
 
   @@map("guesses")
 }
 
-// Multiplayer room model
 model Room {
-  id         String     @id @default(cuid()) // Room code
-  hostUserId String     @map("host_user_id")
-  status     RoomStatus @default(WAITING)
-  maxPlayers Int        @default(6) @map("max_players")
-  currentRound Int      @default(0) @map("current_round")
-  totalRounds  Int      @default(5) @map("total_rounds")
-  roundTimeLimit Int?   @map("round_time_limit") // seconds, null = no limit
-  autoAdvance Boolean   @default(true) @map("auto_advance") // true = auto timer, false = manual host control
-  resultsDisplayTime Int @default(20) @map("results_display_time") // seconds to show results before auto advance
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-
-  // Relations
-  host    User         @relation("RoomHost", fields: [hostUserId], references: [id], onDelete: Cascade)
-  players RoomPlayer[]
-  guesses Guess[]
+  id                 String       @id @default(cuid())
+  hostUserId         String       @map("host_user_id")
+  status             RoomStatus   @default(WAITING)
+  maxPlayers         Int          @default(6) @map("max_players")
+  currentRound       Int          @default(0) @map("current_round")
+  totalRounds        Int          @default(5) @map("total_rounds")
+  roundTimeLimit     Int?         @map("round_time_limit")
+  autoAdvance        Boolean      @default(true) @map("auto_advance")
+  resultsDisplayTime Int          @default(20) @map("results_display_time")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+  guesses            Guess[]
+  players            RoomPlayer[]
+  host               User         @relation("RoomHost", fields: [hostUserId], references: [id], onDelete: Cascade)
 
   @@map("rooms")
 }
 
-// Room player junction table
 model RoomPlayer {
   id       String   @id @default(cuid())
   roomId   String   @map("room_id")
   userId   String   @map("user_id")
   joinedAt DateTime @default(now()) @map("joined_at")
-  score    Int      @default(0) // Total score for this room
-  isReady  Boolean  @default(false) @map("is_ready") // Ready for next round
+  score    Int      @default(0)
+  isReady  Boolean  @default(false) @map("is_ready")
+  room     Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relations
-  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Unique constraint: one user per room
   @@unique([roomId, userId])
   @@map("room_players")
 }
 
-// Room status enum
 enum RoomStatus {
-  WAITING   // Waiting for players to join
-  ACTIVE    // Game in progress
-  FINISHED  // Game completed
-} 
+  WAITING
+  ACTIVE
+  FINISHED
+}

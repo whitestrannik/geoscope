@@ -51,6 +51,10 @@ export function CreateRoomPage() {
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Debug logging
+    console.log('🔍 Creating room with user:', user);
+    console.log('🔍 User ID:', user?.id);
+    
     createRoomMutation.mutate({
       maxPlayers,
       totalRounds,
