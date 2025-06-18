@@ -1,5 +1,8 @@
 # 📍 Phase 0 – Project Setup & Tooling ✅ **COMPLETED**
 
+> **⚠️ WINDOWS DEVELOPMENT ENVIRONMENT ONLY**  
+> **OS**: Windows 10/11 + PowerShell | **NO Unix/Linux/macOS support**
+
 > Goal: Prepare a professional monorepo-based fullstack environment using Vite, Express, TailwindCSS v4, shadcn/ui, tRPC, and Vitest. Ensure security, type safety, and compatibility with Windows + PowerShell.
 
 ---
@@ -65,8 +68,9 @@
 ## 🖥️ 0.7 — Local Dev Workflow ✅
 
 - [x] Set up separate start scripts for frontend and backend
-- [x] Ensure compatibility with PowerShell (Windows development environment)
+- [x] **CRITICAL**: Ensure compatibility with PowerShell (Windows-only development environment)
 - [x] Combined dev script working (`pnpm run dev` runs both servers)
+- [x] **All commands must be PowerShell-compatible** (NO `&&`, Unix paths, or bash syntax)
 
 **🎯 Phase 0 Status: COMPLETE** 
 - Frontend: `http://localhost:3000` ✅ (React + Vite + TailwindCSS v4 + shadcn/ui)

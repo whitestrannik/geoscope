@@ -84,6 +84,9 @@ export interface ServerToClientEvents {
     actualLocation: { lat: number, lng: number },
     imageUrl: string
   }) => void;
+  'results-countdown': (data: { roomId: string, timeRemaining: number }) => void;
+  'next-round-ready': (data: { roomId: string, isHost: boolean }) => void;
+  'loading-next-round': (data: { roomId: string }) => void;
   'game-ended': (data: { 
     roomId: string, 
     finalResults: Array<{
@@ -102,6 +105,7 @@ export interface ClientToServerEvents {
   'player-ready': (data: { roomId: string, isReady: boolean }) => void;
   'submit-guess': (data: { roomId: string, roundIndex: number, guessLat: number, guessLng: number }) => void;
   'start-game': (data: { roomId: string }) => void;
+  'start-next-round': (data: { roomId: string }) => void;
   'get-round-state': (data: { roomId: string }) => void;
 }
 
@@ -437,6 +441,72 @@ export function initializeSocket(httpServer: HTTPServer) {
       }
     });
 
+    // Start next round (host only, for manual mode)
+    socket.on('start-next-round', async ({ roomId }) => {
+      try {
+        const userId = socket.data.userId;
+        if (!userId) {
+          return;
+        }
+
+        // Verify user is host
+        const room = await db.room.findUnique({
+          where: { id: roomId.toUpperCase() },
+          include: {
+            players: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    username: true,
+                    email: true
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        if (!room || room.hostUserId !== userId) {
+          socket.emit('error', { message: 'Only the host can start the next round' });
+          return;
+        }
+
+        // Check if room is in correct state for next round
+        if (room.status !== 'ACTIVE') {
+          socket.emit('error', { message: 'Game is not active' });
+          return;
+        }
+
+        // Check if we haven't exceeded total rounds
+        if (room.currentRound >= room.totalRounds) {
+          socket.emit('error', { message: 'Game has already ended' });
+          return;
+        }
+
+        // Emit loading state
+        io.to(roomId.toUpperCase()).emit('loading-next-round', {
+          roomId: roomId.toUpperCase()
+        });
+
+        // Start the next round
+        const nextRoundIndex = room.currentRound + 1;
+        
+        // Update room's current round
+        await db.room.update({
+          where: { id: roomId.toUpperCase() },
+          data: { currentRound: nextRoundIndex }
+        });
+
+        // Start the new round
+        await startNewRound(roomId.toUpperCase(), nextRoundIndex, room.roundTimeLimit ?? undefined);
+
+      } catch (error) {
+        console.error('❌ Error starting next round:', error);
+        socket.emit('error', { message: 'Failed to start next round' });
+      }
+    });
+
     // Handle disconnect
     socket.on('disconnect', () => {
       const userId = socket.data.userId;
@@ -645,10 +715,51 @@ async function endRound(roomId: string) {
       // End the game
       await endGame(roomId, results);
     } else {
-      // Start next round after a short delay
-      setTimeout(() => {
-        startNewRound(roomId, roundState.roundIndex + 1, room.roundTimeLimit ?? undefined);
-      }, 5000); // 5 second delay between rounds
+      // Handle next round based on room's autoAdvance setting
+      if (room.autoAdvance) {
+        // Auto mode: Start countdown timer
+        const resultsDisplayTime = room.resultsDisplayTime || 20; // Default 20 seconds
+        let timeRemaining = resultsDisplayTime;
+        
+        const countdownInterval = setInterval(() => {
+          timeRemaining--;
+          
+          // Emit countdown update
+          io.to(roomId).emit('results-countdown', {
+            roomId,
+            timeRemaining
+          });
+          
+          if (timeRemaining <= 0) {
+            clearInterval(countdownInterval);
+            
+            // Emit loading state
+            io.to(roomId).emit('loading-next-round', {
+              roomId
+            });
+            
+            // Start next round after a short delay for loading state
+            setTimeout(async () => {
+              const nextRoundIndex = roundState.roundIndex + 1;
+              
+              // Update room's current round
+              await db.room.update({
+                where: { id: roomId },
+                data: { currentRound: nextRoundIndex }
+              });
+              
+              await startNewRound(roomId, nextRoundIndex, room.roundTimeLimit ?? undefined);
+            }, 2000); // 2 second loading delay
+          }
+        }, 1000);
+        
+      } else {
+        // Manual mode: Wait for host to start next round
+        io.to(roomId).emit('next-round-ready', {
+          roomId,
+          isHost: true // This will be filtered on client side based on user
+        });
+      }
     }
 
     // Clean up round state

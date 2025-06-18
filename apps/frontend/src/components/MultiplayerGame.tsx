@@ -5,10 +5,10 @@ import { MapComponent } from '@/components/common/MapComponent';
 import { ImageViewer } from '@/components/common/ImageViewer';
 import { GameLayout } from '@/components/common/GameLayout';
 import type { LayoutMode } from '@/components/common/GameLayout';
-import { Loader2, Clock, Users, Trophy, LogOut, MapPin } from 'lucide-react';
+import { Loader2, Clock, Users, Trophy, LogOut, MapPin, Crown } from 'lucide-react';
 
 interface GameState {
-  phase: 'waiting' | 'round-active' | 'round-results' | 'game-finished';
+  phase: 'waiting' | 'round-active' | 'round-results' | 'results-countdown' | 'waiting-for-host' | 'loading-next-round' | 'game-finished';
   currentRound: number;
   totalRounds: number;
   imageUrl?: string;
@@ -16,6 +16,7 @@ interface GameState {
   timeRemaining?: number;
   results?: any[];
   finalResults?: any[];
+  countdownTime?: number;
 }
 
 interface MultiplayerGameProps {
@@ -138,6 +139,36 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       setPersistedActualLocation(data.actualLocation);
     };
 
+    const handleResultsCountdown = (data: {
+      roomId: string;
+      timeRemaining: number;
+    }) => {
+      setGameState(prev => ({
+        ...prev,
+        phase: 'results-countdown',
+        countdownTime: data.timeRemaining
+      }));
+    };
+
+    const handleNextRoundReady = (data: {
+      roomId: string;
+      isHost: boolean;
+    }) => {
+      setGameState(prev => ({
+        ...prev,
+        phase: 'waiting-for-host'
+      }));
+    };
+
+    const handleLoadingNextRound = (data: {
+      roomId: string;
+    }) => {
+      setGameState(prev => ({
+        ...prev,
+        phase: 'loading-next-round'
+      }));
+    };
+
     const handleGameEnded = (data: {
       roomId: string;
       finalResults: any[];
@@ -154,6 +185,9 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     socket.on('round-started', handleRoundStarted);
     socket.on('guess-submitted', handleGuessSubmitted);
     socket.on('round-ended', handleRoundEnded);
+    socket.on('results-countdown', handleResultsCountdown);
+    socket.on('next-round-ready', handleNextRoundReady);
+    socket.on('loading-next-round', handleLoadingNextRound);
     socket.on('game-ended', handleGameEnded);
 
     return () => {
@@ -161,6 +195,9 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       socket.off('round-started', handleRoundStarted);
       socket.off('guess-submitted', handleGuessSubmitted);
       socket.off('round-ended', handleRoundEnded);
+      socket.off('results-countdown', handleResultsCountdown);
+      socket.off('next-round-ready', handleNextRoundReady);
+      socket.off('loading-next-round', handleLoadingNextRound);
       socket.off('game-ended', handleGameEnded);
     };
   }, [socket]);
@@ -219,6 +256,75 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             <div className="text-center space-y-4">
               <Loader2 className="h-8 w-8 animate-spin mx-auto" />
               <p>Waiting for round to start...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Results countdown (auto mode)
+  if (gameState.phase === 'results-countdown') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="text-center space-y-4">
+              <div className="text-6xl font-bold text-blue-400">{gameState.countdownTime}</div>
+              <p className="text-lg">Next round starting in...</p>
+              <p className="text-sm text-gray-300">Review the results on the map</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Waiting for host (manual mode)
+  if (gameState.phase === 'waiting-for-host') {
+    const isHost = user.id === room.hostUserId;
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="text-center space-y-4">
+              {isHost ? (
+                <>
+                  <Crown className="h-8 w-8 mx-auto text-yellow-400" />
+                  <p className="text-lg">Ready for next round?</p>
+                  <p className="text-sm text-gray-300">You can start when everyone is ready</p>
+                  <Button
+                    onClick={() => socket.startNextRound()}
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+                  >
+                    🚀 Start Next Round
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Clock className="h-8 w-8 animate-pulse mx-auto text-blue-400" />
+                  <p className="text-lg">Waiting for host...</p>
+                  <p className="text-sm text-gray-300">The host will start the next round</p>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Loading next round
+  if (gameState.phase === 'loading-next-round') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="text-center space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+              <p className="text-lg">Loading next round...</p>
+              <p className="text-sm text-gray-300">Preparing new location...</p>
             </div>
           </CardContent>
         </Card>
@@ -287,7 +393,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   }
 
   // Active round state - use GameLayout for consistency
-  if (gameState.phase === 'round-active' || gameState.phase === 'round-results') {
+  if (gameState.phase === 'round-active' || gameState.phase === 'round-results' || gameState.phase === 'results-countdown' || gameState.phase === 'waiting-for-host') {
     // Header actions for multiplayer
     const headerActions = (
       <>

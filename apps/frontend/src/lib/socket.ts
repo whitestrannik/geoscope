@@ -10,6 +10,9 @@ interface ServerToClientEvents {
   'round-started': (data: { roomId: string, imageData: any, roundIndex: number, timeLimit?: number }) => void;
   'guess-submitted': (data: { roomId: string, playerId: string, roundIndex: number }) => void;
   'round-ended': (data: { roomId: string, results: any[], roundIndex: number }) => void;
+  'results-countdown': (data: { roomId: string, timeRemaining: number }) => void;
+  'next-round-ready': (data: { roomId: string, isHost: boolean }) => void;
+  'loading-next-round': (data: { roomId: string }) => void;
   'game-ended': (data: { roomId: string, finalResults: any[] }) => void;
   'room-updated': (data: { roomId: string, room: any }) => void;
   'error': (data: { message: string }) => void;
@@ -21,6 +24,7 @@ interface ClientToServerEvents {
   'player-ready': (data: { roomId: string, isReady: boolean }) => void;
   'submit-guess': (data: { roomId: string, roundIndex: number, guessLat: number, guessLng: number }) => void;
   'start-game': (data: { roomId: string }) => void;
+  'start-next-round': (data: { roomId: string }) => void;
   'get-round-state': (data: { roomId: string }) => void;
 }
 
@@ -71,6 +75,9 @@ class SocketService {
     });
     this.socket.on('guess-submitted', (data) => this.emit('guess-submitted', data));
     this.socket.on('round-ended', (data) => this.emit('round-ended', data));
+    this.socket.on('results-countdown', (data) => this.emit('results-countdown', data));
+    this.socket.on('next-round-ready', (data) => this.emit('next-round-ready', data));
+    this.socket.on('loading-next-round', (data) => this.emit('loading-next-round', data));
     this.socket.on('game-ended', (data) => this.emit('game-ended', data));
     this.socket.on('room-updated', (data) => this.emit('room-updated', data));
 
@@ -209,6 +216,16 @@ class SocketService {
   // Get current room ID
   get roomId(): string | null {
     return this.currentRoomId;
+  }
+
+  // Start next round (host only, for manual mode)
+  startNextRound() {
+    if (!this.socket || !this.currentRoomId) {
+      console.error('🔌 Cannot start next round - socket or room not available');
+      throw new Error('Not connected to a room');
+    }
+
+    this.socket.emit('start-next-round', { roomId: this.currentRoomId });
   }
 }
 

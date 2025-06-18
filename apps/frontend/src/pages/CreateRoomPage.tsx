@@ -16,6 +16,8 @@ export function CreateRoomPage() {
   const [totalRounds, setTotalRounds] = useState(5);
   const [hasTimeLimit, setHasTimeLimit] = useState(false);
   const [roundTimeLimit, setRoundTimeLimit] = useState(120); // 2 minutes
+  const [autoAdvance, setAutoAdvance] = useState(true);
+  const [resultsDisplayTime, setResultsDisplayTime] = useState(20);
 
   const createRoomMutation = trpc.room.create.useMutation({
     onSuccess: (room) => {
@@ -52,7 +54,9 @@ export function CreateRoomPage() {
     createRoomMutation.mutate({
       maxPlayers,
       totalRounds,
-      roundTimeLimit: hasTimeLimit ? roundTimeLimit : undefined
+      roundTimeLimit: hasTimeLimit ? roundTimeLimit : undefined,
+      autoAdvance,
+      resultsDisplayTime
     });
   };
 
@@ -134,6 +138,61 @@ export function CreateRoomPage() {
                     onChange={(e) => setRoundTimeLimit(parseInt(e.target.value) || 120)}
                     className="bg-black/20 border-white/30 text-white"
                   />
+                </div>
+              )}
+            </div>
+
+            {/* Round Progression Mode */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                🔄 Round Progression Mode
+              </Label>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id="autoAdvance"
+                    name="advanceMode"
+                    checked={autoAdvance}
+                    onChange={() => setAutoAdvance(true)}
+                    className="w-4 h-4"
+                  />
+                  <Label htmlFor="autoAdvance" className="text-sm">
+                    ⏱️ Automatic - Rounds advance automatically with countdown timer
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id="manualAdvance"
+                    name="advanceMode"
+                    checked={!autoAdvance}
+                    onChange={() => setAutoAdvance(false)}
+                    className="w-4 h-4"
+                  />
+                  <Label htmlFor="manualAdvance" className="text-sm">
+                    👑 Manual - Host controls when to start next round
+                  </Label>
+                </div>
+              </div>
+              
+              {autoAdvance && (
+                <div className="space-y-2">
+                  <Label htmlFor="resultsDisplayTime" className="text-sm">
+                    Results Display Time (5-60 seconds)
+                  </Label>
+                  <Input
+                    id="resultsDisplayTime"
+                    type="number"
+                    min="5"
+                    max="60"
+                    value={resultsDisplayTime}
+                    onChange={(e) => setResultsDisplayTime(parseInt(e.target.value) || 20)}
+                    className="bg-black/20 border-white/30 text-white"
+                  />
+                  <p className="text-xs text-gray-400">
+                    How long to show results before automatically starting the next round
+                  </p>
                 </div>
               )}
             </div>

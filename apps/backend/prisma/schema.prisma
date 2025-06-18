@@ -58,6 +58,8 @@ model Room {
   currentRound Int      @default(0) @map("current_round")
   totalRounds  Int      @default(5) @map("total_rounds")
   roundTimeLimit Int?   @map("round_time_limit") // seconds, null = no limit
+  autoAdvance Boolean   @default(true) @map("auto_advance") // true = auto timer, false = manual host control
+  resultsDisplayTime Int @default(20) @map("results_display_time") // seconds to show results before auto advance
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
 

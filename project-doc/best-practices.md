@@ -1,3 +1,16 @@
+# Best Practices for GeoScope Development
+
+## ⚠️ **CRITICAL: Windows Development Environment**
+
+**🖥️ This project is Windows-only:**
+- **OS**: Windows 10/11 
+- **Shell**: PowerShell ONLY (not bash/zsh/cmd)
+- **Commands**: All must be PowerShell-compatible
+- **Paths**: Use Windows path format (`C:\path\to\file`)
+- **Forbidden**: Unix commands, `&&`, `||`, bash syntax
+
+**Before running ANY command, ensure it works in PowerShell!**
+
 # 🤖 Implementation Guidelines & Best Practices for GeoScope
 
 This document outlines development rules, constraints, and patterns for an LLM agent implementing this fullstack project.

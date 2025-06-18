@@ -7,6 +7,8 @@ const CreateRoomInputSchema = z.object({
   maxPlayers: z.number().int().min(2).max(10).default(6),
   totalRounds: z.number().int().min(1).max(20).default(5),
   roundTimeLimit: z.number().int().min(30).max(300).optional(), // 30 sec to 5 min
+  autoAdvance: z.boolean().default(true), // true = auto timer, false = manual host control
+  resultsDisplayTime: z.number().int().min(5).max(60).default(20), // 5-60 seconds to show results
 });
 
 const JoinRoomInputSchema = z.object({
@@ -74,6 +76,8 @@ export const roomRouter = router({
           maxPlayers: input.maxPlayers,
           totalRounds: input.totalRounds,
           roundTimeLimit: input.roundTimeLimit ?? null,
+          autoAdvance: input.autoAdvance,
+          resultsDisplayTime: input.resultsDisplayTime,
           players: {
             create: {
               userId: userId,
@@ -112,6 +116,8 @@ export const roomRouter = router({
         currentRound: room.currentRound,
         totalRounds: room.totalRounds,
         roundTimeLimit: room.roundTimeLimit,
+        autoAdvance: room.autoAdvance,
+        resultsDisplayTime: room.resultsDisplayTime,
         createdAt: room.createdAt,
         host: room.host,
         players: room.players.map((p: any) => ({

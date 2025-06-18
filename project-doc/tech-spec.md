@@ -1,5 +1,22 @@
 # 📘 GeoScope – Technical Specification
 
+## ⚠️ **CRITICAL: Windows Development Environment**
+
+**🖥️ This project is developed and optimized for Windows environment:**
+- **OS**: Windows 10/11 (win32)
+- **Shell**: PowerShell (NOT bash/zsh)
+- **Path Format**: Windows paths (`E:\folder\file`)
+- **Command Compatibility**: All scripts and commands MUST be PowerShell-compatible
+- **No Unix Commands**: Avoid `&&`, `||`, Unix path separators, bash-specific syntax
+
+**⚡ PowerShell Command Rules:**
+- Use `;` instead of `&&` for command chaining
+- Use `\` or Windows-style paths
+- All npm scripts must work in PowerShell
+- Git commands must use PowerShell syntax
+
+---
+
 ## Section 1: 🧱 Stack Overview
 
 | Layer           | Technology                                       |
@@ -14,10 +31,10 @@
 | ORM              | Prisma                                          |
 | Hosting          | Railway (Frontend + Backend + DB)              |
 | External Images  | Geo-tagged image APIs (e.g. Mapillary, Unsplash)|
-| Dev Environment  | Local: Windows with PowerShell-compatible CLI   |
+| Dev Environment  | **Windows 10/11 + PowerShell ONLY** ⚠️          |
 | Testing          | Vitest, Jest, Supertest, Playwright             |
 
-> ⚠️ All commands and scripts must be compatible with PowerShell.
+> ⚠️ **WINDOWS ONLY**: All commands and scripts must be PowerShell-compatible. NO Unix/bash commands allowed!
 
 ---
 
