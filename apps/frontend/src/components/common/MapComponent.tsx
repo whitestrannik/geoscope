@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { Button } from '@/components/ui/button';
 
 interface PlayerGuess {
   lat: number;
@@ -53,6 +54,26 @@ export function MapComponent({
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [currentCoords, setCurrentCoords] = useState<string>('');
 
+  // Zoom control functions
+  const handleZoomIn = () => {
+    if (map.current) {
+      map.current.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (map.current) {
+      map.current.zoomOut();
+    }
+  };
+
+  const handleResetZoom = () => {
+    if (map.current) {
+      map.current.setCenter([0, 20]);
+      map.current.setZoom(2);
+    }
+  };
+
   // Use the new prop names with fallback to old ones for backward compatibility
   const currentGuess = userGuess || guessMarker;
   const currentActualLocation = actualLocation || actualMarker;
@@ -97,12 +118,7 @@ export function MapComponent({
       maxZoom: 18
     });
 
-    // Essential controls only
-    map.current.addControl(new maplibregl.NavigationControl({
-      showZoom: true,
-      showCompass: false,
-      visualizePitch: false
-    }), 'top-right');
+    // Remove default navigation controls - we'll add custom ones
 
     map.current.addControl(new maplibregl.AttributionControl({
       compact: true
@@ -488,7 +504,7 @@ export function MapComponent({
       
       {/* Status overlay */}
       {!showResult && !disabled && (
-        <div className="absolute top-3 left-3 bg-black/80 text-white px-3 py-2 rounded-lg text-sm backdrop-blur-sm">
+        <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-sm backdrop-blur-sm shadow-lg border border-white/20">
           {!currentGuess ? (
             <div className="flex items-center gap-2">
               <span className="text-blue-400">🖱️</span>
@@ -503,9 +519,37 @@ export function MapComponent({
         </div>
       )}
 
+      {/* Custom Zoom Controls */}
+      <div className={`absolute ${showResult && resultData ? 'top-20' : 'top-4'} right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-all duration-300 z-20`}>
+        <Button
+          size="sm"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          onClick={handleZoomIn}
+          title="Zoom in"
+        >
+          <span className="text-lg font-semibold leading-none">+</span>
+        </Button>
+        <Button
+          size="sm"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          onClick={handleZoomOut}
+          title="Zoom out"
+        >
+          <span className="text-lg font-semibold leading-none">−</span>
+        </Button>
+        <Button
+          size="sm"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          onClick={handleResetZoom}
+          title="Reset zoom and position"
+        >
+          <span className="font-medium">Reset</span>
+        </Button>
+      </div>
+
       {/* Coordinates display */}
       {currentCoords && !disabled && (
-        <div className="absolute bottom-3 left-3 bg-black/80 text-white px-2 py-1 rounded text-xs backdrop-blur-sm">
+        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20 font-mono">
           {currentCoords}
         </div>
       )}

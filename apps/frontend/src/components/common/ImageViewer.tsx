@@ -134,40 +134,37 @@ export function ImageViewer({
         draggable={false}
       />
 
-      {/* Zoom Controls - Always visible for better UX */}
-      <div className="absolute top-3 right-3 flex flex-col">
+      {/* Zoom Controls - Redesigned with better styling */}
+      <div className="absolute top-4 right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-opacity">
         <Button
           size="sm"
-          variant="outline"
-          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-8 h-8 p-0 rounded-none rounded-t-sm border-b-0"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
           onClick={handleZoomIn}
           title="Zoom in"
         >
-          +
+          <span className="text-lg font-semibold leading-none">+</span>
         </Button>
         <Button
           size="sm"
-          variant="outline"
-          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 w-8 h-8 p-0 rounded-none border-b-0"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
           onClick={handleZoomOut}
           title="Zoom out"
         >
-          -
+          <span className="text-lg font-semibold leading-none">−</span>
         </Button>
         <Button
           size="sm"
-          variant="outline"
-          className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 text-xs h-8 px-2 rounded-none rounded-b-sm"
+          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
           onClick={handleResetZoom}
           title="Reset zoom and position"
         >
-          Reset
+          <span className="font-medium">Reset</span>
         </Button>
       </div>
 
       {/* Zoom Percentage Indicator */}
       {imageScale !== 1 && (
-        <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded text-xs font-mono">
+        <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-sm shadow-lg border border-white/20">
           {Math.round(imageScale * 100)}%
         </div>
       )}
@@ -185,7 +182,7 @@ export function ImageViewer({
 
       {/* Instructions */}
       {showInstructions && !isDraggingImage && (
-        <div className="absolute bottom-3 left-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20">
           {imageScale === 1 
             ? (showFullscreenButton ? 'Click: fullscreen • Scroll/Buttons: zoom' : 'Scroll/Buttons: zoom • Drag: pan')
             : 'Drag: pan • Scroll/Buttons: zoom'
@@ -195,7 +192,7 @@ export function ImageViewer({
 
       {/* Copyright */}
       {copyright && (
-        <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20">
           📸 {copyright}
         </div>
       )}
