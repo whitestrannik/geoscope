@@ -185,7 +185,7 @@ export function SoloPage() {
             copyright={currentGame.copyright}
             onFullscreenToggle={() => setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full')}
             showFullscreenButton={true}
-            showInstructions={true}
+            showInstructions={false}
             isFullscreen={layoutMode === 'image-full'}
             className="h-full"
           />

@@ -167,31 +167,17 @@ export function GameLayout({
         </div>
       )}
 
-      {/* Keyboard Shortcuts Help */}
+      {/* Unified Control Panel - Centered and Simplified */}
       {layoutMode === 'split' && showHelpOverlay && (
-        <div className="fixed bottom-2 right-2 sm:bottom-3 sm:right-3 bg-black/80 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-lg text-xs backdrop-blur-sm border border-white/20 max-w-xs">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm border border-white/20 shadow-lg">
           {customHelpContent || (
-            <>
-              <div className="text-gray-300 mb-1">Controls:</div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap gap-1">
-                  <span><kbd className="bg-white/20 px-1 rounded">Left-click</kbd> Fullscreen</span>
-                  <span><kbd className="bg-white/20 px-1 rounded">Right-click</kbd> Guess</span>
-                  <span><kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom</span>
-                  <span><kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</span>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  <span><kbd className="bg-white/20 px-1 rounded">F</kbd> Photo</span>
-                  <span><kbd className="bg-white/20 px-1 rounded">M</kbd> Map</span>
-                  <span><kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit</span>
-                  {onEnterPress && <span><kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</span>}
-                  {onNPress && <span><kbd className="bg-white/20 px-1 rounded">N</kbd> Next</span>}
-                </div>
-                <div className="text-xs text-gray-400">
-                  Left-click map for fullscreen
-                </div>
-              </div>
-            </>
+            <div className="flex items-center gap-4 text-center">
+              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Left-click</kbd> Fullscreen</span>
+              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Guess</span>
+              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Scroll</kbd> Zoom</span>
+              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Drag</kbd> Pan</span>
+              {onEnterPress && <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Submit</span>}
+            </div>
           )}
         </div>
       )}

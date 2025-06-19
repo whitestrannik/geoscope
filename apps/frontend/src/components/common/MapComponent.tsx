@@ -52,7 +52,6 @@ export function MapComponent({
   const allDistanceLabelsRef = useRef<maplibregl.Marker[]>([]);
   const allGuessMarkersRef = useRef<maplibregl.Marker[]>([]);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [currentCoords, setCurrentCoords] = useState<string>('');
 
   // Zoom control functions
   const handleZoomIn = () => {
@@ -118,12 +117,6 @@ export function MapComponent({
       maxZoom: 18
     });
 
-    // Remove default navigation controls - we'll add custom ones
-
-    map.current.addControl(new maplibregl.AttributionControl({
-      compact: true
-    }), 'bottom-right');
-
     map.current.on('load', () => {
       setIsMapLoaded(true);
     });
@@ -145,15 +138,7 @@ export function MapComponent({
       }
     });
 
-    // Simplified coordinate tracking
-    map.current.on('mousemove', (e) => {
-      const { lat, lng } = e.lngLat;
-      setCurrentCoords(`${lat.toFixed(3)}, ${lng.toFixed(3)}`);
-    });
-
-    map.current.on('mouseleave', () => {
-      setCurrentCoords('');
-    });
+    // No coordinate tracking needed anymore
 
     return () => {
       if (map.current) {
@@ -499,26 +484,21 @@ export function MapComponent({
 
       <div 
         ref={mapContainer} 
-        className={`w-full h-full rounded-lg overflow-hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        className={`w-full h-full rounded-lg overflow-hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} map-container`}
       />
       
-      {/* Status overlay */}
-      {!showResult && !disabled && (
-        <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-sm backdrop-blur-sm shadow-lg border border-white/20">
-          {!currentGuess ? (
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400">🖱️</span>
-              <span>Right-click to place guess • Left-click for fullscreen</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-green-400">✅</span>
-              <span>Guess placed: {currentGuess.lat.toFixed(3)}, {currentGuess.lng.toFixed(3)}</span>
-            </div>
-          )}
-        </div>
-      )}
-
+      {/* CSS to hide default MapLibre controls */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .map-container .maplibregl-ctrl-top-right,
+          .map-container .maplibregl-ctrl-bottom-right,
+          .map-container .maplibregl-ctrl-bottom-left,
+          .map-container .maplibregl-ctrl {
+            display: none !important;
+          }
+        `
+      }} />
+      
       {/* Custom Zoom Controls */}
       <div className={`absolute ${showResult && resultData ? 'top-20' : 'top-4'} right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-all duration-300 z-20`}>
         <Button
@@ -546,13 +526,6 @@ export function MapComponent({
           <span className="font-medium">Reset</span>
         </Button>
       </div>
-
-      {/* Coordinates display */}
-      {currentCoords && !disabled && (
-        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20 font-mono">
-          {currentCoords}
-        </div>
-      )}
 
       {/* Disabled overlay */}
       {disabled && (

@@ -18,7 +18,7 @@ export function ImageViewer({
   copyright,
   onFullscreenToggle,
   showFullscreenButton = true,
-  showInstructions = true,
+  showInstructions = false,
   isFullscreen = false,
   className = "w-full h-full"
 }: ImageViewerProps) {
@@ -180,15 +180,7 @@ export function ImageViewer({
         </div>
       )}
 
-      {/* Instructions */}
-      {showInstructions && !isDraggingImage && (
-        <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20">
-          {imageScale === 1 
-            ? (showFullscreenButton ? 'Click: fullscreen • Scroll/Buttons: zoom' : 'Scroll/Buttons: zoom • Drag: pan')
-            : 'Drag: pan • Scroll/Buttons: zoom'
-          }
-        </div>
-      )}
+
 
       {/* Copyright */}
       {copyright && (
