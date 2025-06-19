@@ -79,13 +79,13 @@ describe('Score Calculation', () => {
     
     // Score for 1000 km away (different country)
     const score1000 = calculateScore(1000);
-    expect(score1000).toBeGreaterThan(350);
-    expect(score1000).toBeLessThan(950);
+    expect(score1000).toBeGreaterThan(500);
+    expect(score1000).toBeLessThan(700);
     
     // Score for 5000 km away (different continent)  
     const score5000 = calculateScore(5000);
     expect(score5000).toBeGreaterThan(0);
-    expect(score5000).toBeLessThan(700);
+    expect(score5000).toBeLessThan(100);
   });
 
   it('never gives negative scores', () => {

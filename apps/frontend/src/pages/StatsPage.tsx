@@ -36,11 +36,11 @@ const StatsPage: React.FC = () => {
     );
   }
 
-  const formatDistance = (meters: number) => {
-    if (meters >= 1000) {
-      return `${(meters / 1000).toFixed(1)} km`;
+  const formatDistance = (kilometers: number) => {
+    if (kilometers >= 1) {
+      return `${kilometers.toFixed(1)} km`;
     }
-    return `${Math.round(meters)} m`;
+    return `${Math.round(kilometers * 1000)} m`;
   };
 
   const formatDate = (date: Date | string | null) => {
@@ -286,7 +286,7 @@ const StatsPage: React.FC = () => {
               <Button onClick={() => navigate('/solo')}>
                 Play Solo
               </Button>
-              <Button variant="outline" onClick={() => navigate('/multiplayer')}>
+              <Button variant="outline" onClick={() => navigate('/room/join')}>
                 Join Multiplayer
               </Button>
             </div>

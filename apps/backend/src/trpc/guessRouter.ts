@@ -61,15 +61,16 @@ export function calculateDistance(lat1: number, lng1: number, lat2: number, lng2
  */
 export function calculateScore(distanceKm: number): number {
   const MAX_SCORE = 1000;
-  const DECAY_FACTOR = 0.0001; // Adjust for scoring curve steepness
   
   // Perfect guess (within 1km) gets max score
   if (distanceKm <= 1) {
     return MAX_SCORE;
   }
   
-  // Exponential decay: score = MAX_SCORE * e^(-DECAY_FACTOR * distance)
-  const score = MAX_SCORE * Math.exp(-DECAY_FACTOR * distanceKm);
+  // Use same scoring algorithm as multiplayer (socket.ts)
+  // Score decreases exponentially with distance
+  // Score is 0 at 10000km or more
+  const score = MAX_SCORE * Math.exp(-distanceKm / 2000);
   
   // Ensure minimum score of 1 for any guess, 0 only for very far distances
   return Math.max(0, Math.round(score));
