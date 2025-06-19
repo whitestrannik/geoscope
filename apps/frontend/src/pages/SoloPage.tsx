@@ -6,6 +6,7 @@ import { ImageViewer } from '@/components/common/ImageViewer';
 import { GameLayout } from '@/components/common/GameLayout';
 import type { LayoutMode } from '@/components/common/GameLayout';
 import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/contexts/AuthContext';
 
 type GameState = 'loading' | 'playing' | 'result';
 
@@ -33,6 +34,7 @@ interface ResultData {
 }
 
 export function SoloPage() {
+  const { user } = useAuth();
   const [gameState, setGameState] = useState<GameState>('loading');
   const [currentGame, setCurrentGame] = useState<GameData | null>(null);
   const [userGuess, setUserGuess] = useState<GuessData | null>(null);
@@ -44,18 +46,32 @@ export function SoloPage() {
   // tRPC hooks
   const { data: imageData, isLoading: imageLoading, error: imageError, refetch: refetchImage } = trpc.image.getRandom.useQuery();
 
-  const evaluateGuessMutation = trpc.guess.evaluate.useMutation({
-    onSuccess: (data) => {
-      setResult(data);
-      setGameState('result');
-      setShowResultsOnMap(true);
-      setShowResultModal(true);
-    },
-    onError: (error) => {
-      console.error('Error evaluating guess:', error);
-      alert('Error evaluating your guess. Please try again.');
-    }
-  });
+  // Use submitSoloGuess for authenticated users (stores in database), evaluate for guests
+  const evaluateGuessMutation = user 
+    ? trpc.guess.submitSoloGuess.useMutation({
+        onSuccess: (data) => {
+          setResult(data);
+          setGameState('result');
+          setShowResultsOnMap(true);
+          setShowResultModal(true);
+        },
+        onError: (error) => {
+          console.error('Error submitting guess:', error);
+          alert('Error submitting your guess. Please try again.');
+        }
+      })
+    : trpc.guess.evaluate.useMutation({
+        onSuccess: (data) => {
+          setResult(data);
+          setGameState('result');
+          setShowResultsOnMap(true);
+          setShowResultModal(true);
+        },
+        onError: (error) => {
+          console.error('Error evaluating guess:', error);
+          alert('Error evaluating your guess. Please try again.');
+        }
+      });
 
   // Handle image data changes
   React.useEffect(() => {
@@ -82,6 +98,7 @@ export function SoloPage() {
 
     evaluateGuessMutation.mutate({
       imageId: currentGame.id,
+      imageUrl: currentGame.imageUrl,
       guessLat: userGuess.lat,
       guessLng: userGuess.lng,
       actualLat: currentGame.actualLat,

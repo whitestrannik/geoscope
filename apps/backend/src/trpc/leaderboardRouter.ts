@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from './trpc.js';
 import { TRPCError } from '@trpc/server';
+import { Prisma } from '@prisma/client';
 
 export const leaderboardRouter = router({
   // Get global top players based on their best scores
@@ -13,45 +14,88 @@ export const leaderboardRouter = router({
       const { limit, mode } = input;
       
       try {
-        // Get top players based on their highest single game score
-        const topPlayers = await ctx.db.$queryRaw<Array<{
-          id: string;
-          username: string | null;
-          email: string;
-          best_score: number;
-          total_games: bigint;
-          avg_score: number;
-          best_distance: number;
-          last_played: Date;
-        }>>`
-          SELECT 
-            u.id,
-            u.username,
-            u.email,
-            MAX(g.score) as best_score,
-            COUNT(g.id) as total_games,
-            AVG(g.score::float) as avg_score,
-            MIN(g.distance) as best_distance,
-            MAX(g.created_at) as last_played
-          FROM users u
-          INNER JOIN guesses g ON u.id = g.user_id
-          WHERE g.user_id IS NOT NULL 
-            ${mode !== 'all' ? `AND g.mode = ${mode}` : ''}
-          GROUP BY u.id, u.username, u.email
-          ORDER BY best_score DESC, avg_score DESC
-          LIMIT ${limit}
-        `;
+        // Build where clause based on mode filter
+        const whereClause = mode === 'all' 
+          ? { userId: { not: null } }
+          : { userId: { not: null }, mode };
 
-        return topPlayers.map((player, index: number) => ({
-          rank: index + 1,
-          id: player.id,
-          username: player.username || player.email.split('@')[0],
-          bestScore: Number(player.best_score),
-          totalGames: Number(player.total_games),
-          avgScore: Math.round(Number(player.avg_score)),
-          bestDistance: Number(player.best_distance),
-          lastPlayed: player.last_played
-        }));
+        // Get all guesses with user data, then process in JavaScript
+        const guessesWithUsers = await ctx.db.guess.findMany({
+          where: whereClause,
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                email: true
+              }
+            }
+          },
+          orderBy: [
+            { score: 'desc' },
+            { createdAt: 'desc' }
+          ]
+        });
+
+        // Group by user and calculate stats
+        const userStatsMap = new Map<string, {
+          id: string;
+          username: string;
+          email: string;
+          bestScore: number;
+          totalGames: number;
+          totalScore: number;
+          bestDistance: number;
+          lastPlayed: Date;
+        }>();
+
+        guessesWithUsers.forEach(guess => {
+          if (!guess.user) return;
+          
+          const userId = guess.user.id;
+          const existing = userStatsMap.get(userId);
+          
+          if (!existing) {
+            userStatsMap.set(userId, {
+              id: guess.user.id,
+              username: (guess.user.username || guess.user.email.split('@')[0]) as string,
+              email: guess.user.email,
+              bestScore: guess.score,
+              totalGames: 1,
+              totalScore: guess.score,
+              bestDistance: guess.distance,
+              lastPlayed: guess.createdAt
+            });
+          } else {
+            existing.bestScore = Math.max(existing.bestScore, guess.score);
+            existing.totalGames += 1;
+            existing.totalScore += guess.score;
+            existing.bestDistance = Math.min(existing.bestDistance, guess.distance);
+            existing.lastPlayed = guess.createdAt > existing.lastPlayed ? guess.createdAt : existing.lastPlayed;
+          }
+        });
+
+        // Convert to array and sort by best score
+        const topPlayers = Array.from(userStatsMap.values())
+          .sort((a, b) => {
+            if (b.bestScore !== a.bestScore) {
+              return b.bestScore - a.bestScore;
+            }
+            return (b.totalScore / b.totalGames) - (a.totalScore / a.totalGames);
+          })
+          .slice(0, limit)
+          .map((player, index) => ({
+            rank: index + 1,
+            id: player.id,
+            username: player.username,
+            bestScore: player.bestScore,
+            totalGames: player.totalGames,
+            avgScore: Math.round(player.totalScore / player.totalGames),
+            bestDistance: player.bestDistance,
+            lastPlayed: player.lastPlayed
+          }));
+
+        return topPlayers;
 
       } catch (error) {
         console.error('Error fetching global leaderboard:', error);

@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { router, publicProcedure } from './trpc.js';
+import { router, publicProcedure, protectedProcedure } from './trpc.js';
 
 // Input validation schemas
 const GuessInputSchema = z.object({
   imageId: z.string(),
+  imageUrl: z.string().url().optional(), // Add imageUrl for storage
   guessLat: z.number().min(-90).max(90),
   guessLng: z.number().min(-180).max(180),
   actualLat: z.number().min(-90).max(90),
@@ -79,9 +80,9 @@ export function calculateScore(distanceKm: number): number {
 export const guessRouter = router({
   evaluate: publicProcedure
     .input(GuessInputSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
-        const { imageId, guessLat, guessLng, actualLat, actualLng } = input;
+        const { imageId, imageUrl, guessLat, guessLng, actualLat, actualLng } = input;
         
         // Calculate distance between guess and actual location
         const distance = calculateDistance(guessLat, guessLng, actualLat, actualLng);
@@ -90,7 +91,7 @@ export const guessRouter = router({
         const score = calculateScore(distance);
         
         // Return comprehensive result
-        return {
+        const result = {
           distance: Math.round(distance * 100) / 100, // Round to 2 decimal places
           score,
           actualLat,
@@ -99,9 +100,56 @@ export const guessRouter = router({
           guessLng,
           imageId
         };
+
+        return result;
       } catch (error) {
         console.error('Error evaluating guess:', error);
         throw new Error('Failed to evaluate guess');
+      }
+    }),
+
+  // New endpoint to store guesses for authenticated users
+  submitSoloGuess: protectedProcedure
+    .input(GuessInputSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { imageId, imageUrl, guessLat, guessLng, actualLat, actualLng } = input;
+        
+        // Calculate distance between guess and actual location
+        const distance = calculateDistance(guessLat, guessLng, actualLat, actualLng);
+        
+        // Calculate score based on distance
+        const score = calculateScore(distance);
+        
+        // Store the guess in the database
+        await ctx.db.guess.create({
+          data: {
+            userId: ctx.user.id,
+            imageUrl: imageUrl || `https://images.mapillary.com/${imageId}/thumb-320.jpg`,
+            actualLat,
+            actualLng,
+            guessLat,
+            guessLng,
+            distance,
+            score,
+            mode: 'solo',
+            roundIndex: 0 // Solo mode is always single round
+          }
+        });
+        
+        // Return comprehensive result
+        return {
+          distance: Math.round(distance * 100) / 100,
+          score,
+          actualLat,
+          actualLng,
+          guessLat,
+          guessLng,
+          imageId
+        };
+      } catch (error) {
+        console.error('Error submitting solo guess:', error);
+        throw new Error('Failed to submit guess');
       }
     })
 }); 
