@@ -441,7 +441,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             onMapClick={handleMapClick}
             onDoubleClick={handleMapDoubleClick}
             userGuess={guess}
-            actualLocation={showResultsOnMap && persistedActualLocation ? persistedActualLocation : undefined}
+            actualLocation={showResultsOnMap && persistedActualLocation ? persistedActualLocation : null}
             allGuesses={showResultsOnMap && persistedResults ? 
               persistedResults.map(r => ({
                 lat: r.guessLat,
@@ -458,6 +458,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
               })() : null
             }
             disabled={gameState.phase !== 'round-active' && gameState.phase !== 'round-results'}
+            className="h-full"
           />
         </CardContent>
       </Card>
@@ -467,34 +468,46 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     const actionSection = (
       <>
         {/* Player Status */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white w-full max-w-2xl">
+        <Card className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border-slate-600/40 text-white w-full max-w-2xl min-w-[600px] shadow-xl">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4" />
-                <span>Players: {guessSubmissions.size}/{room.players.length} submitted</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center space-x-3 flex-1">
+                <div className="bg-blue-500/20 p-2 rounded-lg border border-blue-400/30">
+                  <Users className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-300">Players</div>
+                  <div className="font-semibold text-lg">
+                    {guessSubmissions.size}/{room.players.length} submitted
+                  </div>
+                </div>
               </div>
               {gameState.phase === 'round-active' && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center sm:justify-end w-full sm:w-80">
                   {hasSubmittedGuess ? (
-                    <span className="text-green-400">✅ Guess submitted</span>
+                    <div className="flex items-center space-x-2 bg-green-500/20 border border-green-400/30 px-4 py-2 rounded-lg min-w-[180px] justify-center">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-green-400 font-medium">Guess submitted</span>
+                    </div>
                   ) : guess ? (
                     <Button
                       onClick={handleSubmitGuess}
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg border border-green-500/30 transition-all duration-200 px-6 py-2 min-w-[180px]"
                     >
                       <MapPin className="h-4 w-4 mr-2" />
                       Submit Guess
                     </Button>
                   ) : (
-                    <span className="text-yellow-400">Right-click on the map to place your guess</span>
+                    <div className="bg-amber-500/20 border border-amber-400/30 px-4 py-2 rounded-lg text-center sm:text-left min-w-[280px]">
+                      <span className="text-amber-400 font-medium">Right-click on the map to place your guess</span>
+                    </div>
                   )}
                 </div>
               )}
               {gameState.phase === 'round-results' && (
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center sm:justify-end w-full sm:w-80">
                   {room.autoAdvance && gameState.countdownTime !== undefined ? (
-                    <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg">
+                    <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg min-w-[200px] justify-center">
                       <Clock className="h-4 w-4 text-blue-400" />
                       <div className="text-center">
                         <div className="text-2xl font-bold text-blue-400">{gameState.countdownTime}</div>
@@ -505,15 +518,17 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                     user.id === room.hostUserId ? (
                       <Button
                         onClick={() => socket.startNextRound()}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-lg border border-blue-500/30 px-6 py-2 min-w-[180px]"
                       >
                         <Crown className="h-4 w-4 mr-2" />
                         Start Next Round
                       </Button>
                     ) : (
-                      <span className="text-blue-400 text-sm">
-                        📊 Review results - Host will start next round
-                      </span>
+                      <div className="bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-lg text-center sm:text-left min-w-[280px]">
+                        <span className="text-blue-400 text-sm font-medium">
+                          📊 Review results - Host will start next round
+                        </span>
+                      </div>
                     )
                   ) : null}
                 </div>
@@ -576,23 +591,17 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     // Custom help content for multiplayer
     const customHelpContent = (
-      <>
-        <div className="text-gray-300 mb-1">Multiplayer Controls:</div>
-        <div className="space-y-1">
-          <div className="flex flex-wrap gap-1">
-            <span><kbd className="bg-white/20 px-1 rounded">Left-click</kbd> Fullscreen</span>
-            <span><kbd className="bg-white/20 px-1 rounded">Right-click</kbd> Guess</span>
-            <span><kbd className="bg-white/20 px-1 rounded">Scroll</kbd> Zoom</span>
-            <span><kbd className="bg-white/20 px-1 rounded">Drag</kbd> Pan</span>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            <span><kbd className="bg-white/20 px-1 rounded">F</kbd> Photo</span>
-            <span><kbd className="bg-white/20 px-1 rounded">M</kbd> Map</span>
-            <span><kbd className="bg-white/20 px-1 rounded">Esc</kbd> Exit</span>
-            <span><kbd className="bg-white/20 px-1 rounded">Enter</kbd> Submit</span>
-          </div>
-        </div>
-      </>
+      <div className="flex items-center gap-3 text-center">
+        <span className="text-gray-300">Multiplayer Controls:</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Left-click</kbd> Fullscreen</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Guess</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Scroll</kbd> Zoom</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Drag</kbd> Pan</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">F</kbd> Photo</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">M</kbd> Map</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Esc</kbd> Exit</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Submit</span>
+      </div>
     );
 
     return (

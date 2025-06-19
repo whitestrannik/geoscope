@@ -153,10 +153,34 @@ export function GameLayout({
       {/* Game Content */}
       {renderContent()}
 
-      {/* Action Section - Only in split mode */}
-      {layoutMode === 'split' && actionSection && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mt-4 flex-shrink-0">
-          {actionSection}
+      {/* Action Section with Integrated Control Panel - Only in split mode */}
+      {layoutMode === 'split' && (
+        <div className="flex flex-col items-center gap-3 mt-4 flex-shrink-0">
+          {/* Action Buttons (Submit, Play Again, etc.) */}
+          {actionSection && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+              {actionSection}
+            </div>
+          )}
+          
+          {/* Unified Control Panel */}
+          {showHelpOverlay && (
+            <div className="bg-black/70 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm border border-white/20 shadow-lg">
+              {customHelpContent || (
+                <div className="flex items-center gap-3 text-center flex-wrap justify-center">
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Left-click</kbd> Fullscreen</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Guess</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Scroll</kbd> Zoom</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Drag</kbd> Pan</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">F</kbd> Photo</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">M</kbd> Map</span>
+                  <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Esc</kbd> Exit</span>
+                  {onEnterPress && <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Submit</span>}
+                  {onNPress && <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">N</kbd> Next</span>}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -167,16 +191,14 @@ export function GameLayout({
         </div>
       )}
 
-      {/* Unified Control Panel - Centered and Simplified */}
-      {layoutMode === 'split' && showHelpOverlay && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm border border-white/20 shadow-lg">
+      {/* Control Panel for Fullscreen Modes */}
+      {layoutMode !== 'split' && showHelpOverlay && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm backdrop-blur-sm border border-white/20 shadow-lg z-30">
           {customHelpContent || (
             <div className="flex items-center gap-4 text-center">
-              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Left-click</kbd> Fullscreen</span>
-              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Guess</span>
+              <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Esc</kbd> Exit Fullscreen</span>
               <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Scroll</kbd> Zoom</span>
               <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Drag</kbd> Pan</span>
-              {onEnterPress && <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Submit</span>}
             </div>
           )}
         </div>

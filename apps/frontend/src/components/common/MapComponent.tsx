@@ -73,6 +73,65 @@ export function MapComponent({
     }
   };
 
+  const handleFitToResults = () => {
+    if (!map.current || !showResult) return;
+    
+    const bounds = new maplibregl.LngLatBounds();
+    let hasPoints = false;
+    
+    // Add actual location to bounds
+    if (currentActualLocation && typeof currentActualLocation.lat === 'number' && typeof currentActualLocation.lng === 'number') {
+      bounds.extend([currentActualLocation.lng, currentActualLocation.lat]);
+      hasPoints = true;
+    }
+    
+    // Add user guess to bounds
+    if (currentGuess && typeof currentGuess.lat === 'number' && typeof currentGuess.lng === 'number') {
+      bounds.extend([currentGuess.lng, currentGuess.lat]);
+      hasPoints = true;
+    }
+    
+    // Add all guesses to bounds for multiplayer
+    if (allGuesses && Array.isArray(allGuesses)) {
+      allGuesses.forEach(guess => {
+        if (guess && typeof guess.lat === 'number' && typeof guess.lng === 'number') {
+          bounds.extend([guess.lng, guess.lat]);
+          hasPoints = true;
+        }
+      });
+    }
+    
+    // Only fit bounds if we have valid points
+    if (!hasPoints) {
+      console.warn('No valid points to fit bounds');
+      return;
+    }
+    
+    // Fit bounds with appropriate padding
+    const topPadding = resultData ? 140 : 100;
+    const sidePadding = 100;
+    
+    try {
+      map.current.fitBounds(bounds, {
+        padding: {
+          top: topPadding,
+          bottom: sidePadding,
+          left: sidePadding,
+          right: sidePadding
+        },
+        maxZoom: 8,
+        duration: 1200
+      });
+    } catch (error) {
+      console.error('Error fitting bounds:', error);
+      // Fallback to centering on actual location if available
+      if (currentActualLocation) {
+        map.current.setCenter([currentActualLocation.lng, currentActualLocation.lat]);
+        map.current.setZoom(6);
+      }
+    }
+  };
+
   // Use the new prop names with fallback to old ones for backward compatibility
   const currentGuess = userGuess || guessMarker;
   const currentActualLocation = actualLocation || actualMarker;
@@ -394,28 +453,13 @@ export function MapComponent({
           .addTo(map.current);
       }
 
-      // Smart bounds fitting
-      const bounds = new maplibregl.LngLatBounds();
-      bounds.extend([currentActualLocation.lng, currentActualLocation.lat]);
-      
-      // Include user's guess in bounds
-      if (currentGuess) {
-        bounds.extend([currentGuess.lng, currentGuess.lat]);
-      }
-      
-      // Include all guesses in bounds for multiplayer
-      if (allGuesses) {
-        allGuesses.forEach(guess => {
-          bounds.extend([guess.lng, guess.lat]);
-        });
-      }
-      
-      map.current.fitBounds(bounds, {
-        padding: 80,
-        maxZoom: 10
-      });
+      // Auto-fit bounds only once when results first appear
+      setTimeout(() => {
+        if (!map.current) return;
+        handleFitToResults();
+      }, 200); // Delay to ensure all markers are rendered
     }
-  }, [currentActualLocation, showResult, currentGuess, allGuesses, isMapLoaded]);
+  }, [currentActualLocation, showResult, currentGuess, allGuesses, isMapLoaded, resultData]);
 
   // Handle map resize when container size changes (e.g., fullscreen toggle)
   useEffect(() => {
@@ -517,6 +561,16 @@ export function MapComponent({
         >
           <span className="text-lg font-semibold leading-none">−</span>
         </Button>
+        {showResult ? (
+          <Button
+            size="sm"
+            className="bg-blue-600/80 hover:bg-blue-700/90 border-blue-400/30 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+            onClick={handleFitToResults}
+            title="Fit to results"
+          >
+            <span className="font-medium">Fit</span>
+          </Button>
+        ) : null}
         <Button
           size="sm"
           className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
