@@ -467,75 +467,75 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     // Action section component
     const actionSection = (
       <>
-        {/* Player Status */}
-        <Card className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border-slate-600/40 text-white w-full max-w-2xl min-w-[600px] shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex items-center space-x-3 flex-1">
-                <div className="bg-blue-500/20 p-2 rounded-lg border border-blue-400/30">
-                  <Users className="h-5 w-5 text-blue-400" />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-300">Players</div>
-                  <div className="font-semibold text-lg">
-                    {guessSubmissions.size}/{room.players.length} submitted
-                  </div>
+        {/* Compact Player Status Panel */}
+        <div className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border border-slate-600/40 text-white px-4 py-2 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-500/20 p-1.5 rounded border border-blue-400/30">
+                <Users className="h-4 w-4 text-blue-400" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-300">Players</div>
+                <div className="font-semibold text-sm">
+                  {guessSubmissions.size}/{room.players.length} submitted
                 </div>
               </div>
-              {gameState.phase === 'round-active' && (
-                <div className="flex items-center justify-center sm:justify-end w-full sm:w-80">
-                  {hasSubmittedGuess ? (
-                    <div className="flex items-center space-x-2 bg-green-500/20 border border-green-400/30 px-4 py-2 rounded-lg min-w-[180px] justify-center">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-green-400 font-medium">Guess submitted</span>
+            </div>
+            {gameState.phase === 'round-active' && (
+              <div className="flex items-center">
+                {hasSubmittedGuess ? (
+                  <div className="flex items-center space-x-2 bg-green-500/20 border border-green-400/30 px-3 py-1.5 rounded text-xs">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 font-medium">Guess submitted</span>
+                  </div>
+                ) : guess ? (
+                  <Button
+                    onClick={handleSubmitGuess}
+                    size="sm"
+                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-1.5"
+                  >
+                    <MapPin className="h-3 w-3 mr-1" />
+                    Submit Guess
+                  </Button>
+                ) : (
+                  <div className="bg-amber-500/20 border border-amber-400/30 px-3 py-1.5 rounded text-xs">
+                    <span className="text-amber-400 font-medium">Right-click on map to place guess</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {gameState.phase === 'round-results' && (
+              <div className="flex items-center">
+                {room.autoAdvance && gameState.countdownTime !== undefined ? (
+                  <div className="flex items-center space-x-2 bg-blue-600/20 border border-blue-500/30 px-3 py-1.5 rounded text-xs">
+                    <Clock className="h-3 w-3 text-blue-400" />
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-blue-400">{gameState.countdownTime}</div>
+                      <div className="text-xs text-blue-300">Next round in...</div>
                     </div>
-                  ) : guess ? (
+                  </div>
+                ) : !room.autoAdvance ? (
+                  user.id === room.hostUserId ? (
                     <Button
-                      onClick={handleSubmitGuess}
-                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg border border-green-500/30 transition-all duration-200 px-6 py-2 min-w-[180px]"
+                      onClick={() => socket.startNextRound()}
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-1.5"
                     >
-                      <MapPin className="h-4 w-4 mr-2" />
-                      Submit Guess
+                      <Crown className="h-3 w-3 mr-1" />
+                      Start Next Round
                     </Button>
                   ) : (
-                    <div className="bg-amber-500/20 border border-amber-400/30 px-4 py-2 rounded-lg text-center sm:text-left min-w-[280px]">
-                      <span className="text-amber-400 font-medium">Right-click on the map to place your guess</span>
+                    <div className="bg-blue-500/20 border border-blue-400/30 px-3 py-1.5 rounded text-xs">
+                      <span className="text-blue-400 font-medium">
+                        📊 Review results - Host will start next round
+                      </span>
                     </div>
-                  )}
-                </div>
-              )}
-              {gameState.phase === 'round-results' && (
-                <div className="flex items-center justify-center sm:justify-end w-full sm:w-80">
-                  {room.autoAdvance && gameState.countdownTime !== undefined ? (
-                    <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg min-w-[200px] justify-center">
-                      <Clock className="h-4 w-4 text-blue-400" />
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-400">{gameState.countdownTime}</div>
-                        <div className="text-xs text-blue-300">Next round in...</div>
-                      </div>
-                    </div>
-                  ) : !room.autoAdvance ? (
-                    user.id === room.hostUserId ? (
-                      <Button
-                        onClick={() => socket.startNextRound()}
-                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-lg border border-blue-500/30 px-6 py-2 min-w-[180px]"
-                      >
-                        <Crown className="h-4 w-4 mr-2" />
-                        Start Next Round
-                      </Button>
-                    ) : (
-                      <div className="bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-lg text-center sm:text-left min-w-[280px]">
-                        <span className="text-blue-400 text-sm font-medium">
-                          📊 Review results - Host will start next round
-                        </span>
-                      </div>
-                    )
-                  ) : null}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  )
+                ) : null}
+              </div>
+            )}
+          </div>
+        </div>
       </>
     );
 

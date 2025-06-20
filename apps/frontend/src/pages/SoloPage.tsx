@@ -228,38 +228,89 @@ export function SoloPage() {
   // Action section component
   const actionSection = (
     <>
-      {gameState === 'playing' && (
-        <>
-          <Button
-            onClick={handleSubmitGuess}
-            disabled={!userGuess || evaluateGuessMutation.isPending}
-            size="lg"
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
-          >
-            {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✅ Submit Guess'}
-          </Button>
-          {userGuess && (
-            <div className="text-xs sm:text-sm text-gray-300 text-center">
-              Press <kbd className="bg-white/20 px-1 rounded text-white">Enter</kbd> to submit
+      {/* Compact Solo Status Panel */}
+      <div className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border border-slate-600/40 text-white px-4 py-2 rounded-lg shadow-lg">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="bg-purple-500/20 p-1.5 rounded border border-purple-400/30">
+              <div className="h-4 w-4 text-purple-400">🎮</div>
             </div>
-          )}
-        </>
-      )}
-
-      {gameState === 'result' && result && (
-        <>
-          <Button
-            onClick={handlePlayAgain}
-            size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
-          >
-            🎮 Play Again
-          </Button>
-          <div className="text-xs sm:text-sm text-gray-300 text-center">
-            Press <kbd className="bg-white/20 px-1 rounded text-white">N</kbd> for new game
+            <div>
+              <div className="text-xs text-gray-300">Solo Mode</div>
+              <div className="font-semibold text-sm">
+                {gameState === 'playing' ? 'Place your guess' : gameState === 'result' ? 'Round complete' : 'Loading...'}
+              </div>
+            </div>
           </div>
-        </>
-      )}
+          <div className="flex items-center">
+            {gameState === 'playing' && !userGuess && (
+              <div className="bg-amber-500/20 border border-amber-400/30 px-3 py-1.5 rounded text-xs">
+                <span className="text-amber-400 font-medium">Right-click on map to place guess</span>
+              </div>
+            )}
+            {gameState === 'playing' && userGuess && !evaluateGuessMutation.isPending && (
+              <Button
+                onClick={handleSubmitGuess}
+                size="sm"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-1.5"
+              >
+                ✅ Submit Guess
+              </Button>
+            )}
+            {evaluateGuessMutation.isPending && (
+              <div className="flex items-center space-x-2 bg-blue-500/20 border border-blue-400/30 px-3 py-1.5 rounded text-xs">
+                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                <span className="text-blue-400 font-medium">Calculating...</span>
+              </div>
+            )}
+            {gameState === 'result' && (
+              <Button
+                onClick={handlePlayAgain}
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-1.5"
+              >
+                🎮 Play Again
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Legacy action buttons for keyboard shortcuts display */}
+      <div className="hidden">
+        {gameState === 'playing' && (
+          <>
+            <Button
+              onClick={handleSubmitGuess}
+              disabled={!userGuess || evaluateGuessMutation.isPending}
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 disabled:opacity-50 w-full sm:w-auto"
+            >
+              {evaluateGuessMutation.isPending ? '⏳ Calculating...' : '✅ Submit Guess'}
+            </Button>
+            {userGuess && (
+              <div className="text-xs sm:text-sm text-gray-300 text-center">
+                Press <kbd className="bg-white/20 px-1 rounded text-white">Enter</kbd> to submit
+              </div>
+            )}
+          </>
+        )}
+
+        {gameState === 'result' && result && (
+          <>
+            <Button
+              onClick={handlePlayAgain}
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 sm:px-8 text-base sm:text-lg transition-all duration-200 hover:scale-105 w-full sm:w-auto"
+            >
+              🎮 Play Again
+            </Button>
+            <div className="text-xs sm:text-sm text-gray-300 text-center">
+              Press <kbd className="bg-white/20 px-1 rounded text-white">N</kbd> for new game
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 
