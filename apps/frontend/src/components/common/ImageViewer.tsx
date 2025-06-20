@@ -135,7 +135,7 @@ export function ImageViewer({
       />
 
       {/* Zoom Controls - Redesigned with better styling */}
-      <div className="absolute top-4 right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-opacity">
+      <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-opacity">
         <Button
           size="sm"
           className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"

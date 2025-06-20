@@ -174,7 +174,7 @@ export function SoloPage() {
     <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">📍 Where is this photo taken?</CardTitle>
+          <CardTitle className="text-lg">Guess this location</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col pt-0">
@@ -199,7 +199,7 @@ export function SoloPage() {
     <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">🗺️ Make your guess</CardTitle>
+          <CardTitle className="text-lg">Your guess</CardTitle>
           <div className="flex items-center gap-2">
             {userGuess && gameState === 'playing' && (
               <div className="text-xs text-blue-300 bg-blue-500/20 px-2 py-1 rounded">

@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,18 +56,7 @@ export function HomePage() {
             </Button>
           </Link>
         </CardContent>
-
-        <div className="px-6 pb-6">
-          <div className="text-center text-xs text-blue-300 space-y-1 mt-6 pt-4 border-t border-white/20">
-            <p>✅ React + TypeScript + Vite</p>
-            <p>✅ TailwindCSS v4 + shadcn/ui</p>
-            <p>✅ React Router + Navigation</p>
-            <p>🖼️ Image viewing available in game</p>
-          </div>
-        </div>
       </Card>
-
-
     </div>
   );
 } 

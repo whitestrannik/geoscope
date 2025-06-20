@@ -26,15 +26,6 @@ describe('HomePage', () => {
     expect(screen.getByText('🏆 Leaderboard')).toBeInTheDocument();
   });
 
-  it('renders tech stack status indicators', () => {
-    render(<HomePageWrapper />);
-    
-    expect(screen.getByText('✅ React + TypeScript + Vite')).toBeInTheDocument();
-    expect(screen.getByText('✅ TailwindCSS v4 + shadcn/ui')).toBeInTheDocument();
-    expect(screen.getByText('✅ React Router + Navigation')).toBeInTheDocument();
-    expect(screen.getByText('🖼️ Image viewing available in game')).toBeInTheDocument();
-  });
-
   it('applies correct styling classes to main card', () => {
     render(<HomePageWrapper />);
     

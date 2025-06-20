@@ -80,11 +80,4 @@ describe('App', () => {
     expect(screen.getByText('🏠 Create Room')).toBeInTheDocument();
     expect(screen.getByText('🚪 Join Room')).toBeInTheDocument();
   });
-
-  it('renders setup status indicators', () => {
-    render(<App />);
-    expect(screen.getByText('✅ React + TypeScript + Vite')).toBeInTheDocument();
-    expect(screen.getByText('✅ TailwindCSS v4 + shadcn/ui')).toBeInTheDocument();
-    expect(screen.getByText('✅ React Router + Navigation')).toBeInTheDocument();
-  });
 }); 

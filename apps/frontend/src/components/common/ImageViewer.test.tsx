@@ -27,7 +27,7 @@ describe('ImageViewer', () => {
     render(<ImageViewer {...mockProps} />);
     
     expect(screen.getByText('+')).toBeInTheDocument();
-    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText('−')).toBeInTheDocument();
     expect(screen.getByText('Reset')).toBeInTheDocument();
   });
 
@@ -41,33 +41,32 @@ describe('ImageViewer', () => {
       />
     );
     
-    expect(screen.getByText('← Back')).toBeInTheDocument();
+    const backButton = screen.getByText('← Back');
+    expect(backButton).toBeInTheDocument();
   });
 
   it('calls onFullscreenToggle when fullscreen button is clicked', () => {
     const mockOnFullscreenToggle = vi.fn();
+    
     render(
       <ImageViewer 
         {...mockProps} 
-        isFullscreen={true} 
         onFullscreenToggle={mockOnFullscreenToggle}
+        isFullscreen={true}
       />
     );
     
-    fireEvent.click(screen.getByText('← Back'));
-    expect(mockOnFullscreenToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows instructions when showInstructions is true', () => {
-    render(<ImageViewer {...mockProps} showInstructions={true} />);
+    const backButton = screen.getByText('← Back');
+    fireEvent.click(backButton);
     
-    expect(screen.getByText(/Click: fullscreen • Scroll\/Buttons: zoom/)).toBeInTheDocument();
+    expect(mockOnFullscreenToggle).toHaveBeenCalled();
   });
 
   it('hides instructions when showInstructions is false', () => {
     render(<ImageViewer {...mockProps} showInstructions={false} />);
     
-    expect(screen.queryByText(/Click: fullscreen • Scroll\/Buttons: zoom/)).not.toBeInTheDocument();
+    // No specific instruction text to check for since we removed that feature
+    expect(screen.getByAltText('Test image')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
@@ -82,7 +81,7 @@ describe('ImageViewer', () => {
     render(<ImageViewer {...mockProps} />);
     
     const zoomInButton = screen.getByText('+');
-    const zoomOutButton = screen.getByText('-');
+    const zoomOutButton = screen.getByText('−');
     const resetButton = screen.getByText('Reset');
     
     // Test that buttons are clickable

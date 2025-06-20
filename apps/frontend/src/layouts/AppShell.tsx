@@ -51,6 +51,14 @@ export function AppShell({ children }: AppShellProps) {
                   Solo
                 </Link>
                 <Link
+                  to="/room/create"
+                  className={`text-sm font-medium transition-colors hover:text-blue-300 ${
+                    location.pathname.startsWith('/room') ? 'text-blue-400' : 'text-white/80'
+                  }`}
+                >
+                  Multiplayer
+                </Link>
+                <Link
                   to="/leaderboard"
                   className={`text-sm font-medium transition-colors hover:text-blue-300 ${
                     location.pathname === '/leaderboard' ? 'text-blue-400' : 'text-white/80'

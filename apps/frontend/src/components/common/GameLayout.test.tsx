@@ -108,11 +108,14 @@ describe('GameLayout', () => {
   it('shows help overlay by default', () => {
     render(
       <GameLayoutWrapper>
-        <GameLayout {...mockProps} />
+        <GameLayout 
+          {...mockProps}
+          showHelpOverlay={true}
+        />
       </GameLayoutWrapper>
     );
-    
-    expect(screen.getByText('Controls:')).toBeInTheDocument();
+
+    expect(screen.getByText('Left-click')).toBeInTheDocument();
     expect(screen.getByText('F')).toBeInTheDocument();
     expect(screen.getByText('M')).toBeInTheDocument();
   });

@@ -544,7 +544,7 @@ export function MapComponent({
       }} />
       
       {/* Custom Zoom Controls */}
-      <div className={`absolute ${showResult && resultData ? 'top-20' : 'top-4'} right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-all duration-300 z-20`}>
+      <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-all duration-300 z-20">
         <Button
           size="sm"
           className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
