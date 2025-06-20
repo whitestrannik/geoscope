@@ -3,33 +3,44 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { HomePage } from './HomePage';
 
-const HomePageWrapper = () => (
-  <BrowserRouter>
-    <HomePage />
-  </BrowserRouter>
-);
+// Wrapper component to provide Router context
+function HomePageWrapper() {
+  return (
+    <BrowserRouter>
+      <HomePage />
+    </BrowserRouter>
+  );
+}
 
 describe('HomePage', () => {
   it('renders the main title and description', () => {
     render(<HomePageWrapper />);
     
-    expect(screen.getByText('🌍 GeoScope')).toBeInTheDocument();
-    expect(screen.getByText('Discover the world through real photos')).toBeInTheDocument();
+    expect(screen.getByText('GEOSCOPE')).toBeInTheDocument();
+    expect(screen.getByText('> EXPLORE THE WORLD THROUGH REAL PHOTOS')).toBeInTheDocument();
   });
 
   it('renders all main action buttons', () => {
     render(<HomePageWrapper />);
     
-    expect(screen.getByText('🎮 Play Solo')).toBeInTheDocument();
-    expect(screen.getByText('🏠 Create Room')).toBeInTheDocument();
-    expect(screen.getByText('🚪 Join Room')).toBeInTheDocument();
-    expect(screen.getByText('🏆 Leaderboard')).toBeInTheDocument();
+    expect(screen.getByText('[ SOLO ADVENTURE ]')).toBeInTheDocument();
+    expect(screen.getByText('[ MULTIPLAYER ]')).toBeInTheDocument();
+    expect(screen.getByText('🚪 JOIN ROOM')).toBeInTheDocument();
+    expect(screen.getByText('🏆 LEADERBOARD')).toBeInTheDocument();
   });
 
-  it('applies correct styling classes to main card', () => {
+  it('renders gaming-style stats section', () => {
     render(<HomePageWrapper />);
     
-    const mainCard = screen.getByText('🌍 GeoScope').closest('.bg-white\\/10');
-    expect(mainCard).toHaveClass('backdrop-blur-md', 'border-white/20');
+    expect(screen.getByText('Explorers Worldwide')).toBeInTheDocument();
+    expect(screen.getByText('Countries Featured')).toBeInTheDocument();
+    expect(screen.getByText('Adventures Await')).toBeInTheDocument();
+  });
+
+  it('renders live activity feed', () => {
+    render(<HomePageWrapper />);
+    
+    expect(screen.getByText('[LIVE]')).toBeInTheDocument();
+    expect(screen.getByText(/Explorer_47 discovered Tokyo, Japan|GeoMaster pinpointed|WorldWanderer scored|Navigator_X completed|AtlasSeeker found/)).toBeInTheDocument();
   });
 }); 
