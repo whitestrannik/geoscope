@@ -69,15 +69,15 @@ vi.mock('./lib/trpc', () => ({
 }));
 
 describe('App', () => {
-  it('renders GeoScope title', () => {
+  it('renders GEOSCOPE title', () => {
     render(<App />);
-    expect(screen.getByText('GeoScope')).toBeInTheDocument();
+    expect(screen.getAllByText('GEOSCOPE')).toHaveLength(2); // Header + Homepage
   });
 
-  it('renders main navigation buttons', () => {
+  it('renders main navigation and action buttons', () => {
     render(<App />);
-    expect(screen.getByText('🎮 Play Solo')).toBeInTheDocument();
-    expect(screen.getByText('🏠 Create Room')).toBeInTheDocument();
-    expect(screen.getByText('🚪 Join Room')).toBeInTheDocument();
+    expect(screen.getByText('[ SOLO ADVENTURE ]')).toBeInTheDocument();
+    expect(screen.getByText('> EXPLORE THE WORLD THROUGH REAL PHOTOS')).toBeInTheDocument();
+    expect(screen.getByText('🚪 JOIN ROOM')).toBeInTheDocument();
   });
 }); 

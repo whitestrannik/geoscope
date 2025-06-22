@@ -29,18 +29,17 @@ describe('HomePage', () => {
     expect(screen.getByText('🏆 LEADERBOARD')).toBeInTheDocument();
   });
 
-  it('renders gaming-style stats section', () => {
+  it('renders action card descriptions', () => {
     render(<HomePageWrapper />);
     
-    expect(screen.getByText('Explorers Worldwide')).toBeInTheDocument();
-    expect(screen.getByText('Countries Featured')).toBeInTheDocument();
-    expect(screen.getByText('Adventures Await')).toBeInTheDocument();
+    expect(screen.getByText('> Test your geography skills solo')).toBeInTheDocument();
+    expect(screen.getByText('> Compete with friends worldwide')).toBeInTheDocument();
   });
 
-  it('renders live activity feed', () => {
+  it('renders action card features', () => {
     render(<HomePageWrapper />);
     
-    expect(screen.getByText('[LIVE]')).toBeInTheDocument();
-    expect(screen.getByText(/Explorer_47 discovered Tokyo, Japan|GeoMaster pinpointed|WorldWanderer scored|Navigator_X completed|AtlasSeeker found/)).toBeInTheDocument();
+    expect(screen.getByText('Instant play • Unlimited rounds')).toBeInTheDocument();
+    expect(screen.getByText('Up to 8 players • Real-time')).toBeInTheDocument();
   });
 }); 

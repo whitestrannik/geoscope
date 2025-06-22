@@ -43,7 +43,7 @@ describe('AppShell', () => {
   it('renders user menu', () => {
     render(<AppShellWrapper />);
     
-    expect(screen.getAllByTestId('user-menu')).toHaveLength(2); // Desktop and mobile versions
+    expect(screen.getByTestId('user-menu')).toBeInTheDocument(); // Only desktop version currently
   });
 
   it('renders child content', () => {

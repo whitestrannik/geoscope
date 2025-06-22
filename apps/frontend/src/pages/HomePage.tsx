@@ -1,37 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function HomePage() {
-  const [statsCount, setStatsCount] = useState(0);
-  const [currentActivity, setCurrentActivity] = useState(0);
-
-  const activities = [
-    "Explorer_47 discovered Tokyo, Japan",
-    "GeoMaster pinpointed Machu Picchu perfectly",
-    "WorldWanderer scored 4,850 points in Norway",
-    "Navigator_X completed Arctic Challenge",
-    "AtlasSeeker found the hidden temple",
-  ];
-
-  useEffect(() => {
-    // Animated counter
-    const timer = setInterval(() => {
-      setStatsCount(prev => prev < 10000 ? prev + 127 : 10000);
-    }, 50);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    // Activity feed rotation
-    const activityTimer = setInterval(() => {
-      setCurrentActivity(prev => (prev + 1) % activities.length);
-    }, 3000);
-
-    return () => clearInterval(activityTimer);
-  }, [activities.length]);
-
   return (
     <div className="min-h-[calc(100vh-200px)] relative flex flex-col items-center justify-center">
       {/* Gaming-style Hero Section */}
@@ -52,33 +23,6 @@ export function HomePage() {
           Challenge yourself and friends to identify locations from stunning photographs.<br/>
           Test your geography skills and compete for the highest scores!
         </p>
-      </div>
-
-      {/* Gaming Stats Section */}
-      <div className="flex flex-wrap justify-center gap-8 mb-12">
-        <div className="text-center bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-6 py-4">
-          <div className="text-3xl font-bold text-cyan-400 font-mono">{statsCount.toLocaleString()}+</div>
-          <div className="text-sm text-gray-400 font-mono">Explorers Worldwide</div>
-        </div>
-        <div className="text-center bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-6 py-4">
-          <div className="text-3xl font-bold text-purple-400 font-mono">47</div>
-          <div className="text-sm text-gray-400 font-mono">Countries Featured</div>
-        </div>
-        <div className="text-center bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg px-6 py-4">
-          <div className="text-3xl font-bold text-blue-400 font-mono">∞</div>
-          <div className="text-sm text-gray-400 font-mono">Adventures Await</div>
-        </div>
-      </div>
-
-      {/* Gaming Activity Feed */}
-      <div className="mb-12 max-w-md">
-        <div className="bg-black/80 backdrop-blur-sm border border-cyan-500/50 rounded-lg px-6 py-4 text-center">
-          <div className="text-sm text-cyan-300 font-mono flex items-center justify-center">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></div>
-            <span className="text-green-400">[LIVE]</span>
-            <span className="ml-2">{activities[currentActivity]}</span>
-          </div>
-        </div>
       </div>
 
       {/* Gaming Action Cards */}
@@ -138,20 +82,27 @@ export function HomePage() {
         </Link>
       </div>
 
-      {/* Gaming Quick Actions */}
-      <div className="flex flex-wrap justify-center gap-4 mt-8">
-        <Link 
-          to="/room/join" 
-          className="bg-black/60 backdrop-blur-sm border border-yellow-500/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
-        >
-          🚪 JOIN ROOM
-        </Link>
-        <Link 
-          to="/leaderboard" 
-          className="bg-black/60 backdrop-blur-sm border border-green-500/50 text-green-400 hover:text-green-300 hover:border-green-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
-        >
-          🏆 LEADERBOARD
-        </Link>
+      {/* Gaming Quick Actions - Centered to match main cards grid */}
+      <div className="w-full max-w-4xl mt-8">
+        {/* Use same grid structure as main cards to ensure perfect center alignment */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex justify-end">
+            <Link 
+              to="/room/join" 
+              className="bg-black/60 backdrop-blur-sm border border-yellow-500/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
+            >
+              🚪 JOIN ROOM
+            </Link>
+          </div>
+          <div className="flex justify-start">
+            <Link 
+              to="/leaderboard" 
+              className="bg-black/60 backdrop-blur-sm border border-green-500/50 text-green-400 hover:text-green-300 hover:border-green-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
+            >
+              🏆 LEADERBOARD
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
