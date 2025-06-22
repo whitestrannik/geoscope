@@ -5,24 +5,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export function HomePage() {
   return (
     <div className="min-h-[calc(100vh-200px)] relative flex flex-col items-center justify-center">
-      {/* Gaming-style Hero Section */}
+      {/* Gaming-style Hero Section with Enhanced Visibility */}
       <div className="text-center mb-12 max-w-4xl">
-        <div className="flex items-center justify-center mb-6">
-          <div className="text-6xl animate-pulse mr-4">🌍</div>
-          <h1 className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 font-mono tracking-wider">
-            GEOSCOPE
-          </h1>
-          <div className="text-4xl animate-pulse ml-4">⚡</div>
+        {/* Hero Container with Strong Background */}
+        <div className="bg-black/70 backdrop-blur-md rounded-2xl p-8 border border-cyan-500/30 shadow-2xl shadow-black/50">
+          <div className="flex items-center justify-center mb-6">
+            <div className="text-6xl animate-pulse mr-4 drop-shadow-lg">🌍</div>
+            <h1 className="text-6xl md:text-7xl font-bold text-white font-mono tracking-wider drop-shadow-2xl">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">
+                GEOSCOPE
+              </span>
+            </h1>
+            <div className="text-4xl animate-pulse ml-4 drop-shadow-lg">⚡</div>
+          </div>
+          
+          <p className="text-xl md:text-2xl text-cyan-300 mb-6 font-mono font-bold drop-shadow-lg">
+            &gt; EXPLORE THE WORLD THROUGH REAL PHOTOS
+          </p>
+          
+          <p className="text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed font-mono drop-shadow-md">
+            Challenge yourself and friends to identify locations from stunning photographs.<br/>
+            Test your geography skills and compete for the highest scores!
+          </p>
         </div>
-        
-        <p className="text-xl md:text-2xl text-cyan-300 mb-6 font-mono">
-          &gt; EXPLORE THE WORLD THROUGH REAL PHOTOS
-        </p>
-        
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed font-mono">
-          Challenge yourself and friends to identify locations from stunning photographs.<br/>
-          Test your geography skills and compete for the highest scores!
-        </p>
       </div>
 
       {/* Gaming Action Cards */}

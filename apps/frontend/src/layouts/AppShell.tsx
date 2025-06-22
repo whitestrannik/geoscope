@@ -13,64 +13,56 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black">
-      {/* Add CSS animation directly to the document head */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes float {
-            0% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
-            25% { transform: translateY(-20px) translateX(10px); opacity: 0.7; }
-            50% { transform: translateY(-40px) translateX(-5px); opacity: 0.3; }
-            75% { transform: translateY(-20px) translateX(-10px); opacity: 0.7; }
-            100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
-          }
-        `
-      }} />
-
-      {/* Animated Video-like Background */}
+      {/* Video Background */}
       <div className="fixed inset-0 z-0">
-        {/* Primary animated background with moving elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/80 to-purple-900/60"></div>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+          onLoadedData={(e) => {
+            // Set slower playback rate for smoother, more cinematic effect
+            const video = e.target as HTMLVideoElement;
+            video.playbackRate = 0.7; // 70% of normal speed
+          }}
+          onError={(e) => {
+            // Fallback to CSS background if video fails to load
+            const target = e.target as HTMLVideoElement;
+            target.style.display = 'none';
+            const fallback = target.nextElementSibling as HTMLElement;
+            if (fallback) fallback.style.display = 'block';
+          }}
+        >
+          <source src="/Background3.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
         
-        {/* Animated floating orbs that simulate video movement */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full opacity-20 animate-pulse"
-              style={{
-                width: `${Math.random() * 200 + 50}px`,
-                height: `${Math.random() * 200 + 50}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                background: `radial-gradient(circle, ${
-                  ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981'][Math.floor(Math.random() * 4)]
-                }40, transparent)`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-                transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`,
-              }}
-            />
-          ))}
+        {/* Fallback animated background (hidden by default) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/80 to-purple-900/60" style={{ display: 'none' }}>
+          <div className="absolute inset-0 overflow-hidden">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full opacity-20 animate-pulse"
+                style={{
+                  width: `${Math.random() * 200 + 50}px`,
+                  height: `${Math.random() * 200 + 50}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  background: `radial-gradient(circle, ${
+                    ['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981'][Math.floor(Math.random() * 4)]
+                  }40, transparent)`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  animationDuration: `${3 + Math.random() * 4}s`,
+                }}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Moving particles for atmospheric effect */}
-        <div className="absolute inset-0">
-          {[...Array(50)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-white rounded-full opacity-30"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${5 + Math.random() * 10}s linear infinite`,
-                animationDelay: `${Math.random() * 5}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Atmospheric overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30"></div>
+        {/* Gaming overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30"></div>
       </div>
 
