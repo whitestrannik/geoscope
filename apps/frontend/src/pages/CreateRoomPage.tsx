@@ -30,7 +30,7 @@ export function CreateRoomPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
         <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
           <div>
             <h1 className="text-2xl font-mono text-cyan-400 mb-2">[ AUTHENTICATION REQUIRED ]</h1>
@@ -65,7 +65,7 @@ export function CreateRoomPage() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
       {/* Gaming Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Floating orbs */}
@@ -85,8 +85,8 @@ export function CreateRoomPage() {
         ))}
       </div>
 
-      <div className="w-full max-w-lg relative z-10 h-full flex items-center">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 w-full max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-lg relative z-10">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-mono text-cyan-400 mb-2">
