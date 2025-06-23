@@ -155,55 +155,51 @@ export function RoomPage() {
   // Redirect if not logged in
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl">🔒 Authentication Required</CardTitle>
-            <CardDescription className="text-gray-300">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
+          <div>
+            <h1 className="text-2xl font-mono text-cyan-400 mb-2">🔒 [ AUTHENTICATION REQUIRED ]</h1>
+            <p className="text-gray-300 font-mono">
               You need to be logged in to view this room
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Link to="/">
-              <Button className="w-full">Go Home</Button>
-            </Link>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <Link to="/">
+            <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono">
+              [ GO HOME ]
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-              <p>Loading room...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-cyan-400 mb-4" />
+          <p className="text-white font-mono text-lg">[ LOADING ROOM... ]</p>
+        </div>
       </div>
     );
   }
 
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl">❌ Room Not Found</CardTitle>
-            <CardDescription className="text-gray-300">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+          <div>
+            <h1 className="text-2xl font-mono text-red-400 mb-2">❌ [ ROOM NOT FOUND ]</h1>
+            <p className="text-gray-300 font-mono">
               {error?.message || 'This room does not exist or you do not have access to it.'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Link to="/">
-              <Button className="w-full">Go Home</Button>
-            </Link>
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <Link to="/">
+            <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono">
+              [ GO HOME ]
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -276,7 +272,7 @@ export function RoomPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -306,47 +302,43 @@ export function RoomPage() {
         </div>
 
         {/* Room Info */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl flex items-center space-x-2">
-                  <span>🏠 Room {room.id}</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopyRoomCode}
-                    className="text-white/70 hover:text-white"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </CardTitle>
-                {copySuccess && (
-                  <p className="text-sm text-green-400 mt-1">Room code copied!</p>
-                )}
-                <CardDescription className="text-gray-300">
-                  Host: {getUserDisplayName(room.host)} • {room.players.length}/{room.maxPlayers} players
-                </CardDescription>
-              </div>
-              <div className="text-right text-sm text-white/70">
-                <p>{room.totalRounds} rounds</p>
-                {room.roundTimeLimit && (
-                  <p>{room.roundTimeLimit}s per round</p>
-                )}
-              </div>
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-mono text-cyan-400 flex items-center space-x-2">
+                <span>🏠 [ ROOM {room.id} ]</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyRoomCode}
+                  className="text-white/70 hover:text-white"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </h2>
+              {copySuccess && (
+                <p className="text-sm text-green-400 mt-1 font-mono">Room code copied!</p>
+              )}
+              <p className="text-gray-300 font-mono">
+                Host: {getUserDisplayName(room.host)} • {room.players.length}/{room.maxPlayers} players
+              </p>
             </div>
-          </CardHeader>
-        </Card>
+            <div className="text-right text-sm text-white/70 font-mono">
+              <p>{room.totalRounds} rounds</p>
+              {room.roundTimeLimit && (
+                <p>{room.roundTimeLimit}s per round</p>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Players List */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span>Players ({room.players.length}/{room.maxPlayers})</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 text-white">
+          <h3 className="flex items-center space-x-2 text-xl font-mono text-purple-400 mb-4">
+            <Users className="h-5 w-5" />
+            <span>[ SQUAD MEMBERS ({room.players.length}/{room.maxPlayers}) ]</span>
+          </h3>
+          <div>
             <div className="space-y-3">
               {room.players.map((player) => (
                 <div
@@ -384,57 +376,55 @@ export function RoomPage() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Game Controls */}
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">Game Controls</h3>
-                <p className="text-sm text-white/70">
-                  {allPlayersReady 
-                    ? "All players are ready! Host can start the game."
-                    : "Waiting for all players to be ready..."
-                  }
-                </p>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Button
-                  onClick={handleReadyToggle}
-                  variant={isReady ? "default" : "outline"}
-                  className={
-                    isReady
-                      ? "bg-green-600 hover:bg-green-700 text-white border-green-600"
-                      : "bg-red-600/20 hover:bg-red-600/30 text-red-200 border-red-500/50 hover:text-red-100"
-                  }
-                  disabled={setReadyMutation.isPending}
-                >
-                  {setReadyMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : isReady ? (
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                  ) : (
-                    <XCircle className="h-4 w-4 mr-2" />
-                  )}
-                  {isReady ? 'Ready' : 'Not Ready'}
-                </Button>
-                
-                {isHost && (
-                  <Button
-                    onClick={handleStartGame}
-                    disabled={!canStartGame}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    Start Game
-                  </Button>
-                )}
-              </div>
+        <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h3 className="text-lg font-mono text-green-400">[ GAME CONTROLS ]</h3>
+              <p className="text-sm text-white/70 font-mono">
+                {allPlayersReady 
+                  ? "All players are ready! Host can start the game."
+                  : "Waiting for all players to be ready..."
+                }
+              </p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={handleReadyToggle}
+                variant={isReady ? "default" : "outline"}
+                className={
+                  isReady
+                    ? "bg-green-600 hover:bg-green-700 text-white border-green-600 font-mono"
+                    : "bg-red-600/20 hover:bg-red-600/30 text-red-200 border-red-500/50 hover:text-red-100 font-mono"
+                }
+                disabled={setReadyMutation.isPending}
+              >
+                {setReadyMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : isReady ? (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                ) : (
+                  <XCircle className="h-4 w-4 mr-2" />
+                )}
+                {isReady ? '[ READY ]' : '[ NOT READY ]'}
+              </Button>
+              
+              {isHost && (
+                <Button
+                  onClick={handleStartGame}
+                  disabled={!canStartGame}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed font-mono"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  [ START GAME ]
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

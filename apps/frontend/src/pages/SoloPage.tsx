@@ -138,9 +138,9 @@ export function SoloPage() {
   // Loading state
   if (gameState === 'loading' || imageLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
           <p className="text-white font-mono text-lg">[ LOADING NEW LOCATION... ]</p>
         </div>
       </div>
@@ -150,17 +150,16 @@ export function SoloPage() {
   // Error state
   if (imageError || !currentGame) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="p-8 text-center">
-            <div className="space-y-4">
-              <p className="text-red-400">Failed to load image</p>
-              <Button onClick={() => refetchImage()} className="bg-blue-600 hover:bg-blue-700">
-                Try Again
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+          <div>
+            <h1 className="text-2xl font-mono text-red-400 mb-2">[ MISSION FAILED ]</h1>
+            <p className="text-gray-300 font-mono">Failed to load location data</p>
+          </div>
+          <Button onClick={() => refetchImage()} className="bg-blue-600 hover:bg-blue-700 font-mono">
+            [ RETRY MISSION ]
+          </Button>
+        </div>
       </div>
     );
   }
@@ -312,15 +311,15 @@ export function SoloPage() {
 
   // Results overlay component
   const resultsOverlay = showResultModal && result ? (
-    <Card 
-      className="bg-slate-900/95 backdrop-blur-lg border-white/30 text-white shadow-2xl max-w-lg w-full mx-4 cursor-pointer hover:bg-slate-900/98 transition-colors"
+    <div 
+      className="bg-black/90 backdrop-blur-lg border border-cyan-500/50 text-white shadow-2xl max-w-lg w-full mx-4 cursor-pointer hover:bg-black/95 transition-colors rounded-lg p-6"
       onClick={() => setShowResultModal(false)}
     >
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl sm:text-2xl text-center">🎯 Round Results</CardTitle>
-        <p className="text-center text-sm text-gray-300">Click anywhere to continue</p>
-      </CardHeader>
-      <CardContent>
+      <div className="pb-2">
+        <h2 className="text-xl sm:text-2xl text-center font-mono text-cyan-400">🎯 [ ROUND RESULTS ]</h2>
+        <p className="text-center text-sm text-gray-300 font-mono">Click anywhere to continue</p>
+      </div>
+      <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
           <div className="space-y-2">
             <div className="text-2xl sm:text-3xl">📏</div>
@@ -345,8 +344,8 @@ export function SoloPage() {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   ) : null;
 
   return (

@@ -21,9 +21,9 @@ export function StatsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
           <div className="text-lg text-gray-300 font-mono">[ ANALYZING COMBAT DATA... ]</div>
         </div>
       </div>
@@ -32,9 +32,9 @@ export function StatsPage() {
 
   if (!stats) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center">
-        <div className="text-center py-8">
-          <div className="text-lg text-gray-300 font-mono mb-4">[ DATA ACCESS FAILED ]</div>
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+          <div className="text-lg text-gray-300 font-mono">[ DATA ACCESS FAILED ]</div>
           <Button 
             onClick={() => navigate('/')}
             className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:scale-105"
@@ -70,7 +70,7 @@ export function StatsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900">
+    <div className="min-h-screen">
       {/* Gaming Background Effects */}
       <div className="fixed inset-0 pointer-events-none">
         {[...Array(10)].map((_, i) => (
@@ -111,61 +111,53 @@ export function StatsPage() {
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-black/80 backdrop-blur-md border-blue-500/30 shadow-lg shadow-blue-500/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-mono text-blue-400">GLOBAL RANK</CardTitle>
+          <div className="bg-black/60 backdrop-blur-sm border border-blue-500/30 rounded-lg p-4 shadow-lg shadow-blue-500/10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium font-mono text-blue-400">GLOBAL RANK</h3>
               <Medal className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono text-blue-400">#{stats.globalRank}</div>
-              <p className="text-xs text-gray-400 font-mono">
-                elite operative status
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-2xl font-bold font-mono text-blue-400">#{stats.globalRank}</div>
+            <p className="text-xs text-gray-400 font-mono">
+              elite operative status
+            </p>
+          </div>
 
-          <Card className="bg-black/80 backdrop-blur-md border-yellow-500/30 shadow-lg shadow-yellow-500/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-mono text-yellow-400">LEGENDARY SCORE</CardTitle>
+          <div className="bg-black/60 backdrop-blur-sm border border-yellow-500/30 rounded-lg p-4 shadow-lg shadow-yellow-500/10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium font-mono text-yellow-400">LEGENDARY SCORE</h3>
               <Trophy className="h-4 w-4 text-yellow-400" />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold font-mono ${getScoreColor(stats.bestScore)}`}>
-                {stats.bestScore.toLocaleString()}
-              </div>
-              <p className="text-xs text-gray-400 font-mono">
-                maximum efficiency
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+            <div className={`text-2xl font-bold font-mono ${getScoreColor(stats.bestScore)}`}>
+              {stats.bestScore.toLocaleString()}
+            </div>
+            <p className="text-xs text-gray-400 font-mono">
+              maximum efficiency
+            </p>
+          </div>
 
-          <Card className="bg-black/80 backdrop-blur-md border-purple-500/30 shadow-lg shadow-purple-500/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-mono text-purple-400">MISSIONS COMPLETED</CardTitle>
+          <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-4 shadow-lg shadow-purple-500/10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium font-mono text-purple-400">MISSIONS COMPLETED</h3>
               <BarChart3 className="h-4 w-4 text-purple-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono text-purple-400">{stats.totalGames}</div>
-              <p className="text-xs text-gray-400 font-mono">
-                {stats.soloGames} solo • {stats.multiplayerGames} squad
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-2xl font-bold font-mono text-purple-400">{stats.totalGames}</div>
+            <p className="text-xs text-gray-400 font-mono">
+              {stats.soloGames} solo • {stats.multiplayerGames} squad
+            </p>
+          </div>
 
-          <Card className="bg-black/80 backdrop-blur-md border-green-500/30 shadow-lg shadow-green-500/10">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium font-mono text-green-400">PRECISION RECORD</CardTitle>
+          <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-4 shadow-lg shadow-green-500/10">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium font-mono text-green-400">PRECISION RECORD</h3>
               <Target className="h-4 w-4 text-green-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold font-mono text-green-400">
-                {formatDistance(stats.bestDistance)}
-              </div>
-              <p className="text-xs text-gray-400 font-mono">
-                closest target lock
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-2xl font-bold font-mono text-green-400">
+              {formatDistance(stats.bestDistance)}
+            </div>
+            <p className="text-xs text-gray-400 font-mono">
+              closest target lock
+            </p>
+          </div>
         </div>
 
         {/* Detailed Stats */}
