@@ -138,7 +138,7 @@ export function SoloPage() {
   // Loading state
   if (gameState === 'loading' || imageLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="h-screen flex items-center justify-center">
         <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
           <p className="text-white font-mono text-lg">[ LOADING NEW LOCATION... ]</p>
@@ -150,7 +150,7 @@ export function SoloPage() {
   // Error state
   if (imageError || !currentGame) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="h-screen flex items-center justify-center">
         <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
           <div>
             <h1 className="text-2xl font-mono text-red-400 mb-2">[ MISSION FAILED ]</h1>

@@ -89,7 +89,7 @@ export function StatsPage() {
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto p-6 space-y-6 relative z-10">
+      <div className="max-w-6xl mx-auto p-6 pt-3 space-y-3 relative z-10">
         {/* Header */}
         <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
           <div className="flex items-center justify-between">
@@ -163,7 +163,7 @@ export function StatsPage() {
         </div>
 
         {/* Detailed Stats */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
             <div className="mb-6">
               <h3 className="text-xl font-mono text-cyan-400 flex items-center gap-2 mb-2">
@@ -257,18 +257,18 @@ export function StatsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2">Date</th>
-                      <th className="text-left py-2">Mode</th>
-                      <th className="text-left py-2">Score</th>
-                      <th className="text-left py-2">Distance</th>
-                      <th className="text-left py-2">Round</th>
+                    <tr className="border-b border-gray-600">
+                      <th className="text-left py-2 text-gray-300 font-mono">Date</th>
+                      <th className="text-left py-2 text-gray-300 font-mono">Mode</th>
+                      <th className="text-left py-2 text-gray-300 font-mono">Score</th>
+                      <th className="text-left py-2 text-gray-300 font-mono">Distance</th>
+                      <th className="text-left py-2 text-gray-300 font-mono">Round</th>
                     </tr>
                   </thead>
                   <tbody>
                     {stats.recentGames.map((game, index) => (
-                      <tr key={game.id} className="border-b hover:bg-gray-50">
-                        <td className="py-2">
+                      <tr key={game.id} className="border-b border-gray-700/50 hover:bg-gray-800/50">
+                        <td className="py-2 text-gray-300 font-mono">
                           {new Date(game.createdAt).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -277,21 +277,21 @@ export function StatsPage() {
                           })}
                         </td>
                         <td className="py-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium font-mono ${
                             game.mode === 'solo' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-green-100 text-green-800'
+                              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' 
+                              : 'bg-green-500/20 text-green-300 border border-green-500/40'
                           }`}>
                             {game.mode}
                           </span>
                         </td>
-                        <td className={`py-2 font-medium ${getScoreColor(game.score)}`}>
+                        <td className={`py-2 font-medium font-mono ${getScoreColor(game.score)}`}>
                           {game.score.toLocaleString()}
                         </td>
-                        <td className="py-2">
+                        <td className="py-2 text-gray-300 font-mono">
                           {formatDistance(game.distance)}
                         </td>
-                        <td className="py-2 text-gray-600">
+                        <td className="py-2 text-gray-400 font-mono">
                           {game.roundIndex !== null ? `#${game.roundIndex + 1}` : '-'}
                         </td>
                       </tr>

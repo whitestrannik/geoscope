@@ -76,7 +76,7 @@ const LeaderboardPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="max-w-6xl mx-auto p-6 space-y-6 relative z-10">
+      <div className="max-w-6xl mx-auto p-6 pt-3 space-y-3 relative z-10">
         {/* Header */}
         <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
           <div className="flex items-center justify-between">
