@@ -171,14 +171,14 @@ export function SoloPage() {
 
   // Image section component
   const imageSection = (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
-      <CardHeader className="pb-2">
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full flex flex-col">
+      <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Guess this location</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col pt-0">
-        <div className="flex-1 min-h-0">
+      <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
+        <div className="flex-1 min-h-0 h-full">
           <ImageViewer
             imageUrl={currentGame.imageUrl}
             alt="Mystery location"
@@ -187,7 +187,7 @@ export function SoloPage() {
             showFullscreenButton={true}
             showInstructions={false}
             isFullscreen={layoutMode === 'image-full'}
-            className="h-full"
+            className="h-full w-full"
           />
         </div>
       </CardContent>
@@ -196,8 +196,8 @@ export function SoloPage() {
 
   // Map section component
   const mapSection = (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full">
-      <CardHeader className="pb-2">
+    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full flex flex-col">
+      <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Your guess</CardTitle>
           <div className="flex items-center gap-2">
@@ -209,8 +209,8 @@ export function SoloPage() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col pt-0">
-        <div className="flex-1 min-h-0">
+      <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
+        <div className="flex-1 min-h-0 h-full">
           <MapComponent
             onMarkerPlace={handleMarkerPlace}
             onDoubleClick={handleMapDoubleClick}
@@ -218,7 +218,7 @@ export function SoloPage() {
             actualMarker={showResultsOnMap ? { lat: currentGame.actualLat, lng: currentGame.actualLng } : null}
             showResult={showResultsOnMap}
             resultData={showResultsOnMap && result ? { distance: result.distance, score: result.score } : null}
-            className="h-full"
+            className="h-full w-full"
           />
         </div>
       </CardContent>

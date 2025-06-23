@@ -141,63 +141,72 @@ export function MapComponent({
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    // Simplified map style for better performance and clarity
+    // Simple reliable map style
     const mapStyle = {
       "version": 8 as const,
-      "name": "Clean World Map",
+      "name": "Simple Map",
       "sources": {
-        "raster-tiles": {
+        "osm": {
           "type": "raster" as const,
-          "tiles": [
-            "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          ],
+          "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
           "tileSize": 256,
           "attribution": "© OpenStreetMap contributors"
         }
       },
       "layers": [
         {
-          "id": "raster-layer",
-          "source": "raster-tiles",
-          "type": "raster" as const,
-          "paint": {
-            "raster-opacity": 1
-          }
+          "id": "osm-layer",
+          "source": "osm",
+          "type": "raster" as const
         }
       ]
     };
 
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: mapStyle,
-      center: [0, 20],
-      zoom: 2,
-      attributionControl: false,
-      maxZoom: 18
-    });
+    try {
+      map.current = new maplibregl.Map({
+        container: mapContainer.current,
+        style: mapStyle,
+        center: [0, 20],
+        zoom: 2,
+        attributionControl: false,
+        maxZoom: 18
+      });
 
-    map.current.on('load', () => {
-      setIsMapLoaded(true);
-    });
+      map.current.on('load', () => {
+        setIsMapLoaded(true);
+        
+        // Initial resize after load
+        setTimeout(() => {
+          if (map.current) {
+            map.current.resize();
+          }
+        }, 100);
+      });
 
-    // Click handlers - left click for fullscreen, right click for guess
-    map.current.on('click', () => {
-      // Left click - toggle fullscreen
-      if (onDoubleClick) {
-        onDoubleClick();
-      }
-    });
+      map.current.on('error', (e) => {
+        console.error('❌ Map error:', e);
+      });
 
-    // Right-click handler for placing guesses
-    map.current.on('contextmenu', (e) => {
-      e.preventDefault(); // Prevent context menu
-      if (!disabled && !showResult && clickHandler) {
-        const { lat, lng } = e.lngLat;
-        clickHandler(lat, lng);
-      }
-    });
+      // Click handlers - left click for fullscreen, right click for guess
+      map.current.on('click', () => {
+        // Left click - toggle fullscreen
+        if (onDoubleClick) {
+          onDoubleClick();
+        }
+      });
 
-    // No coordinate tracking needed anymore
+      // Right-click handler for placing guesses
+      map.current.on('contextmenu', (e) => {
+        e.preventDefault(); // Prevent context menu
+        if (!disabled && !showResult && clickHandler) {
+          const { lat, lng } = e.lngLat;
+          clickHandler(lat, lng);
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to initialize map:', error);
+    }
 
     return () => {
       if (map.current) {
@@ -206,6 +215,28 @@ export function MapComponent({
       }
     };
   }, []);
+
+  // Monitor container size changes with ResizeObserver
+  useEffect(() => {
+    if (!mapContainer.current || !map.current || !isMapLoaded) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Trigger map resize with a small delay
+        setTimeout(() => {
+          if (map.current) {
+            map.current.resize();
+          }
+        }, 100);
+      }
+    });
+
+    resizeObserver.observe(mapContainer.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [isMapLoaded]);
 
   // Update user's guess marker
   useEffect(() => {
@@ -461,18 +492,6 @@ export function MapComponent({
     }
   }, [currentActualLocation, showResult, currentGuess, allGuesses, isMapLoaded, resultData]);
 
-  // Handle map resize when container size changes (e.g., fullscreen toggle)
-  useEffect(() => {
-    if (!map.current || !isMapLoaded) return;
-    
-    // Small delay to ensure DOM has updated
-    const timer = setTimeout(() => {
-      map.current?.resize();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [className, isMapLoaded]);
-
   // Helper function to calculate distance between two points
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
     const R = 6371; // Earth's radius in kilometers
@@ -529,16 +548,58 @@ export function MapComponent({
       <div 
         ref={mapContainer} 
         className={`w-full h-full rounded-lg overflow-hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} map-container`}
-      />
+        style={{ 
+          position: 'relative',
+          height: '100%',
+          minHeight: '400px', // Ensure minimum visible size
+          flex: '1 1 0%', // Allow flex growth and shrinkage
+          boxSizing: 'border-box'
+        }}
+      >
+        {/* Loading indicator */}
+        {!isMapLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-800/90 backdrop-blur-sm text-white z-50">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-2"></div>
+              <p className="text-sm">Loading map...</p>
+            </div>
+          </div>
+        )}
+      </div>
       
-      {/* CSS to hide default MapLibre controls */}
+      {/* CSS to ensure map fills container properly */}
       <style dangerouslySetInnerHTML={{
         __html: `
+          .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 400px;
+            flex: 1 1 0%;
+            display: flex;
+            flex-direction: column;
+          }
+          .map-container canvas {
+            outline: none !important;
+          }
           .map-container .maplibregl-ctrl-top-right,
           .map-container .maplibregl-ctrl-bottom-right,
           .map-container .maplibregl-ctrl-bottom-left,
           .map-container .maplibregl-ctrl {
             display: none !important;
+          }
+          .maplibregl-map {
+            width: 100% !important;
+            height: 100% !important;
+            flex: 1 1 0% !important;
+          }
+          .maplibregl-canvas-container {
+            width: 100% !important;
+            height: 100% !important;
+          }
+          .maplibregl-canvas {
+            width: 100% !important;
+            height: 100% !important;
           }
         `
       }} />
