@@ -139,14 +139,10 @@ export function SoloPage() {
   if (gameState === 'loading' || imageLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-              <p>Loading new location...</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto"></div>
+          <p className="text-white font-mono text-lg">[ LOADING NEW LOCATION... ]</p>
+        </div>
       </div>
     );
   }
