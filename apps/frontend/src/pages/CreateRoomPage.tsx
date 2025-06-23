@@ -86,17 +86,18 @@ export function CreateRoomPage() {
       </div>
 
       <div className="w-full max-w-lg relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-mono text-cyan-400 mb-2">
-            ⚔️ [ CREATE MISSION ]
-          </h1>
-          <p className="text-gray-300 font-mono">
-            {`> Configure multiplayer session parameters`}
-          </p>
-        </div>
-        
-        <form onSubmit={handleCreateRoom} className="space-y-6">
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-mono text-cyan-400 mb-2">
+              ⚔️ [ CREATE MISSION ]
+            </h1>
+            <p className="text-gray-300 font-mono">
+              {`> Configure multiplayer session parameters`}
+            </p>
+          </div>
+          
+          <form onSubmit={handleCreateRoom} className="space-y-6">
           {/* Max Players */}
           <div className="space-y-2">
             <Label htmlFor="maxPlayers" className="flex items-center gap-2 font-mono text-cyan-300">
@@ -254,7 +255,8 @@ export function CreateRoomPage() {
               <span className="text-red-400">ERROR:</span> Mission deployment failed - {createRoomMutation.error.message}
             </div>
           )}
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

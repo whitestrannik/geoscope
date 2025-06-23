@@ -76,17 +76,18 @@ export function JoinRoomPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-mono text-purple-400 mb-2">
-            🚪 [ JOIN SQUAD ]
-          </h1>
-          <p className="text-gray-300 font-mono">
-            {`> Enter mission access code to join active squad`}
-          </p>
-        </div>
-        
-        <form onSubmit={handleJoinRoom} className="space-y-6">
+        <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-mono text-purple-400 mb-2">
+              🚪 [ JOIN SQUAD ]
+            </h1>
+            <p className="text-gray-300 font-mono">
+              {`> Enter mission access code to join active squad`}
+            </p>
+          </div>
+          
+          <form onSubmit={handleJoinRoom} className="space-y-6">
           {/* Room Code Input */}
           <div className="space-y-2">
             <Label htmlFor="roomCode" className="flex items-center gap-2 font-mono text-purple-300">
@@ -151,7 +152,8 @@ export function JoinRoomPage() {
             <p>💡 Request access code from squad leader</p>
             <p>🎮 Auto-deploy to mission briefing upon access</p>
           </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

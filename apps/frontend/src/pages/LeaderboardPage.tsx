@@ -78,22 +78,24 @@ const LeaderboardPage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto p-6 space-y-6 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
-              [ GLOBAL RANKINGS ]
-            </h1>
-            <p className="text-gray-300 font-mono">
-              {`> Elite operatives worldwide • Real-time combat statistics`}
-            </p>
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
+                [ GLOBAL RANKINGS ]
+              </h1>
+              <p className="text-gray-300 font-mono">
+                {`> Elite operatives worldwide • Real-time combat statistics`}
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/stats')}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105"
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              [ MY STATS ]
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/stats')}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105"
-          >
-            <TrendingUp className="h-4 w-4 mr-2" />
-            [ MY STATS ]
-          </Button>
         </div>
 
         {/* Tab Navigation */}
@@ -134,7 +136,7 @@ const LeaderboardPage: React.FC = () => {
 
         {/* Global Top Tab */}
         {activeTab === 'global' && !globalLoading && (
-          <div className="space-y-4">
+          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 space-y-4">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-mono text-cyan-400 mb-2">
@@ -193,7 +195,7 @@ const LeaderboardPage: React.FC = () => {
 
         {/* Recent Winners Tab */}
         {activeTab === 'recent' && !recentLoading && (
-          <div className="space-y-4">
+          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 space-y-4">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-mono text-cyan-400 mb-2">

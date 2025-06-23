@@ -91,22 +91,24 @@ export function StatsPage() {
 
       <div className="max-w-6xl mx-auto p-6 space-y-6 relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
-              [ OPERATIVE PROFILE ]
-            </h1>
-            <p className="text-gray-300 font-mono">
-              {`> Mission performance analysis • Combat effectiveness metrics`}
-            </p>
+        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
+                [ OPERATIVE PROFILE ]
+              </h1>
+              <p className="text-gray-300 font-mono">
+                {`> Mission performance analysis • Combat effectiveness metrics`}
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/leaderboard')}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105"
+            >
+              <Trophy className="h-4 w-4 mr-2" />
+              [ VIEW RANKINGS ]
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/leaderboard')}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105"
-          >
-            <Trophy className="h-4 w-4 mr-2" />
-            [ VIEW RANKINGS ]
-          </Button>
         </div>
 
         {/* Overview Cards */}
@@ -162,68 +164,72 @@ export function StatsPage() {
 
         {/* Detailed Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+            <div className="mb-6">
+              <h3 className="text-xl font-mono text-cyan-400 flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5" />
-                Performance Metrics
-              </CardTitle>
-              <CardDescription>Your overall game statistics</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+                [ PERFORMANCE METRICS ]
+              </h3>
+              <p className="text-gray-400 font-mono text-sm">
+                {`> Overall mission statistics and combat analysis`}
+              </p>
+            </div>
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Average Score</span>
-                <span className={`font-bold ${getScoreColor(stats.avgScore)}`}>
+                <span className="text-sm font-medium font-mono text-gray-300">Average Score</span>
+                <span className={`font-bold font-mono ${getScoreColor(stats.avgScore)}`}>
                   {stats.avgScore.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Average Distance</span>
-                <span className="font-bold">
+                <span className="text-sm font-medium font-mono text-gray-300">Average Distance</span>
+                <span className="font-bold font-mono text-white">
                   {formatDistance(stats.avgDistance)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Total Distance Guessed</span>
-                <span className="font-bold">
+                <span className="text-sm font-medium font-mono text-gray-300">Total Distance Guessed</span>
+                <span className="font-bold font-mono text-white">
                   {formatDistance(stats.totalDistance)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Games per Mode</span>
-                <div className="text-right">
-                  <div className="text-sm">Solo: {stats.soloGames}</div>
-                  <div className="text-sm">Multiplayer: {stats.multiplayerGames}</div>
+                <span className="text-sm font-medium font-mono text-gray-300">Games per Mode</span>
+                <div className="text-right font-mono">
+                  <div className="text-sm text-blue-400">Solo: {stats.soloGames}</div>
+                  <div className="text-sm text-green-400">Multiplayer: {stats.multiplayerGames}</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6">
+            <div className="mb-6">
+              <h3 className="text-xl font-mono text-purple-400 flex items-center gap-2 mb-2">
                 <Calendar className="h-5 w-5" />
-                Activity Timeline
-              </CardTitle>
-              <CardDescription>Your GeoScope journey</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+                [ ACTIVITY TIMELINE ]
+              </h3>
+              <p className="text-gray-400 font-mono text-sm">
+                {`> Mission deployment history and progress tracking`}
+              </p>
+            </div>
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">First Game</span>
-                <span className="font-bold">
+                <span className="text-sm font-medium font-mono text-gray-300">First Game</span>
+                <span className="font-bold font-mono text-white">
                   {formatDate(stats.firstPlayed)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Last Game</span>
-                <span className="font-bold">
+                <span className="text-sm font-medium font-mono text-gray-300">Last Game</span>
+                <span className="font-bold font-mono text-white">
                   {formatDate(stats.lastPlayed)}
                 </span>
               </div>
               {stats.totalGames > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Improvement Rate</span>
-                  <span className="font-bold text-blue-600">
+                  <span className="text-sm font-medium font-mono text-gray-300">Improvement Rate</span>
+                  <span className="font-bold font-mono text-blue-400">
                     {stats.bestScore > stats.avgScore 
                       ? `+${Math.round(((stats.bestScore - stats.avgScore) / stats.avgScore) * 100)}%`
                       : 'Keep playing!'
@@ -231,21 +237,23 @@ export function StatsPage() {
                   </span>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Recent Games */}
         {stats.recentGames.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-6">
+            <div className="mb-6">
+              <h3 className="text-xl font-mono text-green-400 flex items-center gap-2 mb-2">
                 <Clock className="h-5 w-5" />
-                Recent Games
-              </CardTitle>
-              <CardDescription>Your last {stats.recentGames.length} games</CardDescription>
-            </CardHeader>
-            <CardContent>
+                [ RECENT MISSIONS ]
+              </h3>
+              <p className="text-gray-400 font-mono text-sm">
+                {`> Last ${stats.recentGames.length} combat operations and performance data`}
+              </p>
+            </div>
+            <div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -291,29 +299,33 @@ export function StatsPage() {
                   </tbody>
                 </table>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Empty State */}
         {stats.totalGames === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No games played yet</h3>
-              <p className="text-gray-600 mb-4">
-                Start playing to see your statistics and track your progress!
-              </p>
-              <div className="space-x-4">
-                <Button onClick={() => navigate('/solo')}>
-                  Play Solo
-                </Button>
-                <Button variant="outline" onClick={() => navigate('/room/join')}>
-                  Join Multiplayer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+            <MapPin className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+            <h3 className="text-lg font-mono text-cyan-400 mb-2">[ NO MISSIONS ON RECORD ]</h3>
+            <p className="text-gray-300 font-mono mb-6">
+              {`> Deploy to combat zones to begin tracking performance metrics`}
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button 
+                onClick={() => navigate('/solo')}
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:scale-105"
+              >
+                🎯 [ SOLO MISSION ]
+              </Button>
+              <Button 
+                onClick={() => navigate('/room/join')}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-mono shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105"
+              >
+                ⚔️ [ JOIN SQUAD ]
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>
