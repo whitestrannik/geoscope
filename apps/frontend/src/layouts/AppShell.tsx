@@ -12,7 +12,7 @@ export function AppShell({ children }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black">
+    <div className="min-h-screen relative bg-black">
       {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video

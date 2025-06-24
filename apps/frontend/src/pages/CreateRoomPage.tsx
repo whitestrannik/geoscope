@@ -65,8 +65,8 @@ export function CreateRoomPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 relative">
-      <div className="w-full max-w-lg relative z-10">
+    <div className="p-4 py-6 relative">
+      <div className="w-full max-w-lg mx-auto relative z-10">
         <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6">
           {/* Header */}
           <div className="text-center mb-6">
