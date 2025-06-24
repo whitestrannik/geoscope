@@ -83,7 +83,7 @@ export function AppShell({ children }: AppShellProps) {
 
             {/* Gaming-style Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
-              <nav className="flex items-center space-x-1 bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-cyan-500/30">
+              <nav className="flex items-center space-x-1 bg-black/70 backdrop-blur-md rounded-lg px-4 py-2 border border-cyan-500/30">
                 <Link
                   to="/"
                   className={`px-4 py-2 text-sm font-mono font-medium transition-all duration-300 rounded ${

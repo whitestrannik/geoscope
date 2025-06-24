@@ -156,7 +156,7 @@ export function RoomPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
           <div>
             <h1 className="text-2xl font-mono text-cyan-400 mb-2">🔒 [ AUTHENTICATION REQUIRED ]</h1>
             <p className="text-gray-300 font-mono">
@@ -176,7 +176,7 @@ export function RoomPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto text-cyan-400 mb-4" />
           <p className="text-white font-mono text-lg">[ LOADING ROOM... ]</p>
         </div>
@@ -187,7 +187,7 @@ export function RoomPage() {
   if (error || !room) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+        <div className="bg-black/70 backdrop-blur-md border border-red-500/30 rounded-lg p-8 text-center space-y-6">
           <div>
             <h1 className="text-2xl font-mono text-red-400 mb-2">❌ [ ROOM NOT FOUND ]</h1>
             <p className="text-gray-300 font-mono">
@@ -302,7 +302,7 @@ export function RoomPage() {
         </div>
 
         {/* Room Info */}
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 text-white">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-mono text-cyan-400 flex items-center space-x-2">
@@ -333,7 +333,7 @@ export function RoomPage() {
         </div>
 
         {/* Players List */}
-        <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6 text-white">
+        <div className="bg-black/70 backdrop-blur-md border border-purple-500/30 rounded-lg p-6 text-white">
           <h3 className="flex items-center space-x-2 text-xl font-mono text-purple-400 mb-4">
             <Users className="h-5 w-5" />
             <span>[ SQUAD MEMBERS ({room.players.length}/{room.maxPlayers}) ]</span>
@@ -380,7 +380,7 @@ export function RoomPage() {
         </div>
 
         {/* Game Controls */}
-        <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-6 text-white">
+        <div className="bg-black/70 backdrop-blur-md border border-green-500/30 rounded-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <h3 className="text-lg font-mono text-green-400">[ GAME CONTROLS ]</h3>

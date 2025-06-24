@@ -58,27 +58,9 @@ const LeaderboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Gaming Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-cyan-500/10 animate-pulse"
-            style={{
-              width: `${Math.random() * 80 + 30}px`,
-              height: `${Math.random() * 80 + 30}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          />
-        ))}
-      </div>
-
       <div className="max-w-6xl mx-auto p-6 pt-3 space-y-3 relative z-10 -mt-8">
         {/* Header */}
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
@@ -99,7 +81,7 @@ const LeaderboardPage: React.FC = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-black/60 backdrop-blur-sm p-1 rounded-lg border border-cyan-500/30">
+        <div className="flex space-x-1 bg-black/70 backdrop-blur-md p-1 rounded-lg border border-cyan-500/30">
           <button
             onClick={() => setActiveTab('global')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-mono font-medium transition-all duration-300 ${
@@ -136,7 +118,7 @@ const LeaderboardPage: React.FC = () => {
 
         {/* Global Top Tab */}
         {activeTab === 'global' && !globalLoading && (
-          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 space-y-4">
+          <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6 space-y-4">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-mono text-cyan-400 mb-2">
@@ -195,7 +177,7 @@ const LeaderboardPage: React.FC = () => {
 
         {/* Recent Winners Tab */}
         {activeTab === 'recent' && !recentLoading && (
-          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6 space-y-4">
+          <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6 space-y-4">
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-mono text-cyan-400 mb-2">
@@ -267,7 +249,7 @@ const LeaderboardPage: React.FC = () => {
         {/* Stats Summary */}
         {globalTop && globalTop.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-black/60 backdrop-blur-sm border border-yellow-500/30 rounded-lg p-4 shadow-lg shadow-yellow-500/10">
+            <div className="bg-black/70 backdrop-blur-md border border-yellow-500/30 rounded-lg p-4 shadow-lg shadow-yellow-500/10">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium font-mono text-yellow-400">LEGENDARY SCORE</h3>
                 <Trophy className="h-4 w-4 text-yellow-400" />
@@ -280,7 +262,7 @@ const LeaderboardPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-black/60 backdrop-blur-sm border border-blue-500/30 rounded-lg p-4 shadow-lg shadow-blue-500/10">
+            <div className="bg-black/70 backdrop-blur-md border border-blue-500/30 rounded-lg p-4 shadow-lg shadow-blue-500/10">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium font-mono text-blue-400">ACTIVE OPERATIVES</h3>
                 <Users className="h-4 w-4 text-blue-400" />
@@ -293,7 +275,7 @@ const LeaderboardPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-4 shadow-lg shadow-green-500/10">
+            <div className="bg-black/70 backdrop-blur-md border border-green-500/30 rounded-lg p-4 shadow-lg shadow-green-500/10">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium font-mono text-green-400">PRECISION RECORD</h3>
                 <Target className="h-4 w-4 text-green-400" />

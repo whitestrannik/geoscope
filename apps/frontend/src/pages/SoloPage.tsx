@@ -138,11 +138,9 @@ export function SoloPage() {
   // Loading state
   if (gameState === 'loading' || imageLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-          <p className="text-white font-mono text-lg">[ LOADING NEW LOCATION... ]</p>
-        </div>
+      <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+        <div className="text-lg text-gray-300 font-mono">[ INITIALIZING MISSION... ]</div>
       </div>
     );
   }
@@ -150,16 +148,19 @@ export function SoloPage() {
   // Error state
   if (imageError || !currentGame) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
-          <div>
-            <h1 className="text-2xl font-mono text-red-400 mb-2">[ MISSION FAILED ]</h1>
-            <p className="text-gray-300 font-mono">Failed to load location data</p>
-          </div>
-          <Button onClick={() => refetchImage()} className="bg-blue-600 hover:bg-blue-700 font-mono">
-            [ RETRY MISSION ]
-          </Button>
+      <div className="bg-black/70 backdrop-blur-md border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+        <div>
+          <h1 className="text-2xl font-mono text-red-400 mb-2">[ MISSION FAILURE ]</h1>
+          <p className="text-gray-300 font-mono">
+            {imageError?.message || 'Failed to load game data. Please try again.'}
+          </p>
         </div>
+        <Button 
+          onClick={() => refetchImage()}
+          className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:scale-105"
+        >
+          [ RETRY MISSION ]
+        </Button>
       </div>
     );
   }

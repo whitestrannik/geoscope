@@ -30,8 +30,8 @@ export function CreateRoomPage() {
 
   if (!user) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center space-y-6">
           <div>
             <h1 className="text-2xl font-mono text-cyan-400 mb-2">[ AUTHENTICATION REQUIRED ]</h1>
             <p className="text-gray-300 font-mono">
@@ -65,28 +65,9 @@ export function CreateRoomPage() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-      {/* Gaming Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        {/* Floating orbs */}
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-cyan-500/10 animate-pulse"
-            style={{
-              width: `${Math.random() * 100 + 50}px`,
-              height: `${Math.random() * 100 + 50}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
       <div className="w-full max-w-lg relative z-10">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 max-h-[90vh] overflow-y-auto">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8">
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-mono text-cyan-400 mb-2">

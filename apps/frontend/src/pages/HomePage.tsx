@@ -94,7 +94,7 @@ export function HomePage() {
           <div className="flex justify-end">
             <Link 
               to="/room/join" 
-              className="bg-black/60 backdrop-blur-sm border border-yellow-500/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
+              className="bg-black/70 backdrop-blur-md border border-yellow-500/50 text-yellow-400 hover:text-yellow-300 hover:border-yellow-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
             >
               🚪 JOIN ROOM
             </Link>
@@ -102,7 +102,7 @@ export function HomePage() {
           <div className="flex justify-start">
             <Link 
               to="/leaderboard" 
-              className="bg-black/60 backdrop-blur-sm border border-green-500/50 text-green-400 hover:text-green-300 hover:border-green-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
+              className="bg-black/70 backdrop-blur-md border border-green-500/50 text-green-400 hover:text-green-300 hover:border-green-400 transition-all duration-300 px-6 py-3 rounded-lg font-mono font-medium"
             >
               🏆 LEADERBOARD
             </Link>

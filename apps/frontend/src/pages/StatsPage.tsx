@@ -22,7 +22,7 @@ export function StatsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
           <div className="text-lg text-gray-300 font-mono">[ ANALYZING COMBAT DATA... ]</div>
         </div>
@@ -33,7 +33,7 @@ export function StatsPage() {
   if (!stats) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-black/60 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center space-y-6">
+        <div className="bg-black/70 backdrop-blur-md border border-red-500/30 rounded-lg p-8 text-center space-y-6">
           <div className="text-lg text-gray-300 font-mono">[ DATA ACCESS FAILED ]</div>
           <Button 
             onClick={() => navigate('/')}
@@ -71,27 +71,9 @@ export function StatsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Gaming Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        {[...Array(10)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-cyan-500/10 animate-pulse"
-            style={{
-              width: `${Math.random() * 60 + 20}px`,
-              height: `${Math.random() * 60 + 20}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          />
-        ))}
-      </div>
-
       <div className="max-w-6xl mx-auto p-6 pt-3 space-y-3 relative z-10 -mt-8">
         {/* Header */}
-        <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold font-mono text-cyan-400 mb-2">
@@ -113,7 +95,7 @@ export function StatsPage() {
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-black/60 backdrop-blur-sm border border-blue-500/30 rounded-lg p-4 shadow-lg shadow-blue-500/10">
+          <div className="bg-black/70 backdrop-blur-md border border-blue-500/30 rounded-lg p-4 shadow-lg shadow-blue-500/10">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium font-mono text-blue-400">GLOBAL RANK</h3>
               <Medal className="h-4 w-4 text-blue-400" />
@@ -124,7 +106,7 @@ export function StatsPage() {
             </p>
           </div>
 
-          <div className="bg-black/60 backdrop-blur-sm border border-yellow-500/30 rounded-lg p-4 shadow-lg shadow-yellow-500/10">
+          <div className="bg-black/70 backdrop-blur-md border border-yellow-500/30 rounded-lg p-4 shadow-lg shadow-yellow-500/10">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium font-mono text-yellow-400">LEGENDARY SCORE</h3>
               <Trophy className="h-4 w-4 text-yellow-400" />
@@ -137,7 +119,7 @@ export function StatsPage() {
             </p>
           </div>
 
-          <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-4 shadow-lg shadow-purple-500/10">
+          <div className="bg-black/70 backdrop-blur-md border border-purple-500/30 rounded-lg p-4 shadow-lg shadow-purple-500/10">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium font-mono text-purple-400">MISSIONS COMPLETED</h3>
               <BarChart3 className="h-4 w-4 text-purple-400" />
@@ -148,7 +130,7 @@ export function StatsPage() {
             </p>
           </div>
 
-          <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-4 shadow-lg shadow-green-500/10">
+          <div className="bg-black/70 backdrop-blur-md border border-green-500/30 rounded-lg p-4 shadow-lg shadow-green-500/10">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium font-mono text-green-400">PRECISION RECORD</h3>
               <Target className="h-4 w-4 text-green-400" />
@@ -164,7 +146,7 @@ export function StatsPage() {
 
         {/* Detailed Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-6">
+          <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6">
             <div className="mb-6">
               <h3 className="text-xl font-mono text-cyan-400 flex items-center gap-2 mb-2">
                 <TrendingUp className="h-5 w-5" />
@@ -203,7 +185,7 @@ export function StatsPage() {
             </div>
           </div>
 
-          <div className="bg-black/60 backdrop-blur-sm border border-purple-500/30 rounded-lg p-6">
+          <div className="bg-black/70 backdrop-blur-md border border-purple-500/30 rounded-lg p-6">
             <div className="mb-6">
               <h3 className="text-xl font-mono text-purple-400 flex items-center gap-2 mb-2">
                 <Calendar className="h-5 w-5" />
@@ -243,7 +225,7 @@ export function StatsPage() {
 
         {/* Recent Games */}
         {stats.recentGames.length > 0 && (
-          <div className="bg-black/60 backdrop-blur-sm border border-green-500/30 rounded-lg p-6">
+          <div className="bg-black/70 backdrop-blur-md border border-green-500/30 rounded-lg p-6">
             <div className="mb-6">
               <h3 className="text-xl font-mono text-green-400 flex items-center gap-2 mb-2">
                 <Clock className="h-5 w-5" />
@@ -305,7 +287,7 @@ export function StatsPage() {
 
         {/* Empty State */}
         {stats.totalGames === 0 && (
-          <div className="bg-black/60 backdrop-blur-sm border border-cyan-500/30 rounded-lg p-8 text-center">
+          <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
             <MapPin className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
             <h3 className="text-lg font-mono text-cyan-400 mb-2">[ NO MISSIONS ON RECORD ]</h3>
             <p className="text-gray-300 font-mono mb-6">
