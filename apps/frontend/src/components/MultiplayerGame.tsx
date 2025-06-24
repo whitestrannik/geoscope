@@ -406,24 +406,56 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     // Image section component
     const imageSection = (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white overflow-hidden h-full">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Guess this location</CardTitle>
+      <Card className="bg-black/80 backdrop-blur-md border-cyan-500/30 text-white shadow-2xl shadow-cyan-500/10 overflow-hidden h-full hover:border-cyan-400/50 transition-all duration-300">
+        <CardHeader className="pb-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-cyan-500/20">
+          <CardTitle className="text-lg font-mono text-cyan-300 flex items-center">
+            <span className="text-cyan-400 mr-2">📸</span>
+            [ INTEL FEED ]
+          </CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="bg-cyan-500/20 border border-cyan-400/30 px-2 py-1 rounded text-xs font-mono text-cyan-300">
+                &gt; ROUND {gameState.currentRound}/{gameState.totalRounds}
+              </div>
+              {gameState.timeLimit && timeRemaining !== null && (
+                <div className={`bg-red-500/20 border border-red-400/30 px-2 py-1 rounded text-xs font-mono ${
+                  timeRemaining <= 10 ? 'text-red-300 animate-pulse' : 'text-red-400'
+                }`}>
+                  ⏱ {formatTime(timeRemaining)}
+                </div>
+              )}
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="p-0 h-full">
+        <CardContent className="p-0 h-full relative">
           {gameState.imageUrl ? (
-            <ImageViewer
-              imageUrl={gameState.imageUrl}
-              alt="Location to guess"
-              onFullscreenToggle={() => setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full')}
-              showFullscreenButton={true}
-              showInstructions={false}
-              isFullscreen={layoutMode === 'image-full'}
-              className="h-full"
-            />
+            <>
+              <ImageViewer
+                imageUrl={gameState.imageUrl}
+                alt="Location to guess"
+                onFullscreenToggle={() => setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full')}
+                showFullscreenButton={true}
+                showInstructions={false}
+                isFullscreen={layoutMode === 'image-full'}
+                className="h-full"
+              />
+              {/* Gaming-style scanning overlay animation */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-cyan-400/60 animate-pulse"></div>
+                <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-cyan-400/60 animate-pulse"></div>
+                <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-cyan-400/60 animate-pulse"></div>
+                <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-cyan-400/60 animate-pulse"></div>
+              </div>
+            </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin" />
+              <div className="text-center">
+                <div className="relative">
+                  <div className="w-8 h-8 bg-cyan-400 rounded-full animate-ping mx-auto mb-3"></div>
+                  <div className="absolute inset-0 w-8 h-8 bg-cyan-500 rounded-full mx-auto"></div>
+                </div>
+                <p className="text-cyan-300 font-mono text-sm">[ LOADING INTEL... ]</p>
+              </div>
             </div>
           )}
         </CardContent>
@@ -432,11 +464,34 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     // Map section component
     const mapSection = (
-      <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white overflow-hidden h-full">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Your guess</CardTitle>
+      <Card className="bg-black/80 backdrop-blur-md border-purple-500/30 text-white shadow-2xl shadow-purple-500/10 overflow-hidden h-full hover:border-purple-400/50 transition-all duration-300">
+        <CardHeader className="pb-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-purple-500/20">
+          <CardTitle className="text-lg font-mono text-purple-300 flex items-center">
+            <span className="text-purple-400 mr-2">🎯</span>
+            [ TACTICAL MAP ]
+          </CardTitle>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {guess && gameState.phase === 'round-active' && (
+                <div className="text-xs text-purple-300 bg-purple-500/20 border border-purple-400/30 px-2 py-1 rounded font-mono flex items-center">
+                  <span className="text-purple-400 mr-1">●</span>
+                  {guess.lat.toFixed(2)}, {guess.lng.toFixed(2)}
+                </div>
+              )}
+              {!guess && gameState.phase === 'round-active' && (
+                <div className="bg-amber-500/20 border border-amber-400/30 px-2 py-1 rounded text-xs font-mono text-amber-300">
+                  &gt; AWAITING COORDINATES
+                </div>
+              )}
+              {gameState.phase === 'round-results' && (
+                <div className="bg-green-500/20 border border-green-400/30 px-2 py-1 rounded text-xs font-mono text-green-300">
+                  &gt; MISSION COMPLETE
+                </div>
+              )}
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="p-0 h-full">
+        <CardContent className="p-0 h-full relative">
           <MapComponent
             onMapClick={handleMapClick}
             onDoubleClick={handleMapDoubleClick}
@@ -460,6 +515,14 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             disabled={gameState.phase !== 'round-active' && gameState.phase !== 'round-results'}
             className="h-full"
           />
+          {/* Gaming-style radar scanning effect */}
+          {!guess && gameState.phase === 'round-active' && (
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div className="text-purple-400/60 font-mono text-sm animate-pulse">
+                [ RIGHT-CLICK TO DEPLOY MARKER ]
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     );
@@ -467,73 +530,84 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     // Action section component
     const actionSection = (
       <>
-        {/* Compact Player Status Panel */}
-        <div className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border border-slate-600/40 text-white px-4 py-2 rounded-lg shadow-lg">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-500/20 p-1.5 rounded border border-blue-400/30">
-                <Users className="h-4 w-4 text-blue-400" />
+        {/* Enhanced Gaming-style Multiplayer Status Panel */}
+        <div className="bg-gradient-to-r from-black/90 to-slate-900/90 backdrop-blur-lg border border-purple-500/40 text-white px-6 py-4 rounded-lg shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-300">
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-purple-500/20 p-3 rounded-lg border border-purple-400/30 shadow-lg shadow-purple-500/20">
+                <Users className="h-6 w-6 text-purple-400" />
               </div>
               <div>
-                <div className="text-xs text-gray-300">Players</div>
-                <div className="font-semibold text-sm">
-                  {guessSubmissions.size}/{room.players.length} submitted
+                <div className="text-xs text-purple-300 font-mono uppercase tracking-wider">[ MULTIPLAYER BATTLE ]</div>
+                <div className="font-semibold text-lg font-mono text-white">
+                  {gameState.phase === 'round-active' ? 
+                    `> ${guessSubmissions.size}/${room.players.length} OPERATIVES READY` : 
+                    gameState.phase === 'round-results' ? '> ANALYZING RESULTS...' : 
+                    '> AWAITING ORDERS...'}
                 </div>
               </div>
             </div>
-            {gameState.phase === 'round-active' && (
-              <div className="flex items-center">
-                {hasSubmittedGuess ? (
-                  <div className="flex items-center space-x-2 bg-green-500/20 border border-green-400/30 px-3 py-1.5 rounded text-xs">
-                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                    <span className="text-green-400 font-medium">Guess submitted</span>
-                  </div>
-                ) : guess ? (
-                  <Button
-                    onClick={handleSubmitGuess}
-                    size="sm"
-                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-1.5"
-                  >
-                    <MapPin className="h-3 w-3 mr-1" />
-                    Submit Guess
-                  </Button>
-                ) : (
-                  <div className="bg-amber-500/20 border border-amber-400/30 px-3 py-1.5 rounded text-xs">
-                    <span className="text-amber-400 font-medium">Right-click on map to place guess</span>
-                  </div>
-                )}
-              </div>
-            )}
-            {gameState.phase === 'round-results' && (
-              <div className="flex items-center">
-                {room.autoAdvance && gameState.countdownTime !== undefined ? (
-                  <div className="flex items-center space-x-2 bg-blue-600/20 border border-blue-500/30 px-3 py-1.5 rounded text-xs">
-                    <Clock className="h-3 w-3 text-blue-400" />
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-blue-400">{gameState.countdownTime}</div>
-                      <div className="text-xs text-blue-300">Next round in...</div>
+            <div className="flex items-center gap-3">
+              {gameState.phase === 'round-active' && (
+                <>
+                  {hasSubmittedGuess ? (
+                    <div className="flex items-center space-x-3 bg-green-500/20 border border-green-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                      <div className="relative">
+                        <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                        <div className="absolute inset-0 w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
+                      <span className="text-green-300 font-medium">COORDINATES LOCKED</span>
                     </div>
-                  </div>
-                ) : !room.autoAdvance ? (
-                  user.id === room.hostUserId ? (
+                  ) : guess ? (
                     <Button
-                      onClick={() => socket.startNextRound()}
-                      size="sm"
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-1.5"
+                      onClick={handleSubmitGuess}
+                      size="lg"
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-mono font-bold px-6 py-3 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-105"
                     >
-                      <Crown className="h-3 w-3 mr-1" />
-                      Start Next Round
+                      <span className="mr-2">🚀</span>
+                      [ DEPLOY STRIKE ]
                     </Button>
                   ) : (
-                    <div className="bg-blue-500/20 border border-blue-400/30 px-3 py-1.5 rounded text-xs">
-                      <span className="text-blue-400 font-medium">
-                        📊 Review results - Host will start next round
-                      </span>
+                    <div className="bg-amber-500/20 border border-amber-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                      <span className="text-amber-400 font-medium animate-pulse">● RIGHT-CLICK MAP TO TARGET</span>
                     </div>
-                  )
-                ) : null}
-              </div>
-            )}
+                  )}
+                </>
+              )}
+              {gameState.phase === 'round-results' && (
+                <>
+                  {room.autoAdvance && gameState.countdownTime !== undefined ? (
+                    <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-mono">
+                      <div className="relative">
+                        <div className="w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
+                        <div className="absolute inset-0 w-4 h-4 bg-blue-500 rounded-full"></div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-blue-300 font-mono">{gameState.countdownTime}</div>
+                        <div className="text-xs text-blue-400 font-mono">NEXT ROUND DEPLOYING...</div>
+                      </div>
+                    </div>
+                  ) : !room.autoAdvance ? (
+                    user.id === room.hostUserId ? (
+                      <Button
+                        onClick={() => socket.startNextRound()}
+                        size="lg"
+                        className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono font-bold px-6 py-3 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:scale-105"
+                      >
+                        <span className="mr-2">👑</span>
+                        [ LAUNCH NEXT ROUND ]
+                      </Button>
+                    ) : (
+                      <div className="bg-cyan-500/20 border border-cyan-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                        <span className="text-cyan-400 font-medium animate-pulse">
+                          ● AWAITING COMMANDER ORDERS
+                        </span>
+                      </div>
+                    )
+                  ) : null}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </>
@@ -542,17 +616,21 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     // Results overlay component
     const resultsOverlay = showResultModal && gameState.results ? (
       <Card 
-        className="bg-slate-900/95 backdrop-blur-lg border-white/30 text-white shadow-2xl max-w-2xl w-full mx-4 cursor-pointer hover:bg-slate-900/98 transition-colors"
+        className="bg-black/95 backdrop-blur-xl border border-purple-500/50 text-white shadow-2xl shadow-purple-500/20 max-w-3xl w-full mx-4 cursor-pointer hover:bg-black/98 hover:border-purple-400/60 transition-all duration-300 rounded-xl"
         onClick={() => setShowResultModal(false)}
       >
-        <CardHeader>
-          <CardTitle className="text-xl sm:text-2xl text-center">Round {gameState.currentRound} Results</CardTitle>
-          <p className="text-center text-sm text-gray-300">
+        <CardHeader className="pb-6">
+          <CardTitle className="text-3xl font-mono text-purple-400 text-center mb-2 flex items-center justify-center">
+            <span className="mr-3">⚔</span>
+            [ BATTLE RESULTS - ROUND {gameState.currentRound} ]
+            <span className="ml-3">⚔</span>
+          </CardTitle>
+          <p className="text-center text-sm text-gray-300 font-mono animate-pulse">
             {!room.autoAdvance && gameState.phase === 'round-results' 
-              ? "Examine results - Host will start next round" 
+              ? "&gt; EXAMINE TACTICAL DATA - COMMANDER WILL DEPLOY NEXT ROUND" 
               : room.autoAdvance && gameState.countdownTime !== undefined
-              ? `Review results - Next round starts in ${gameState.countdownTime}s`
-              : "Click anywhere to continue"}
+              ? `&gt; ANALYZE RESULTS - NEXT DEPLOYMENT IN ${gameState.countdownTime}S`
+              : "&gt; CLICK ANYWHERE TO CONTINUE MISSION"}
           </p>
         </CardHeader>
         <CardContent>
@@ -560,30 +638,41 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             {gameState.results.map((result, index) => (
               <div
                 key={result.playerId}
-                className="flex items-center justify-between p-4 bg-white/10 rounded-lg border border-white/20"
+                className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 ${
+                  result.playerId === user.id 
+                    ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/50 shadow-lg shadow-cyan-500/20' 
+                    : 'bg-gradient-to-r from-purple-600/10 to-slate-600/10 border-purple-500/30'
+                }`}
               >
                 <div className="flex items-center space-x-4">
-                  <div className="text-2xl">
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                  <div className="text-3xl font-mono">
+                    {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </div>
                   <div>
-                    <p className="font-semibold text-lg">{result.username}</p>
+                    <p className="font-bold text-xl font-mono text-white">{result.username}</p>
                     {result.playerId === user.id && (
-                      <p className="text-sm text-blue-400">You</p>
+                      <p className="text-sm text-cyan-400 font-mono">[ YOU ]</p>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-xl">{result.score} points</p>
-                  <p className="text-sm text-gray-300">
-                    {result.hasGuessed ? `${result.distance.toFixed(1)} km` : 'No guess'}
+                  <p className="font-bold text-2xl font-mono text-white">{result.score} PTS</p>
+                  <p className="text-sm text-gray-300 font-mono">
+                    {result.hasGuessed ? `${result.distance.toFixed(1)} KM` : 'NO STRIKE'}
                   </p>
-                  <p className="text-sm text-gray-300">
-                    Total: {result.totalScore}
+                  <p className="text-sm text-purple-400 font-mono">
+                    TOTAL: {result.totalScore}
                   </p>
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Gaming-style divider */}
+          <div className="mt-6 pt-6 border-t border-purple-500/30">
+            <div className="text-center text-xs text-gray-400 font-mono">
+              &gt; OPERATION #{Math.floor(Math.random() * 9999).toString().padStart(4, '0')} - ROUND {gameState.currentRound} COMPLETE
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -591,16 +680,16 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     // Custom help content for multiplayer
     const customHelpContent = (
-      <div className="flex items-center gap-3 text-center">
-        <span className="text-gray-300">Multiplayer Controls:</span>
+      <div className="flex items-center gap-3 text-center flex-wrap justify-center">
+        <span className="text-purple-300 font-mono">[ MULTIPLAYER CONTROLS ]:</span>
         <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Left-click</kbd> Fullscreen</span>
-        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Guess</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Right-click</kbd> Target</span>
         <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Scroll</kbd> Zoom</span>
         <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Drag</kbd> Pan</span>
-        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">F</kbd> Photo</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">F</kbd> Intel</span>
         <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">M</kbd> Map</span>
         <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Esc</kbd> Exit</span>
-        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Submit</span>
+        <span><kbd className="bg-white/20 px-1.5 py-0.5 rounded text-xs">Enter</kbd> Deploy</span>
       </div>
     );
 

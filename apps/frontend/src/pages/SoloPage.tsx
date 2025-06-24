@@ -171,14 +171,22 @@ export function SoloPage() {
 
   // Image section component
   const imageSection = (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full flex flex-col">
-      <CardHeader className="pb-2 flex-shrink-0">
+    <Card className="bg-black/80 backdrop-blur-md border-cyan-500/30 text-white shadow-2xl shadow-cyan-500/10 h-full flex flex-col hover:border-cyan-400/50 transition-all duration-300">
+      <CardHeader className="pb-3 flex-shrink-0 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-cyan-500/20">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Guess this location</CardTitle>
+          <CardTitle className="text-lg font-mono text-cyan-300 flex items-center">
+            <span className="text-cyan-400 mr-2">📸</span>
+            [ TARGET VISUAL ]
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="bg-cyan-500/20 border border-cyan-400/30 px-2 py-1 rounded text-xs font-mono text-cyan-300">
+              &gt; ANALYZE
+            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
-        <div className="flex-1 min-h-0 h-full">
+        <div className="flex-1 min-h-0 h-full relative">
           <ImageViewer
             imageUrl={currentGame.imageUrl}
             alt="Mystery location"
@@ -189,6 +197,13 @@ export function SoloPage() {
             isFullscreen={layoutMode === 'image-full'}
             className="h-full w-full"
           />
+          {/* Gaming-style scanning overlay animation */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-cyan-400/60 animate-pulse"></div>
+            <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-cyan-400/60 animate-pulse"></div>
+            <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-cyan-400/60 animate-pulse"></div>
+            <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-cyan-400/60 animate-pulse"></div>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -196,21 +211,30 @@ export function SoloPage() {
 
   // Map section component
   const mapSection = (
-    <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white shadow-2xl h-full flex flex-col">
-      <CardHeader className="pb-2 flex-shrink-0">
+    <Card className="bg-black/80 backdrop-blur-md border-purple-500/30 text-white shadow-2xl shadow-purple-500/10 h-full flex flex-col hover:border-purple-400/50 transition-all duration-300">
+      <CardHeader className="pb-3 flex-shrink-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-purple-500/20">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Your guess</CardTitle>
+          <CardTitle className="text-lg font-mono text-purple-300 flex items-center">
+            <span className="text-purple-400 mr-2">🎯</span>
+            [ TARGETING SYSTEM ]
+          </CardTitle>
           <div className="flex items-center gap-2">
             {userGuess && gameState === 'playing' && (
-              <div className="text-xs text-blue-300 bg-blue-500/20 px-2 py-1 rounded">
-                📍 {userGuess.lat.toFixed(2)}, {userGuess.lng.toFixed(2)}
+              <div className="text-xs text-purple-300 bg-purple-500/20 border border-purple-400/30 px-2 py-1 rounded font-mono flex items-center">
+                <span className="text-purple-400 mr-1">●</span>
+                {userGuess.lat.toFixed(2)}, {userGuess.lng.toFixed(2)}
+              </div>
+            )}
+            {!userGuess && gameState === 'playing' && (
+              <div className="bg-amber-500/20 border border-amber-400/30 px-2 py-1 rounded text-xs font-mono text-amber-300">
+                &gt; AWAITING TARGET
               </div>
             )}
           </div>
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-3 pt-0 min-h-0">
-        <div className="flex-1 min-h-0 h-full">
+        <div className="flex-1 min-h-0 h-full relative">
           <MapComponent
             onMarkerPlace={handleMarkerPlace}
             onDoubleClick={handleMapDoubleClick}
@@ -220,6 +244,14 @@ export function SoloPage() {
             resultData={showResultsOnMap && result ? { distance: result.distance, score: result.score } : null}
             className="h-full w-full"
           />
+          {/* Gaming-style radar scanning effect */}
+          {!userGuess && gameState === 'playing' && (
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div className="text-purple-400/60 font-mono text-sm animate-pulse">
+                [ RIGHT-CLICK TO PLACE TARGET MARKER ]
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -228,48 +260,56 @@ export function SoloPage() {
   // Action section component
   const actionSection = (
     <>
-      {/* Compact Solo Status Panel */}
-      <div className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-lg border border-slate-600/40 text-white px-4 py-2 rounded-lg shadow-lg">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="bg-purple-500/20 p-1.5 rounded border border-purple-400/30">
-              <div className="h-4 w-4 text-purple-400">🎮</div>
+      {/* Enhanced Gaming-style Solo Status Panel */}
+      <div className="bg-gradient-to-r from-black/90 to-slate-900/90 backdrop-blur-lg border border-cyan-500/40 text-white px-6 py-4 rounded-lg shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all duration-300">
+        <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center space-x-4">
+            <div className="bg-cyan-500/20 p-3 rounded-lg border border-cyan-400/30 shadow-lg shadow-cyan-500/20">
+              <div className="h-6 w-6 text-cyan-400 flex items-center justify-center font-mono">⚡</div>
             </div>
             <div>
-              <div className="text-xs text-gray-300">Solo Mode</div>
-              <div className="font-semibold text-sm">
-                {gameState === 'playing' ? 'Place your guess' : gameState === 'result' ? 'Round complete' : 'Loading...'}
+              <div className="text-xs text-cyan-300 font-mono uppercase tracking-wider">[ SOLO MISSION ]</div>
+              <div className="font-semibold text-lg font-mono text-white">
+                {gameState === 'playing' ? 
+                  (userGuess ? '> TARGET LOCKED' : '> SCANNING LOCATION...') : 
+                  gameState === 'result' ? '> MISSION COMPLETE' : 
+                  '> INITIALIZING...'}
               </div>
             </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             {gameState === 'playing' && !userGuess && (
-              <div className="bg-amber-500/20 border border-amber-400/30 px-3 py-1.5 rounded text-xs">
-                <span className="text-amber-400 font-medium">Right-click on map to place guess</span>
+              <div className="bg-amber-500/20 border border-amber-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                <span className="text-amber-400 font-medium animate-pulse">● RIGHT-CLICK MAP TO TARGET</span>
               </div>
             )}
             {gameState === 'playing' && userGuess && !evaluateGuessMutation.isPending && (
               <Button
                 onClick={handleSubmitGuess}
-                size="sm"
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-1.5"
+                size="lg"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-mono font-bold px-6 py-3 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-300 hover:scale-105"
               >
-                ✅ Submit Guess
+                <span className="mr-2">🚀</span>
+                [ LAUNCH STRIKE ]
               </Button>
             )}
             {evaluateGuessMutation.isPending && (
-              <div className="flex items-center space-x-2 bg-blue-500/20 border border-blue-400/30 px-3 py-1.5 rounded text-xs">
-                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
-                <span className="text-blue-400 font-medium">Calculating...</span>
+              <div className="flex items-center space-x-3 bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-ping"></div>
+                  <div className="absolute inset-0 w-3 h-3 bg-blue-500 rounded-full"></div>
+                </div>
+                <span className="text-blue-300 font-medium">CALCULATING TRAJECTORY...</span>
               </div>
             )}
             {gameState === 'result' && (
               <Button
                 onClick={handlePlayAgain}
-                size="sm"
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-1.5"
+                size="lg"
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-mono font-bold px-6 py-3 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300 hover:scale-105"
               >
-                🎮 Play Again
+                <span className="mr-2">⚡</span>
+                [ NEW MISSION ]
               </Button>
             )}
           </div>
@@ -317,36 +357,49 @@ export function SoloPage() {
   // Results overlay component
   const resultsOverlay = showResultModal && result ? (
     <div 
-      className="bg-black/90 backdrop-blur-lg border border-cyan-500/50 text-white shadow-2xl max-w-lg w-full mx-4 cursor-pointer hover:bg-black/95 transition-colors rounded-lg p-6"
+      className="bg-black/95 backdrop-blur-xl border border-cyan-500/50 text-white shadow-2xl shadow-cyan-500/20 max-w-2xl w-full mx-4 cursor-pointer hover:bg-black/98 hover:border-cyan-400/60 transition-all duration-300 rounded-xl p-8"
       onClick={() => setShowResultModal(false)}
     >
-      <div className="pb-2">
-        <h2 className="text-xl sm:text-2xl text-center font-mono text-cyan-400">🎯 [ ROUND RESULTS ]</h2>
-        <p className="text-center text-sm text-gray-300 font-mono">Click anywhere to continue</p>
+      <div className="pb-6 text-center">
+        <h2 className="text-3xl font-mono text-cyan-400 mb-2 flex items-center justify-center">
+          <span className="mr-3">🎯</span>
+          [ MISSION RESULTS ]
+          <span className="ml-3">🎯</span>
+        </h2>
+        <p className="text-sm text-gray-300 font-mono animate-pulse">
+          &gt; CLICK ANYWHERE TO CONTINUE TO NEXT MISSION
+        </p>
       </div>
       <div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-center">
-          <div className="space-y-2">
-            <div className="text-2xl sm:text-3xl">📏</div>
-            <div className="text-sm sm:text-base font-semibold text-gray-200">Distance</div>
-            <div className="text-xl sm:text-2xl text-blue-300 font-bold">{result.distance.toLocaleString()} km</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          <div className="space-y-3 bg-gradient-to-b from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-lg p-4">
+            <div className="text-3xl animate-pulse">📏</div>
+            <div className="text-sm font-bold text-blue-300 font-mono uppercase tracking-wider">[ Distance ]</div>
+            <div className="text-2xl text-blue-400 font-bold font-mono">{result.distance.toLocaleString()} KM</div>
           </div>
           
-          <div className="space-y-2">
-            <div className="text-2xl sm:text-3xl">🏆</div>
-            <div className="text-sm sm:text-base font-semibold text-gray-200">Score</div>
-            <div className={`text-2xl sm:text-3xl font-bold ${getScoreColor(result.score)}`}>
+          <div className="space-y-3 bg-gradient-to-b from-green-600/20 to-emerald-800/20 border border-green-500/30 rounded-lg p-4">
+            <div className="text-3xl animate-pulse">🏆</div>
+            <div className="text-sm font-bold text-green-300 font-mono uppercase tracking-wider">[ Score ]</div>
+            <div className={`text-3xl font-bold font-mono ${getScoreColor(result.score)}`}>
               {result.score.toLocaleString()}
             </div>
-            <div className="text-sm text-gray-300">{getScoreMessage(result.score)}</div>
+            <div className="text-sm text-gray-300 font-mono">{getScoreMessage(result.score)}</div>
           </div>
           
-          <div className="space-y-2">
-            <div className="text-2xl sm:text-3xl">📍</div>
-            <div className="text-sm sm:text-base font-semibold text-gray-200">Actual Location</div>
-            <div className="text-sm text-gray-300">
+          <div className="space-y-3 bg-gradient-to-b from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-lg p-4">
+            <div className="text-3xl animate-pulse">📍</div>
+            <div className="text-sm font-bold text-purple-300 font-mono uppercase tracking-wider">[ Target Location ]</div>
+            <div className="text-sm text-purple-400 font-mono">
               {currentGame.location || `${result.actualLat.toFixed(2)}, ${result.actualLng.toFixed(2)}`}
             </div>
+          </div>
+        </div>
+        
+        {/* Gaming-style divider */}
+        <div className="mt-6 pt-6 border-t border-cyan-500/30">
+          <div className="text-center text-xs text-gray-400 font-mono">
+            &gt; MISSION #{Math.floor(Math.random() * 9999).toString().padStart(4, '0')} COMPLETED
           </div>
         </div>
       </div>
