@@ -65,20 +65,20 @@ export function CreateRoomPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative">
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4 relative">
       <div className="w-full max-w-lg relative z-10">
-        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-6">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-mono text-cyan-400 mb-2">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-mono text-cyan-400 mb-2">
               ⚔️ [ CREATE MISSION ]
             </h1>
-            <p className="text-gray-300 font-mono">
+            <p className="text-gray-300 font-mono text-sm">
               {`> Configure multiplayer session parameters`}
             </p>
           </div>
           
-          <form onSubmit={handleCreateRoom} className="space-y-6">
+          <form onSubmit={handleCreateRoom} className="space-y-4">
           {/* Max Players */}
           <div className="space-y-2">
             <Label htmlFor="maxPlayers" className="flex items-center gap-2 font-mono text-cyan-300">
@@ -114,7 +114,7 @@ export function CreateRoomPage() {
           </div>
 
           {/* Time Limit */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -123,7 +123,7 @@ export function CreateRoomPage() {
                 onChange={(e) => setHasTimeLimit(e.target.checked)}
                 className="w-4 h-4 accent-cyan-500"
               />
-              <Label htmlFor="hasTimeLimit" className="flex items-center gap-2 font-mono text-cyan-300">
+              <Label htmlFor="hasTimeLimit" className="flex items-center gap-2 font-mono text-cyan-300 text-sm">
                 <Timer className="h-4 w-4" />
                 ENABLE COUNTDOWN TIMER
               </Label>
@@ -131,7 +131,7 @@ export function CreateRoomPage() {
             
             {hasTimeLimit && (
               <div className="space-y-2 pl-6 border-l-2 border-cyan-500/30">
-                <Label htmlFor="roundTimeLimit" className="text-sm font-mono text-gray-300">
+                <Label htmlFor="roundTimeLimit" className="text-xs font-mono text-gray-300">
                   {`> TIME PER ROUND (30-300 seconds)`}
                 </Label>
                 <Input
@@ -141,18 +141,18 @@ export function CreateRoomPage() {
                   max="300"
                   value={roundTimeLimit}
                   onChange={(e) => setRoundTimeLimit(parseInt(e.target.value) || 120)}
-                  className="bg-black/60 backdrop-blur-sm border-cyan-500/50 text-white font-mono focus:border-cyan-400 focus:ring-cyan-400/20"
+                  className="bg-black/60 backdrop-blur-sm border-cyan-500/50 text-white font-mono focus:border-cyan-400 focus:ring-cyan-400/20 h-8"
                 />
               </div>
             )}
           </div>
 
           {/* Round Progression Mode */}
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2 font-mono text-cyan-300">
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2 font-mono text-cyan-300 text-sm">
               🔄 PROGRESSION MODE
             </Label>
-            <div className="space-y-3 pl-6 border-l-2 border-cyan-500/30">
+            <div className="space-y-2 pl-6 border-l-2 border-cyan-500/30">
               <div className="flex items-center gap-2">
                 <input
                   type="radio"
@@ -162,7 +162,7 @@ export function CreateRoomPage() {
                   onChange={() => setAutoAdvance(true)}
                   className="w-4 h-4 accent-cyan-500"
                 />
-                <Label htmlFor="autoAdvance" className="text-sm font-mono text-gray-300">
+                <Label htmlFor="autoAdvance" className="text-xs font-mono text-gray-300">
                   ⏱️ AUTO - Rounds advance with countdown
                 </Label>
               </div>
@@ -175,15 +175,15 @@ export function CreateRoomPage() {
                   onChange={() => setAutoAdvance(false)}
                   className="w-4 h-4 accent-cyan-500"
                 />
-                <Label htmlFor="manualAdvance" className="text-sm font-mono text-gray-300">
+                <Label htmlFor="manualAdvance" className="text-xs font-mono text-gray-300">
                   👑 MANUAL - Host controls progression
                 </Label>
               </div>
             </div>
             
             {autoAdvance && (
-              <div className="space-y-2 pl-6 border-l-2 border-purple-500/30">
-                <Label htmlFor="resultsDisplayTime" className="text-sm font-mono text-purple-300">
+              <div className="space-y-1 pl-6 border-l-2 border-purple-500/30">
+                <Label htmlFor="resultsDisplayTime" className="text-xs font-mono text-purple-300">
                   {`> RESULTS DISPLAY TIME (5-60 seconds)`}
                 </Label>
                 <Input
@@ -193,17 +193,14 @@ export function CreateRoomPage() {
                   max="60"
                   value={resultsDisplayTime}
                   onChange={(e) => setResultsDisplayTime(parseInt(e.target.value) || 20)}
-                  className="bg-black/60 backdrop-blur-sm border-purple-500/50 text-white font-mono focus:border-purple-400 focus:ring-purple-400/20"
+                  className="bg-black/60 backdrop-blur-sm border-purple-500/50 text-white font-mono focus:border-purple-400 focus:ring-purple-400/20 h-8"
                 />
-                <p className="text-xs text-gray-400 font-mono">
-                  // Duration before auto-advancing to next round
-                </p>
               </div>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-2">
             <Link to="/" className="flex-1">
               <Button 
                 type="button" 
