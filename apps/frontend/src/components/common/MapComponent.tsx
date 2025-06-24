@@ -141,22 +141,22 @@ export function MapComponent({
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    // Simple reliable map style
+    // Gaming/Tactical map style with English labels
     const mapStyle = {
       "version": 8 as const,
-      "name": "Simple Map",
+      "name": "Gaming Tactical Map",
       "sources": {
-        "osm": {
+        "carto-voyager": {
           "type": "raster" as const,
-          "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+          "tiles": ["https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png"],
           "tileSize": 256,
-          "attribution": "© OpenStreetMap contributors"
+          "attribution": "© CARTO © OpenStreetMap contributors"
         }
       },
       "layers": [
         {
-          "id": "osm-layer",
-          "source": "osm",
+          "id": "voyager-layer",
+          "source": "carto-voyager",
           "type": "raster" as const
         }
       ]
@@ -169,7 +169,12 @@ export function MapComponent({
         center: [0, 20],
         zoom: 2,
         attributionControl: false,
-        maxZoom: 18
+        maxZoom: 18,
+        locale: {
+          // Force English labels
+          'name': '{name_en}',
+          'name:latin': '{name_en}'
+        }
       });
 
       map.current.on('load', () => {
@@ -252,11 +257,15 @@ export function MapComponent({
     if (currentGuess) {
       const guessEl = document.createElement('div');
       guessEl.innerHTML = `
-        <div class="w-6 h-6 bg-blue-500 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:scale-110 transition-transform">
-          ✓
+        <div class="relative group">
+          <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-700 border-2 border-cyan-300 rounded-full shadow-lg shadow-purple-500/50 flex items-center justify-center text-cyan-100 text-sm font-bold cursor-pointer hover:scale-110 transition-all duration-300 animate-pulse">
+            🎯
+          </div>
+          <div class="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-ping"></div>
+          <div class="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full"></div>
         </div>
       `;
-      guessEl.title = `Your guess: ${currentGuess.lat.toFixed(3)}, ${currentGuess.lng.toFixed(3)}`;
+      guessEl.title = `YOUR TARGET: ${currentGuess.lat.toFixed(3)}, ${currentGuess.lng.toFixed(3)}`;
 
       guessMarkerRef.current = new maplibregl.Marker({
         element: guessEl,
@@ -277,17 +286,29 @@ export function MapComponent({
 
     // Add all guess markers if showing results
     if (allGuesses && showResult) {
-      const colors = ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316'];
+      const colors = [
+        { bg: 'from-cyan-500 to-blue-600', border: 'border-cyan-300', shadow: 'shadow-cyan-500/50' },
+        { bg: 'from-red-500 to-red-700', border: 'border-red-300', shadow: 'shadow-red-500/50' },
+        { bg: 'from-green-500 to-emerald-600', border: 'border-green-300', shadow: 'shadow-green-500/50' },
+        { bg: 'from-yellow-500 to-orange-600', border: 'border-yellow-300', shadow: 'shadow-yellow-500/50' },
+        { bg: 'from-purple-500 to-violet-700', border: 'border-purple-300', shadow: 'shadow-purple-500/50' },
+        { bg: 'from-pink-500 to-rose-600', border: 'border-pink-300', shadow: 'shadow-pink-500/50' }
+      ];
       
       allGuesses.forEach((guess, index) => {
-        const color = colors[index % colors.length];
+        const colorScheme = colors[index % colors.length];
         const markerEl = document.createElement('div');
         markerEl.innerHTML = `
-          <div class="w-6 h-6 border-2 border-white rounded-full shadow-lg flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:scale-110 transition-transform" style="background-color: ${color}">
-            ${index + 1}
+          <div class="relative group">
+            <div class="w-7 h-7 bg-gradient-to-br ${colorScheme.bg} border-2 ${colorScheme.border} rounded-full shadow-lg ${colorScheme.shadow} flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:scale-110 transition-all duration-300 font-mono">
+              #${index + 1}
+            </div>
+            <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md border border-cyan-500/30 text-cyan-300 px-2 py-1 rounded text-xs font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+              ${guess.username}
+            </div>
           </div>
         `;
-        markerEl.title = `${guess.username}: ${guess.lat.toFixed(3)}, ${guess.lng.toFixed(3)}`;
+        markerEl.title = `OPERATIVE ${guess.username}: ${guess.lat.toFixed(3)}, ${guess.lng.toFixed(3)}`;
 
         const marker = new maplibregl.Marker({
           element: markerEl,
@@ -301,27 +322,21 @@ export function MapComponent({
     }
   }, [allGuesses, showResult, isMapLoaded]);
 
-  // Update actual marker (only shown in results)
+  // Update actual location marker
   useEffect(() => {
     if (!map.current || !isMapLoaded) return;
 
-    // Remove existing actual marker
+    // Remove existing actual marker and distance label
     if (actualMarkerRef.current) {
       actualMarkerRef.current.remove();
       actualMarkerRef.current = null;
     }
-
-    // Remove existing distance label
     if (distanceLabelRef.current) {
       distanceLabelRef.current.remove();
       distanceLabelRef.current = null;
     }
 
-    // Remove all existing distance labels for multiplayer
-    allDistanceLabelsRef.current.forEach(label => label.remove());
-    allDistanceLabelsRef.current = [];
-
-    // Remove existing distance lines
+    // Remove distance line from map
     if (map.current.getLayer('distance-line')) {
       map.current.removeLayer('distance-line');
     }
@@ -329,27 +344,22 @@ export function MapComponent({
       map.current.removeSource('distance-line');
     }
 
-    // Remove all multiplayer distance lines
-    for (let i = 0; i < 10; i++) { // Support up to 10 players
-      const layerId = `distance-line-${i}`;
-      const sourceId = `distance-line-${i}`;
-      if (map.current.getLayer(layerId)) {
-        map.current.removeLayer(layerId);
-      }
-      if (map.current.getSource(sourceId)) {
-        map.current.removeSource(sourceId);
-      }
-    }
-
-    // Add actual marker if provided and showing results
+    // Add actual location marker if showing results
     if (currentActualLocation && showResult) {
       const actualEl = document.createElement('div');
       actualEl.innerHTML = `
-        <div class="w-8 h-8 bg-red-500 border-3 border-white rounded-full shadow-lg flex items-center justify-center text-white text-sm cursor-pointer hover:scale-110 transition-transform">
-          📍
+        <div class="relative group">
+          <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 border-3 border-yellow-300 rounded-full shadow-xl shadow-red-500/50 flex items-center justify-center text-yellow-100 text-lg font-bold cursor-pointer hover:scale-110 transition-all duration-300 animate-bounce">
+            📍
+          </div>
+          <div class="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+          <div class="absolute -top-2 -right-2 w-4 h-4 bg-yellow-500 rounded-full"></div>
+          <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md border border-red-500/50 text-red-300 px-2 py-1 rounded text-xs font-mono whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50">
+            ACTUAL LOCATION
+          </div>
         </div>
       `;
-      actualEl.title = `Actual location: ${currentActualLocation.lat.toFixed(3)}, ${currentActualLocation.lng.toFixed(3)}`;
+      actualEl.title = `ACTUAL TARGET: ${currentActualLocation.lat.toFixed(3)}, ${currentActualLocation.lng.toFixed(3)}`;
 
       actualMarkerRef.current = new maplibregl.Marker({
         element: actualEl,
@@ -358,83 +368,11 @@ export function MapComponent({
         .setLngLat([currentActualLocation.lng, currentActualLocation.lat])
         .addTo(map.current);
 
-      // Draw distance lines for all players in multiplayer mode
-      if (allGuesses && allGuesses.length > 0) {
-        const colors = ['#fbbf24', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#F97316', '#06B6D4', '#84CC16', '#EC4899'];
-        
-        allGuesses.forEach((guess, index) => {
-          const distance = calculateDistance(
-            guess.lat, 
-            guess.lng, 
-            currentActualLocation.lat, 
-            currentActualLocation.lng
-          );
+      // Add distance line if user guess exists
+      if (currentGuess) {
+        const distance = calculateDistance(currentGuess.lat, currentGuess.lng, currentActualLocation.lat, currentActualLocation.lng);
 
-          const color = colors[index % colors.length];
-          const layerId = `distance-line-${index}`;
-          const sourceId = `distance-line-${index}`;
-
-          // Add line source and layer for each player
-          map.current!.addSource(sourceId, {
-            type: 'geojson',
-            data: {
-              type: 'Feature',
-              properties: {},
-              geometry: {
-                type: 'LineString',
-                coordinates: [
-                  [guess.lng, guess.lat],
-                  [currentActualLocation.lng, currentActualLocation.lat]
-                ]
-              }
-            }
-          });
-
-          map.current!.addLayer({
-            id: layerId,
-            type: 'line',
-            source: sourceId,
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round'
-            },
-            paint: {
-              'line-color': color,
-              'line-width': 2,
-              'line-dasharray': [3, 3]
-            }
-          });
-
-          // Add distance label at midpoint for each player
-          const midLat = (guess.lat + currentActualLocation.lat) / 2;
-          const midLng = (guess.lng + currentActualLocation.lng) / 2;
-
-          const distanceEl = document.createElement('div');
-          distanceEl.innerHTML = `
-            <div class="px-2 py-1 rounded-lg text-xs font-bold shadow-lg border-2 border-white" style="background-color: ${color}; color: ${color === '#fbbf24' ? '#000' : '#fff'}">
-              ${guess.username}: ${distance.toFixed(1)} km
-            </div>
-          `;
-
-          const distanceLabel = new maplibregl.Marker({
-            element: distanceEl,
-            anchor: 'center'
-          })
-            .setLngLat([midLng, midLat])
-            .addTo(map.current!);
-
-          allDistanceLabelsRef.current.push(distanceLabel);
-        });
-      } else if (currentGuess) {
-        // Single player mode - draw one distance line
-        const distance = calculateDistance(
-          currentGuess.lat, 
-          currentGuess.lng, 
-          currentActualLocation.lat, 
-          currentActualLocation.lng
-        );
-
-        // Add line source and layer
+        // Add distance line source and layer
         map.current.addSource('distance-line', {
           type: 'geojson',
           data: {
@@ -459,20 +397,24 @@ export function MapComponent({
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#fbbf24', // Yellow color
-            'line-width': 3,
-            'line-dasharray': [2, 2]
+            'line-color': '#fbbf24', // Gaming yellow
+            'line-width': 4,
+            'line-dasharray': [3, 3],
+            'line-opacity': 0.9
           }
         });
 
-        // Add distance label at midpoint
+        // Add distance label at midpoint with gaming style
         const midLat = (currentGuess.lat + currentActualLocation.lat) / 2;
         const midLng = (currentGuess.lng + currentActualLocation.lng) / 2;
 
         const distanceEl = document.createElement('div');
         distanceEl.innerHTML = `
-          <div class="bg-yellow-500 text-black px-2 py-1 rounded-lg text-sm font-bold shadow-lg border-2 border-white">
-            ${distance.toFixed(1)} km
+          <div class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-2 rounded-lg text-sm font-bold font-mono shadow-xl border-2 border-yellow-300 backdrop-blur-sm">
+            <div class="flex items-center gap-1">
+              <span>📏</span>
+              <span>${distance.toFixed(1)} KM</span>
+            </div>
           </div>
         `;
 
@@ -514,32 +456,33 @@ export function MapComponent({
 
   return (
     <div className={`relative ${className}`}>
-      {/* Results Header */}
+      {/* Gaming Results Header */}
       {showResult && resultData && (
-        <div className="absolute top-3 left-3 right-3 bg-slate-900/95 backdrop-blur-lg border border-white/30 text-white px-4 py-3 rounded-lg shadow-lg z-10">
+        <div className="absolute top-3 left-3 right-3 bg-black/95 backdrop-blur-xl border border-cyan-500/50 text-white px-4 py-3 rounded-lg shadow-xl shadow-cyan-500/20 z-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <span className="text-blue-400">📏</span>
-                <span className="text-sm font-medium">Your Distance:</span>
-                <span className="text-lg font-bold text-blue-300">{resultData.distance.toFixed(1)} km</span>
+                <span className="text-cyan-400 text-lg">📏</span>
+                <span className="text-sm font-mono text-cyan-300">DISTANCE:</span>
+                <span className="text-lg font-bold text-cyan-400 font-mono">{resultData.distance.toFixed(1)} KM</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-yellow-400">🏆</span>
-                <span className="text-sm font-medium">Your Score:</span>
-                <span className={`text-lg font-bold ${getScoreColor(resultData.score)}`}>
+                <span className="text-yellow-400 text-lg">🏆</span>
+                <span className="text-sm font-mono text-yellow-300">SCORE:</span>
+                <span className={`text-lg font-bold font-mono ${getScoreColor(resultData.score)}`}>
                   {resultData.score.toLocaleString()}
                 </span>
               </div>
               {allGuesses && allGuesses.length > 1 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-purple-400">👥</span>
-                  <span className="text-sm font-medium">{allGuesses.length} players</span>
+                  <span className="text-purple-400 text-lg">⚔</span>
+                  <span className="text-sm font-mono text-purple-300">OPERATIVES:</span>
+                  <span className="text-lg font-bold text-purple-400 font-mono">{allGuesses.length}</span>
                 </div>
               )}
             </div>
-            <div className="text-xs text-gray-400">
-              {allGuesses && allGuesses.length > 1 ? 'All results shown on map' : 'Results shown on map'}
+            <div className="text-xs text-gray-400 font-mono">
+              {allGuesses && allGuesses.length > 1 ? '&gt; ALL TARGETS ON TACTICAL MAP' : '&gt; RESULTS ON TACTICAL MAP'}
             </div>
           </div>
         </div>
@@ -547,21 +490,33 @@ export function MapComponent({
 
       <div 
         ref={mapContainer} 
-        className={`w-full h-full rounded-lg overflow-hidden ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} map-container`}
+        className={`w-full h-full rounded-lg overflow-hidden border border-cyan-500/30 shadow-lg shadow-cyan-500/10 ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} map-container relative`}
         style={{ 
           position: 'relative',
           height: '100%',
-          minHeight: '400px', // Ensure minimum visible size
-          flex: '1 1 0%', // Allow flex growth and shrinkage
+          minHeight: '400px',
+          flex: '1 1 0%',
           boxSizing: 'border-box'
         }}
       >
+        {/* Gaming grid overlay */}
+        <div className="absolute inset-0 pointer-events-none z-10" style={{
+          backgroundImage: `
+            linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '20px 20px'
+        }}></div>
+
         {/* Loading indicator */}
         {!isMapLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-800/90 backdrop-blur-sm text-white z-50">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/90 backdrop-blur-sm text-white z-50">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-2"></div>
-              <p className="text-sm">Loading map...</p>
+              <div className="relative">
+                <div className="w-8 h-8 bg-cyan-400 rounded-full animate-ping mx-auto mb-3"></div>
+                <div className="absolute inset-0 w-8 h-8 bg-cyan-500 rounded-full mx-auto"></div>
+              </div>
+              <p className="text-sm font-mono text-cyan-300">[ LOADING TACTICAL MAP... ]</p>
             </div>
           </div>
         )}
@@ -604,48 +559,50 @@ export function MapComponent({
         `
       }} />
       
-      {/* Custom Zoom Controls */}
-      <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-all duration-300 z-20">
+      {/* Gaming-style Custom Zoom Controls */}
+      <div className="absolute top-1/2 -translate-y-1/2 right-4 flex flex-col gap-2 opacity-90 hover:opacity-100 transition-all duration-300 z-20">
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 w-10 h-10 p-0 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleZoomIn}
-          title="Zoom in"
+          title="Tactical Zoom In"
         >
-          <span className="text-lg font-semibold leading-none">+</span>
+          <span className="text-lg font-bold leading-none">+</span>
         </Button>
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 w-10 h-10 p-0 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleZoomOut}
-          title="Zoom out"
+          title="Tactical Zoom Out"
         >
-          <span className="text-lg font-semibold leading-none">−</span>
+          <span className="text-lg font-bold leading-none">−</span>
         </Button>
         {showResult ? (
           <Button
             size="sm"
-            className="bg-blue-600/80 hover:bg-blue-700/90 border-blue-400/30 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+            className="bg-purple-600/80 hover:bg-purple-500/90 border border-purple-400/30 text-purple-100 hover:text-white text-xs h-10 px-3 rounded-lg backdrop-blur-md shadow-lg shadow-purple-500/20 transition-all duration-300 hover:scale-105 font-mono"
             onClick={handleFitToResults}
-            title="Fit to results"
+            title="Focus All Targets"
           >
-            <span className="font-medium">Fit</span>
+            <span className="font-bold">FIT</span>
           </Button>
         ) : null}
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 text-xs h-10 px-2 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleResetZoom}
-          title="Reset zoom and position"
+          title="Reset Tactical View"
         >
-          <span className="font-medium">Reset</span>
+          <span className="font-bold">RST</span>
         </Button>
       </div>
 
-      {/* Disabled overlay */}
+      {/* Gaming Disabled overlay */}
       {disabled && (
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center text-white text-sm backdrop-blur-sm">
-          {showResult ? 'Viewing results' : 'Round not active'}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center text-cyan-300 text-sm font-mono z-30">
+          <div className="bg-black/80 backdrop-blur-md border border-cyan-500/30 px-4 py-2 rounded-lg">
+            {showResult ? '[ REVIEWING TACTICAL DATA ]' : '[ MISSION STANDBY ]'}
+          </div>
         </div>
       )}
     </div>

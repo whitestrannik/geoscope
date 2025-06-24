@@ -134,72 +134,75 @@ export function ImageViewer({
         draggable={false}
       />
 
-      {/* Zoom Controls - Redesigned with better styling */}
-      <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-1 opacity-90 hover:opacity-100 transition-opacity">
+      {/* Gaming-style Zoom Controls - Consistent with Map */}
+      <div className="absolute top-1/2 right-4 -translate-y-1/2 flex flex-col gap-2 opacity-90 hover:opacity-100 transition-all duration-300">
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 w-10 h-10 p-0 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleZoomIn}
-          title="Zoom in"
+          title="Enhanced Zoom In"
         >
-          <span className="text-lg font-semibold leading-none">+</span>
+          <span className="text-lg font-bold leading-none">+</span>
         </Button>
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white w-9 h-9 p-0 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 w-10 h-10 p-0 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleZoomOut}
-          title="Zoom out"
+          title="Enhanced Zoom Out"
         >
-          <span className="text-lg font-semibold leading-none">−</span>
+          <span className="text-lg font-bold leading-none">−</span>
         </Button>
         <Button
           size="sm"
-          className="bg-black/70 hover:bg-black/90 border-white/20 text-white hover:text-white text-xs h-9 px-2 rounded-lg backdrop-blur-sm shadow-lg transition-all duration-200 hover:scale-105"
+          className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 text-xs h-10 px-2 rounded-lg backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono"
           onClick={handleResetZoom}
-          title="Reset zoom and position"
+          title="Reset Enhanced View"
         >
-          <span className="font-medium">Reset</span>
+          <span className="font-bold">RST</span>
         </Button>
       </div>
 
-      {/* Zoom Percentage Indicator */}
+      {/* Gaming-style Zoom Percentage Indicator */}
       {imageScale !== 1 && (
-        <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs font-mono backdrop-blur-sm shadow-lg border border-white/20">
-          {Math.round(imageScale * 100)}%
-        </div>
-      )}
-
-      {/* Interactive Overlay (for solo style) */}
-      {showFullscreenButton && (
-        <div 
-          className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
-        >
-          <div className="bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium">
-            {isFullscreen ? '↩️ Back to split view' : '⛶ Go fullscreen'}
+        <div className="absolute bottom-4 right-4 bg-black/90 backdrop-blur-md border border-cyan-500/30 text-cyan-300 px-3 py-2 rounded-lg text-xs font-mono shadow-lg shadow-cyan-500/10">
+          <div className="flex items-center gap-1">
+            <span className="text-cyan-400">🔍</span>
+            <span>{Math.round(imageScale * 100)}%</span>
           </div>
         </div>
       )}
 
-
-
-      {/* Copyright */}
-      {copyright && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-3 py-1.5 rounded-lg text-xs backdrop-blur-sm shadow-lg border border-white/20">
-          📸 {copyright}
+      {/* Gaming Interactive Overlay */}
+      {showFullscreenButton && (
+        <div 
+          className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none"
+        >
+          <div className="bg-black/80 backdrop-blur-md border border-cyan-500/30 text-cyan-300 px-4 py-2 rounded-lg text-sm font-mono shadow-lg shadow-cyan-500/20">
+            {isFullscreen ? '[ ↩ RETURN TO TACTICAL VIEW ]' : '[ ⛶ ENHANCE VISUAL FEED ]'}
+          </div>
         </div>
       )}
 
-      {/* Back Button (for fullscreen mode) */}
+      {/* Gaming-style Copyright */}
+      {copyright && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/90 backdrop-blur-md border border-cyan-500/30 text-cyan-300 px-3 py-2 rounded-lg text-xs font-mono shadow-lg shadow-cyan-500/10">
+          <div className="flex items-center gap-1">
+            <span className="text-cyan-400">📸</span>
+            <span>{copyright}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Gaming Back Button (for fullscreen mode) */}
       {isFullscreen && onFullscreenToggle && (
         <div className="absolute top-3 left-3">
           <Button
             onClick={onFullscreenToggle}
             size="sm"
-            variant="outline"
-            className="bg-black/50 text-white border-white/30 hover:bg-black/70 hover:text-white hover:border-white/50"
-            title="Back to split view (Press Esc)"
+            className="bg-black/80 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 backdrop-blur-md shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 font-mono px-3"
+            title="Return to Tactical View"
           >
-            ← Back
+            <span className="font-bold">← BACK</span>
           </Button>
         </div>
       )}
