@@ -68,7 +68,7 @@ export const roomRouter = router({
         });
       }
 
-      // Create room and add host as first player
+      // Create room and add host as first player (simplified for current DB schema)
       const room = await ctx.db.room.create({
         data: {
           id: roomCode,
@@ -76,8 +76,6 @@ export const roomRouter = router({
           maxPlayers: input.maxPlayers,
           totalRounds: input.totalRounds,
           roundTimeLimit: input.roundTimeLimit ?? null,
-          autoAdvance: input.autoAdvance,
-          resultsDisplayTime: input.resultsDisplayTime,
           players: {
             create: {
               userId: userId,
@@ -108,6 +106,7 @@ export const roomRouter = router({
         }
       });
 
+      // Return with default values for missing fields
       return {
         id: room.id,
         hostUserId: room.hostUserId,
@@ -116,8 +115,8 @@ export const roomRouter = router({
         currentRound: room.currentRound,
         totalRounds: room.totalRounds,
         roundTimeLimit: room.roundTimeLimit,
-        autoAdvance: room.autoAdvance,
-        resultsDisplayTime: room.resultsDisplayTime,
+        autoAdvance: true, // Default value
+        resultsDisplayTime: 20, // Default value  
         createdAt: room.createdAt,
         host: room.host,
         players: room.players.map((p: any) => ({
