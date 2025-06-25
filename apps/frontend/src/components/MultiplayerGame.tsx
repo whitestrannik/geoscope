@@ -173,12 +173,26 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       roomId: string;
       finalResults: any[];
     }) => {
-      setGameState(prev => ({
-        ...prev,
-        phase: 'game-finished',
-        finalResults: data.finalResults
-      }));
-      setTimerActive(false);
+      // Check if we're currently in the last round results phase
+      if (gameState.phase === 'round-results' && gameState.currentRound === gameState.totalRounds) {
+        // Give players time to see the last round results before showing final screen
+        setTimeout(() => {
+          setGameState(prev => ({
+            ...prev,
+            phase: 'game-finished',
+            finalResults: data.finalResults
+          }));
+          setTimerActive(false);
+        }, 5000); // 5 second delay to view last round results
+      } else {
+        // Regular game end (shouldn't happen but just in case)
+        setGameState(prev => ({
+          ...prev,
+          phase: 'game-finished',
+          finalResults: data.finalResults
+        }));
+        setTimerActive(false);
+      }
     };
 
     socket.on('game-started', handleGameStarted);
@@ -250,15 +264,11 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   // Waiting for round to start
   if (gameState.phase === 'waiting') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-              <p>Waiting for round to start...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <div className="text-lg text-gray-300 font-mono">[ AWAITING MISSION ORDERS... ]</div>
+        </div>
       </div>
     );
   }
@@ -270,32 +280,36 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
     const isHost = user.id === room.hostUserId;
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              {isHost ? (
-                <>
-                  <Crown className="h-8 w-8 mx-auto text-yellow-400" />
-                  <p className="text-lg">Ready for next round?</p>
-                  <p className="text-sm text-gray-300">You can start when everyone is ready</p>
-                  <Button
-                    onClick={() => socket.startNextRound()}
-                    className="bg-green-600 hover:bg-green-700 text-white font-semibold"
-                  >
-                    🚀 Start Next Round
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Clock className="h-8 w-8 animate-pulse mx-auto text-blue-400" />
-                  <p className="text-lg">Waiting for host...</p>
-                  <p className="text-sm text-gray-300">The host will start the next round</p>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4">
+        <div className="bg-black/70 backdrop-blur-md border border-purple-500/30 rounded-lg p-8 text-center space-y-6 max-w-md">
+          {isHost ? (
+            <>
+              <Crown className="h-12 w-12 mx-auto text-yellow-400" />
+              <div>
+                <div className="text-xl font-mono text-yellow-400 mb-2">[ COMMANDER STATUS ]</div>
+                <p className="text-gray-300 font-mono mb-2">Ready to deploy next mission?</p>
+                <p className="text-sm text-gray-400 font-mono">All operatives await your orders</p>
+              </div>
+              <Button
+                onClick={() => socket.startNextRound()}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-mono shadow-lg shadow-green-500/25 transition-all duration-300 hover:scale-105"
+              >
+                🚀 [ LAUNCH NEXT ROUND ]
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="animate-pulse">
+                <Clock className="h-12 w-12 mx-auto text-cyan-400 mb-4" />
+              </div>
+              <div>
+                <div className="text-xl font-mono text-cyan-400 mb-2">[ STANDBY MODE ]</div>
+                <p className="text-gray-300 font-mono mb-2">Awaiting commander orders...</p>
+                <p className="text-sm text-gray-400 font-mono">Host will initiate next deployment</p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     );
   }
@@ -303,16 +317,12 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   // Loading next round
   if (gameState.phase === 'loading-next-round') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white">
-          <CardContent className="flex items-center justify-center p-8">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-              <p className="text-lg">Loading next round...</p>
-              <p className="text-sm text-gray-300">Preparing new location...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center p-4">
+        <div className="bg-black/70 backdrop-blur-md border border-cyan-500/30 rounded-lg p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <div className="text-lg text-gray-300 font-mono">[ LOADING NEXT MISSION... ]</div>
+          <div className="text-sm text-gray-400 font-mono mt-2">Preparing tactical insertion...</div>
+        </div>
       </div>
     );
   }
@@ -320,55 +330,74 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   // Game finished state
   if (gameState.phase === 'game-finished' && gameState.finalResults) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 p-4">
+      <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-black via-slate-900 to-purple-900 p-4">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Header */}
+          {/* Gaming Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-white">🏆 Game Complete!</h1>
+            <div className="flex items-center gap-4">
+              <Trophy className="h-8 w-8 text-yellow-400" />
+              <h1 className="text-4xl font-bold text-yellow-400 font-mono">[ MISSION COMPLETE ]</h1>
+            </div>
             <Button
               onClick={onLeaveRoom}
               variant="outline"
-              className="bg-black/50 text-white border-white/30 hover:bg-black/70"
+              className="bg-red-500/20 border-red-500/30 text-red-200 hover:bg-red-500/30 font-mono"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Leave Room
+              [ EXIT ]
             </Button>
           </div>
 
           {/* Final Results */}
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                Final Results
+          <Card className="bg-black/80 backdrop-blur-md border-purple-500/30 text-white shadow-2xl shadow-purple-500/10">
+            <CardHeader className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-purple-500/20">
+              <CardTitle className="flex items-center gap-3 text-2xl font-mono text-purple-300">
+                <span className="text-purple-400">🏆</span>
+                [ FINAL BATTLE RANKINGS ]
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <div className="space-y-4">
                 {gameState.finalResults.map((result, index) => (
                   <div
                     key={result.playerId}
-                    className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+                    className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 ${
+                      result.playerId === user.id 
+                        ? 'bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/50 shadow-lg shadow-cyan-500/20' 
+                        : index === 0
+                        ? 'bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border-yellow-500/50 shadow-lg shadow-yellow-500/20'
+                        : 'bg-gradient-to-r from-purple-600/10 to-slate-600/10 border-purple-500/30'
+                    }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="text-2xl">
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                      <div className="text-4xl font-mono">
+                        {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                       </div>
                       <div>
-                        <p className="font-semibold text-lg">{result.username}</p>
+                        <p className="font-bold text-xl font-mono text-white">{result.username}</p>
                         {result.playerId === user.id && (
-                          <p className="text-sm text-blue-400">You</p>
+                          <p className="text-sm text-cyan-400 font-mono">[ YOUR RESULTS ]</p>
+                        )}
+                        {index === 0 && result.playerId !== user.id && (
+                          <p className="text-sm text-yellow-400 font-mono">[ CHAMPION ]</p>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-xl">{result.totalScore} points</p>
-                      <p className="text-sm text-white/70">
-                        {result.roundsPlayed} rounds played
+                      <p className="font-bold text-2xl font-mono text-white">{result.totalScore} PTS</p>
+                      <p className="text-sm text-gray-300 font-mono">
+                        {gameState.totalRounds} MISSIONS COMPLETED
                       </p>
                     </div>
                   </div>
                 ))}
+              </div>
+              
+              {/* Gaming-style footer */}
+              <div className="mt-8 pt-6 border-t border-purple-500/30">
+                <div className="text-center text-xs text-gray-400 font-mono">
+                  &gt; OPERATION COMPLETE - ALL OBJECTIVES ACHIEVED
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -626,7 +655,9 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             <span className="ml-3">⚔</span>
           </CardTitle>
           <p className="text-center text-sm text-gray-300 font-mono animate-pulse">
-            {!room.autoAdvance && gameState.phase === 'round-results' 
+            {gameState.currentRound === gameState.totalRounds 
+              ? "&gt; FINAL ROUND COMPLETE - MISSION SUMMARY LOADING IN 5S..."
+              : !room.autoAdvance && gameState.phase === 'round-results' 
               ? "&gt; EXAMINE TACTICAL DATA - COMMANDER WILL DEPLOY NEXT ROUND" 
               : room.autoAdvance && gameState.countdownTime !== undefined
               ? `&gt; ANALYZE RESULTS - NEXT DEPLOYMENT IN ${gameState.countdownTime}S`

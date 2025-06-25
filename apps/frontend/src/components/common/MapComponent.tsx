@@ -336,6 +336,10 @@ export function MapComponent({
       distanceLabelRef.current = null;
     }
 
+    // Remove all distance labels
+    allDistanceLabelsRef.current.forEach(label => label.remove());
+    allDistanceLabelsRef.current = [];
+
     // Remove distance line from map
     if (map.current.getLayer('distance-line')) {
       map.current.removeLayer('distance-line');
@@ -343,6 +347,17 @@ export function MapComponent({
     if (map.current.getSource('distance-line')) {
       map.current.removeSource('distance-line');
     }
+
+    // Remove all distance lines for multiplayer
+    const layerIds = ['distance-line-1', 'distance-line-2', 'distance-line-3', 'distance-line-4', 'distance-line-5', 'distance-line-6'];
+    layerIds.forEach(layerId => {
+      if (map.current.getLayer(layerId)) {
+        map.current.removeLayer(layerId);
+      }
+      if (map.current.getSource(layerId)) {
+        map.current.removeSource(layerId);
+      }
+    });
 
     // Add actual location marker if showing results
     if (currentActualLocation && showResult) {
@@ -368,8 +383,79 @@ export function MapComponent({
         .setLngLat([currentActualLocation.lng, currentActualLocation.lat])
         .addTo(map.current);
 
-      // Add distance line if user guess exists
-      if (currentGuess) {
+      // In multiplayer mode, draw lines for all guesses
+      if (allGuesses && allGuesses.length > 0) {
+        const colors = [
+          '#06b6d4', // cyan
+          '#ef4444', // red  
+          '#10b981', // emerald
+          '#f59e0b', // amber
+          '#8b5cf6', // violet
+          '#ec4899'  // pink
+        ];
+
+        allGuesses.forEach((guess, index) => {
+          const distance = calculateDistance(guess.lat, guess.lng, currentActualLocation.lat, currentActualLocation.lng);
+          const color = colors[index % colors.length];
+          const layerId = `distance-line-${index + 1}`;
+
+          // Add distance line source and layer
+          map.current.addSource(layerId, {
+            type: 'geojson',
+            data: {
+              type: 'Feature',
+              properties: {},
+              geometry: {
+                type: 'LineString',
+                coordinates: [
+                  [guess.lng, guess.lat],
+                  [currentActualLocation.lng, currentActualLocation.lat]
+                ]
+              }
+            }
+          });
+
+          map.current.addLayer({
+            id: layerId,
+            type: 'line',
+            source: layerId,
+            layout: {
+              'line-join': 'round',
+              'line-cap': 'round'
+            },
+            paint: {
+              'line-color': color,
+              'line-width': 3,
+              'line-dasharray': [4, 2],
+              'line-opacity': 0.8
+            }
+          });
+
+          // Add distance label at midpoint
+          const midLat = (guess.lat + currentActualLocation.lat) / 2;
+          const midLng = (guess.lng + currentActualLocation.lng) / 2;
+
+          const distanceEl = document.createElement('div');
+          distanceEl.innerHTML = `
+            <div class="bg-gradient-to-r from-black/90 to-slate-900/90 text-white border-2 px-2 py-1 rounded text-xs font-bold font-mono shadow-lg backdrop-blur-sm" style="border-color: ${color}; color: ${color};">
+              <div class="flex items-center gap-1">
+                <span>#${index + 1}</span>
+                <span>${distance.toFixed(1)}km</span>
+              </div>
+            </div>
+          `;
+
+          const distanceLabel = new maplibregl.Marker({
+            element: distanceEl,
+            anchor: 'center'
+          })
+            .setLngLat([midLng, midLat])
+            .addTo(map.current);
+
+          allDistanceLabelsRef.current.push(distanceLabel);
+        });
+      } else if (currentGuess) {
+        // Single player mode - draw line only for user's guess
         const distance = calculateDistance(currentGuess.lat, currentGuess.lng, currentActualLocation.lat, currentActualLocation.lng);
 
         // Add distance line source and layer
