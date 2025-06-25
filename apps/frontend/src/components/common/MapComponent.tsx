@@ -351,10 +351,10 @@ export function MapComponent({
     // Remove all distance lines for multiplayer
     const layerIds = ['distance-line-1', 'distance-line-2', 'distance-line-3', 'distance-line-4', 'distance-line-5', 'distance-line-6'];
     layerIds.forEach(layerId => {
-      if (map.current.getLayer(layerId)) {
+      if (map.current && map.current.getLayer(layerId)) {
         map.current.removeLayer(layerId);
       }
-      if (map.current.getSource(layerId)) {
+      if (map.current && map.current.getSource(layerId)) {
         map.current.removeSource(layerId);
       }
     });
@@ -400,7 +400,7 @@ export function MapComponent({
           const layerId = `distance-line-${index + 1}`;
 
           // Add distance line source and layer
-          map.current.addSource(layerId, {
+          map.current!.addSource(layerId, {
             type: 'geojson',
             data: {
               type: 'Feature',
@@ -415,7 +415,7 @@ export function MapComponent({
             }
           });
 
-          map.current.addLayer({
+          map.current!.addLayer({
             id: layerId,
             type: 'line',
             source: layerId,
@@ -450,7 +450,7 @@ export function MapComponent({
             anchor: 'center'
           })
             .setLngLat([midLng, midLat])
-            .addTo(map.current);
+            .addTo(map.current!);
 
           allDistanceLabelsRef.current.push(distanceLabel);
         });

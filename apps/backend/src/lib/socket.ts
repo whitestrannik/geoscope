@@ -712,8 +712,34 @@ async function endRound(roomId: string) {
 
     // Check if this was the last round
     if (roundState.roundIndex >= room.totalRounds) {
-      // End the game
-      await endGame(roomId, results);
+      // Handle final round based on room's autoAdvance setting
+      if (room.autoAdvance) {
+        // Auto mode: Give time to see final round results before ending game
+        const resultsDisplayTime = room.resultsDisplayTime || 20; // Default 20 seconds
+        let timeRemaining = resultsDisplayTime;
+        
+        const countdownInterval = setInterval(() => {
+          timeRemaining--;
+          
+          // Emit countdown update
+          io.to(roomId).emit('results-countdown', {
+            roomId,
+            timeRemaining
+          });
+          
+          if (timeRemaining <= 0) {
+            clearInterval(countdownInterval);
+            
+            // End the game after countdown (don't await in setInterval)
+            endGame(roomId, results).catch(error => {
+              console.error('Error ending game:', error);
+            });
+          }
+        }, 1000);
+      } else {
+        // Manual mode: End game immediately (host can review results as long as needed)
+        await endGame(roomId, results);
+      }
     } else {
       // Handle next round based on room's autoAdvance setting
       if (room.autoAdvance) {

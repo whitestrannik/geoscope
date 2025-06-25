@@ -5,7 +5,7 @@ import { MapComponent } from '@/components/common/MapComponent';
 import { ImageViewer } from '@/components/common/ImageViewer';
 import { GameLayout } from '@/components/common/GameLayout';
 import type { LayoutMode } from '@/components/common/GameLayout';
-import { Loader2, Clock, Users, Trophy, LogOut, MapPin, Crown } from 'lucide-react';
+import { Clock, Users, Trophy, LogOut, Crown } from 'lucide-react';
 
 interface GameState {
   phase: 'waiting' | 'round-active' | 'round-results' | 'waiting-for-host' | 'loading-next-round' | 'game-finished';
@@ -41,6 +41,9 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   const [showResultModal, setShowResultModal] = useState(false);
   const [persistedResults, setPersistedResults] = useState<any[] | null>(null);
   const [persistedActualLocation, setPersistedActualLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
+  // Track if we're in the last round for proper game ending delay
+  const [isLastRound, setIsLastRound] = useState(false);
   
   // Check if we need to request current round state (room is ACTIVE but we're still waiting)
   useEffect(() => {
@@ -132,6 +135,9 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       }));
       setTimerActive(false);
       
+      // Check if this is the last round
+      setIsLastRound(data.roundIndex >= room.totalRounds);
+      
       // Set results display states
       setShowResultsOnMap(true);
       setShowResultModal(true);
@@ -173,26 +179,14 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       roomId: string;
       finalResults: any[];
     }) => {
-      // Check if we're currently in the last round results phase
-      if (gameState.phase === 'round-results' && gameState.currentRound === gameState.totalRounds) {
-        // Give players time to see the last round results before showing final screen
-        setTimeout(() => {
-          setGameState(prev => ({
-            ...prev,
-            phase: 'game-finished',
-            finalResults: data.finalResults
-          }));
-          setTimerActive(false);
-        }, 5000); // 5 second delay to view last round results
-      } else {
-        // Regular game end (shouldn't happen but just in case)
-        setGameState(prev => ({
-          ...prev,
-          phase: 'game-finished',
-          finalResults: data.finalResults
-        }));
-        setTimerActive(false);
-      }
+      // Show final results immediately - backend now handles the timing
+      setGameState(prev => ({
+        ...prev,
+        phase: 'game-finished',
+        finalResults: data.finalResults
+      }));
+      setTimerActive(false);
+      setIsLastRound(false);
     };
 
     socket.on('game-started', handleGameStarted);
@@ -605,7 +599,18 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
               )}
               {gameState.phase === 'round-results' && (
                 <>
-                  {room.autoAdvance && gameState.countdownTime !== undefined ? (
+                  {isLastRound && gameState.countdownTime !== undefined ? (
+                    <div className="flex items-center space-x-3 bg-yellow-600/20 border border-yellow-500/30 px-4 py-2 rounded-lg text-sm font-mono">
+                      <div className="relative">
+                        <div className="w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+                        <div className="absolute inset-0 w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-yellow-300 font-mono">{gameState.countdownTime}</div>
+                        <div className="text-xs text-yellow-400 font-mono">FINAL RESULTS LOADING...</div>
+                      </div>
+                    </div>
+                  ) : room.autoAdvance && gameState.countdownTime !== undefined ? (
                     <div className="flex items-center space-x-3 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-mono">
                       <div className="relative">
                         <div className="w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
@@ -616,7 +621,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                         <div className="text-xs text-blue-400 font-mono">NEXT ROUND DEPLOYING...</div>
                       </div>
                     </div>
-                  ) : !room.autoAdvance ? (
+                  ) : !room.autoAdvance && !isLastRound ? (
                     user.id === room.hostUserId ? (
                       <Button
                         onClick={() => socket.startNextRound()}
@@ -633,6 +638,12 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                         </span>
                       </div>
                     )
+                  ) : isLastRound ? (
+                    <div className="bg-yellow-500/20 border border-yellow-400/30 px-4 py-2 rounded-lg text-sm font-mono">
+                      <span className="text-yellow-400 font-medium animate-pulse">
+                        ● MISSION COMPLETE - COMPILING FINAL REPORT
+                      </span>
+                    </div>
                   ) : null}
                 </>
               )}
@@ -655,8 +666,10 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
             <span className="ml-3">⚔</span>
           </CardTitle>
           <p className="text-center text-sm text-gray-300 font-mono animate-pulse">
-            {gameState.currentRound === gameState.totalRounds 
-              ? "&gt; FINAL ROUND COMPLETE - MISSION SUMMARY LOADING IN 5S..."
+            {isLastRound && gameState.countdownTime !== undefined
+              ? `&gt; FINAL ROUND COMPLETE - MISSION SUMMARY IN ${gameState.countdownTime}S...`
+              : isLastRound 
+              ? "&gt; FINAL ROUND COMPLETE - PREPARING MISSION SUMMARY..."
               : !room.autoAdvance && gameState.phase === 'round-results' 
               ? "&gt; EXAMINE TACTICAL DATA - COMMANDER WILL DEPLOY NEXT ROUND" 
               : room.autoAdvance && gameState.countdownTime !== undefined
