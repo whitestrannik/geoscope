@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (err) {
+    } catch {
       return { error: { message: 'Sign up failed', status: 500 } }
     }
   }
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (err) {
+    } catch {
       return { error: { message: 'Sign in failed', status: 500 } }
     }
   }
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {}
-    } catch (err) {
+    } catch {
       return { error: { message: 'Profile update failed', status: 500 } }
     }
   }

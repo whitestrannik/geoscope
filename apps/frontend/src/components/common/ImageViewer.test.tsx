@@ -63,7 +63,7 @@ describe('ImageViewer', () => {
   });
 
   it('hides instructions when showInstructions is false', () => {
-    render(<ImageViewer {...mockProps} showInstructions={false} />);
+    render(<ImageViewer {...mockProps} />);
     
     // No specific instruction text to check for since we removed that feature
     expect(screen.getByAltText('Test image')).toBeInTheDocument();

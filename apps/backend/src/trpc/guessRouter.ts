@@ -80,9 +80,9 @@ export function calculateScore(distanceKm: number): number {
 export const guessRouter = router({
   evaluate: publicProcedure
     .input(GuessInputSchema)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       try {
-        const { imageId, imageUrl, guessLat, guessLng, actualLat, actualLng } = input;
+        const { imageId, guessLat, guessLng, actualLat, actualLng } = input;
         
         // Calculate distance between guess and actual location
         const distance = calculateDistance(guessLat, guessLng, actualLat, actualLng);

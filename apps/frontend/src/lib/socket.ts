@@ -3,17 +3,23 @@ import { supabase } from './supabase';
 
 // Match the server-side event interfaces
 interface ServerToClientEvents {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'player-joined': (data: { roomId: string, player: any }) => void;
   'player-left': (data: { roomId: string, playerId: string }) => void;
   'player-ready': (data: { roomId: string, playerId: string, isReady: boolean }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'game-started': (data: { roomId: string, imageData: any, roundIndex: number }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'round-started': (data: { roomId: string, imageData: any, roundIndex: number, timeLimit?: number }) => void;
   'guess-submitted': (data: { roomId: string, playerId: string, roundIndex: number }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'round-ended': (data: { roomId: string, results: any[], roundIndex: number }) => void;
   'results-countdown': (data: { roomId: string, timeRemaining: number }) => void;
   'next-round-ready': (data: { roomId: string, isHost: boolean }) => void;
   'loading-next-round': (data: { roomId: string }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'game-ended': (data: { roomId: string, finalResults: any[] }) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'room-updated': (data: { roomId: string, room: any }) => void;
   'error': (data: { message: string }) => void;
 }
@@ -33,6 +39,7 @@ export type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 class SocketService {
   private socket: TypedSocket | null = null;
   private currentRoomId: string | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   private eventHandlers: Map<string, Function[]> = new Map();
 
   constructor() {
@@ -57,7 +64,7 @@ class SocketService {
     this.socket.on('connect', () => {
     });
 
-    this.socket.on('disconnect', (_reason) => {
+    this.socket.on('disconnect', () => {
     });
 
     this.socket.on('error', (data) => {
@@ -195,6 +202,7 @@ class SocketService {
   }
 
   // Emit event to registered handlers
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private emit(event: string, data: any) {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {

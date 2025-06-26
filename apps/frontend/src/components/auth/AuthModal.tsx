@@ -46,7 +46,7 @@ export function AuthModal({ open, onOpenChange, defaultMode = 'login' }: AuthMod
           setError('Check your email to confirm your account!')
         }
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)

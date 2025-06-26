@@ -219,21 +219,20 @@ export function MapComponent({
         map.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Monitor container size changes with ResizeObserver
   useEffect(() => {
     if (!mapContainer.current || !map.current || !isMapLoaded) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // Trigger map resize with a small delay
-        setTimeout(() => {
-          if (map.current) {
-            map.current.resize();
-          }
-        }, 100);
-      }
+    const resizeObserver = new ResizeObserver(() => {
+      // Trigger map resize with a small delay
+      setTimeout(() => {
+        if (map.current) {
+          map.current.resize();
+        }
+      }, 100);
     });
 
     resizeObserver.observe(mapContainer.current);
@@ -518,6 +517,7 @@ export function MapComponent({
         handleFitToResults();
       }, 200); // Delay to ensure all markers are rendered
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentActualLocation, showResult, currentGuess, allGuesses, isMapLoaded, resultData]);
 
   // Helper function to calculate distance between two points

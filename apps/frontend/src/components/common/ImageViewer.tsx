@@ -7,7 +7,6 @@ interface ImageViewerProps {
   copyright?: string;
   onFullscreenToggle?: () => void;
   showFullscreenButton?: boolean;
-  showInstructions?: boolean;
   isFullscreen?: boolean;
   className?: string;
 }
@@ -18,7 +17,6 @@ export function ImageViewer({
   copyright,
   onFullscreenToggle,
   showFullscreenButton = true,
-  showInstructions = false,
   isFullscreen = false,
   className = "w-full h-full"
 }: ImageViewerProps) {
@@ -59,7 +57,7 @@ export function ImageViewer({
   }, [imageUrl]);
 
   // Image interaction handlers
-  const handleImageClick = (_e: React.MouseEvent) => {
+  const handleImageClick = () => {
     // Only trigger fullscreen if this was a click, not a drag
     if (!hasMouseMoved && onFullscreenToggle && showFullscreenButton) {
       onFullscreenToggle();
@@ -88,13 +86,13 @@ export function ImageViewer({
     }
   };
 
-  const handleImageMouseUp = (e: React.MouseEvent) => {
+  const handleImageMouseUp = () => {
     if (isDraggingImage) {
       setIsDraggingImage(false);
       // Small delay to handle click vs drag distinction
       setTimeout(() => {
         if (!hasMouseMoved && onFullscreenToggle && showFullscreenButton) {
-          handleImageClick(e);
+          handleImageClick();
         }
         setHasMouseMoved(false);
       }, 10);

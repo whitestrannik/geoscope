@@ -14,14 +14,19 @@ interface GameState {
   imageUrl?: string;
   timeLimit?: number;
   timeRemaining?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   results?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   finalResults?: any[];
   countdownTime?: number;
 }
 
 interface MultiplayerGameProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   room: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   socket: any;
   onLeaveRoom: () => void;
 }
@@ -39,6 +44,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
   // Separate states for results display
   const [showResultsOnMap, setShowResultsOnMap] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [persistedResults, setPersistedResults] = useState<any[] | null>(null);
   const [persistedActualLocation, setPersistedActualLocation] = useState<{ lat: number; lng: number } | null>(null);
   
@@ -67,6 +73,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
   // Set up socket event listeners
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleGameStarted = (_data: {
       roomId: string;
       roundIndex: number;
@@ -123,6 +130,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     const handleRoundEnded = (data: {
       roomId: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       results: any[];
       roundIndex: number;
       actualLocation: { lat: number; lng: number };
@@ -156,7 +164,8 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       }));
     };
 
-    const handleNextRoundReady = (data: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleNextRoundReady = (_data: {
       roomId: string;
       isHost: boolean;
     }) => {
@@ -166,7 +175,8 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       }));
     };
 
-    const handleLoadingNextRound = (data: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleLoadingNextRound = (_data: {
       roomId: string;
     }) => {
       setGameState(prev => ({
@@ -177,6 +187,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
 
     const handleGameEnded = (data: {
       roomId: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       finalResults: any[];
     }) => {
       // Show final results immediately - backend now handles the timing
@@ -208,6 +219,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
       socket.off('loading-next-round', handleLoadingNextRound);
       socket.off('game-ended', handleGameEnded);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
   // Timer countdown effect
@@ -458,7 +470,7 @@ export function MultiplayerGame({ room, user, socket, onLeaveRoom }: Multiplayer
                 alt="Location to guess"
                 onFullscreenToggle={() => setLayoutMode(prev => prev === 'image-full' ? 'split' : 'image-full')}
                 showFullscreenButton={true}
-                showInstructions={false}
+
                 isFullscreen={layoutMode === 'image-full'}
                 className="h-full"
               />

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+// import React from 'react';
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
 import { useAuth } from '../contexts/AuthContext';
@@ -248,7 +248,7 @@ export function StatsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {stats.recentGames.map((game, index) => (
+                    {stats.recentGames.map((game) => (
                       <tr key={game.id} className="border-b border-gray-700/50 hover:bg-gray-800/50">
                         <td className="py-2 text-gray-300 font-mono">
                           {new Date(game.createdAt).toLocaleDateString('en-US', {

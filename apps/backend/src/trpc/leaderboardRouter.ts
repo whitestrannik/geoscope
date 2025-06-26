@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { router, publicProcedure, protectedProcedure } from './trpc.js';
 import { TRPCError } from '@trpc/server';
-import { Prisma } from '@prisma/client';
 
 export const leaderboardRouter = router({
   // Get global top players based on their best scores
