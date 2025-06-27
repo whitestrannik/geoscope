@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: geoscope-backend
+    env: node
+    buildCommand: cd apps/backend && npm install && npx prisma generate
+    startCommand: cd apps/backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: MAPILLARY_ACCESS_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        value: https://geoscope-k8id0terk-strannik-works-projects.vercel.app 

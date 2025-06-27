@@ -1,10 +1,9 @@
 import { createTRPCReact } from '@trpc/react-query';
 import { httpBatchLink } from '@trpc/client';
-import type { AppRouter } from '../../../backend/src/trpc/index.js';
 import { supabase } from './supabase';
 
-// Create tRPC React hooks
-export const trpc = createTRPCReact<AppRouter>();
+// Create tRPC React hooks with any type for deployment
+export const trpc = createTRPCReact<any>();
 
 // tRPC client configuration
 export const trpcClient = trpc.createClient({
