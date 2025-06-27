@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
@@ -26,7 +26,7 @@ app.use('/api/trpc', createExpressMiddleware({
 }));
 
 // Basic health check endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ 
     status: 'ok', 
     message: 'GeoScope Backend is running!',
@@ -39,5 +39,5 @@ initializeSocket(server);
 
 // Start server
 server.listen(PORT, () => {
-
+  console.log(`🚀 Server running on port ${PORT}`);
 }); 
