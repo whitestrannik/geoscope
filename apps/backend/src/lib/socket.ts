@@ -1,9 +1,9 @@
 import { Server as HTTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { verifyToken } from './supabase';
-import { db } from './db';
+import { verifyToken } from './supabase.js';
+import { db } from './db.js';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import { appRouter } from '../trpc';
+import { appRouter } from '../trpc/index.js';
 
 // Create tRPC client for internal use
 const trpc = createTRPCProxyClient<typeof appRouter>({
